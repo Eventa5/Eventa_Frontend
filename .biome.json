@@ -1,0 +1,17 @@
+{
+  "formatter": {
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100,
+    "quoteStyle": "double",
+    "trailingComma": "all"
+  },
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "rules": {
+      "recommended": true
+    }
+  }
+}
