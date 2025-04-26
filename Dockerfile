@@ -17,6 +17,7 @@ FROM node:20-alpine3.18 AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
 
 # 建立非 root 使用者
 RUN addgroup --system --gid 1001 eventa && \
