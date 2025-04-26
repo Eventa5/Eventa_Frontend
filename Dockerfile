@@ -2,7 +2,6 @@
 FROM node:20-alpine3.18 AS builder
 
 WORKDIR /app
-ENV NODE_ENV=production
 
 # 安裝依賴
 COPY package.json package-lock.json* ./

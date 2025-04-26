@@ -49,10 +49,9 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/eventa-frontend:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/eventa-frontend:${{ github.sha }}
-          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/eventa-frontend:buildcache
+          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/eventa-frontend:buildcache,ignore-error=true
           cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/eventa-frontend:buildcache,mode=max
 
-      # 使用 Render 官方推薦的部署方法
       - name: 觸發 Render 部署
         if: success()
         run: curl "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
