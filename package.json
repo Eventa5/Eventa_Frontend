@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "biome lint .",
+    "lint": "biome check --fix --unsafe .",
+    "format": "biome check --write .",
     "prepare": "husky install"
   },
   "dependencies": {
