@@ -1,0 +1,39 @@
+# 版本控制
+.git
+.github
+.gitignore
+
+# 依賴目錄
+node_modules
+npm-debug.log
+
+# 建置輸出
+.next
+out
+
+# 本地環境檔案
+.env*.local
+.env
+
+# 測試檔案
+__tests__
+coverage
+
+# 開發工具
+.vscode
+.idea
+*.swp
+*.swo
+
+# 系統檔案
+.DS_Store
+Thumbs.db
+
+# 部署檔案
+README.md
+*.md
+LICENSE
+.husky
+.prettierrc
+.eslintrc*
+.editorconfig

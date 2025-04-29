@@ -6,8 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "biome check --fix --unsafe .",
-		"format": "biome check --write .",
+    "lint": "npx biome check --write --staged .",
+    "format": "npx biome format --write --staged .",
     "prepare": "husky install"
   },
   "dependencies": {
