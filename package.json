@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "npx biome check --write --staged .",
+    "lint": "npx biome check --write .",
+    "lint:staged": "npx biome check --write --staged .",
+    "lint-fix": "biome check --fix --unsafe .",
     "format": "npx biome format --write --staged .",
     "prepare": "husky install"
   },
