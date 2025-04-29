@@ -41,6 +41,42 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  /* Primary 色系分級 */
+  --color-primary-50: #fdfbf5;
+  --color-primary-100: #fff7e1;
+  --color-primary-200: #ffeec4;
+  --color-primary-300: #ffe6a6;
+  --color-primary-400: #ffdd89;
+  --color-primary-500: #ffd56b;
+  --color-primary-600: #d9b456;
+  --color-primary-700: #b39340;
+  --color-primary-800: #8e712b;
+  --color-primary-900: #685015;
+  --color-primary-950: #55400b;
+  /* Secondary 色系分級 */
+  --color-secondary-50: #fdf1ed;
+  --color-secondary-100: #fce3da;
+  --color-secondary-200: #f9c7b6;
+  --color-secondary-300: #f6ab91;
+  --color-secondary-400: #f38f6d;
+  --color-secondary-500: #f07348;
+  --color-secondary-600: #c35d3a;
+  --color-secondary-700: #96472c;
+  --color-secondary-800: #69311d;
+  --color-secondary-900: #3c1b0f;
+  --color-secondary-950: #251008;
+  /* Neutral 色系分級 */
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #e5e5e5;
+  --color-neutral-300: #d4d4d4;
+  --color-neutral-400: #a3a3a3;
+  --color-neutral-500: #737373;
+  --color-neutral-600: #525252;
+  --color-neutral-700: #404040;
+  --color-neutral-800: #262626;
+  --color-neutral-900: #171717;
+  --color-neutral-950: #0a0a0a;
 }
 
 :root {
