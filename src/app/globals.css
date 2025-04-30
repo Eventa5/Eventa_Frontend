@@ -158,4 +158,8 @@
     @apply bg-background text-foreground;
     font-family: var(--font-noto-sans-tc), sans-serif;
   }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
 }
