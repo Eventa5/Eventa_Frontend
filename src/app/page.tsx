@@ -109,7 +109,6 @@ export default function Home() {
               mode="single"
               selected={date}
               onSelect={setDate}
-              initialFocus
             />
           </PopoverContent>
         </Popover>
