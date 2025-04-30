@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
+import { FormInput } from "@/components/ui/form-input";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, EyeClosed, EyeIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -32,7 +32,19 @@ export default function Home() {
           <br />
           活動票券一手掌握
         </h1>
-        <Input />
+        <FormInput
+          value="123"
+          error
+        />
+        <FormInput
+          value="•••"
+          endAdornment={<EyeClosed className="h-4 w-4" />}
+          type="password"
+        />
+        <FormInput
+          value="123"
+          endAdornment={<EyeIcon className="h-4 w-4" />}
+        />
         <Button>登入</Button>
         <RadioGroup defaultValue="option-one">
           <div className="flex items-center space-x-2">
