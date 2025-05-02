@@ -4,34 +4,36 @@ on:
   push:
     branches: [develop]
 
+env:
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/eventa-frontend
+
 jobs:
   build-and-deploy:
-    name: 構建與部署
+    name: 多架構建構與部署
     runs-on: ubuntu-latest
 
     steps:
-      - name: 檢出代碼
+      - name: 檢出程式碼
         uses: actions/checkout@v4
 
-      - name: 設置 Node.js 環境
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
+      - name: 安裝依賴並執行建構
+        run: |
+          npm ci
+          npm run build
 
-      - name: 安裝依賴項
-        run: npm ci
+      - name: 將建構的檔案複製到上下文目錄
+        run: |
+          mkdir -p context/.next
+          cp -r .next/standalone context/.next/
+          cp -r .next/static context/.next/
+          cp -r public context/
+          cp package.json context/
+          cp Dockerfile context/
 
-      - name: 執行代碼檢查
-        run: npm run lint
-
-      - name: 構建應用程序
-        run: npm run build
-
-      - name: 設置 QEMU
+      - name: 啟用 QEMU（支援跨架構建構）
         uses: docker/setup-qemu-action@v3
 
-      - name: 設置 Docker Buildx
+      - name: 設定 Buildx 建構器
         uses: docker/setup-buildx-action@v3
 
       - name: 登入 Docker Hub
@@ -40,18 +42,17 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: 構建並推送 Docker 映像
+      - name: 建構並推送多架構映像
         uses: docker/build-push-action@v5
         with:
-          context: .
-          push: true
+          context: ./context
+          file: ./context/Dockerfile
           platforms: linux/amd64,linux/arm64
+          push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/eventa-frontend:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/eventa-frontend:${{ github.sha }}
-          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/eventa-frontend:buildcache,ignore-error=true
-          cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/eventa-frontend:buildcache,mode=max
+            ${{ env.IMAGE_NAME }}:latest
+          cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:buildcache,ignore-error=true
+          cache-to: type=registry,ref=${{ env.IMAGE_NAME }}:buildcache,mode=max
 
-      - name: 觸發 Render 部署
-        if: success()
-        run: curl "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+      - name: 觸發 Render 自動部署
+        run: curl -X GET "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
