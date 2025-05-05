@@ -1,10 +1,7 @@
-import type { Config } from 'tailwindcss'
+import type { Config } from "tailwindcss";
 
 export default {
-  content: [
-    "./components/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
-  ],
+  content: ["./components/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
@@ -26,5 +23,4 @@ export default {
     },
   },
   plugins: [],
-} satisfies Config
-
+} satisfies Config;
