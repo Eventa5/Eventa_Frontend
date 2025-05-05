@@ -68,7 +68,7 @@ interface DropdownProps {
   onChange?: (event: ChangeEvent<HTMLSelectElement>) => void;
 }
 
-export function CustomSelectDropdown(props: DropdownProps) {
+function CustomSelectDropdown(props: DropdownProps) {
   const { options, value, onChange } = props;
 
   const handleValueChange = (newValue: string) => {
@@ -122,7 +122,7 @@ const countryOptions = [
   { label: "其他 +0", value: "+0" },
 ];
 
-export function CountryCodeSelect({
+function CountryCodeSelect({
   value,
   onChange,
 }: {
