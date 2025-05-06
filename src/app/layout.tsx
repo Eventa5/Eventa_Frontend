@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Noto_Sans_TC, Noto_Serif_TC } from "next/font/google";
 import "./globals.css";
+import localFont from "next/font/local";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -10,6 +11,35 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const notoSansTC = localFont({
+  src: [
+    {
+      path: "./fonts/NotoSansTC-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "./fonts/NotoSansTC-Bold.ttf",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "./fonts/NotoSansTC-Black.ttf",
+      weight: "900",
+      style: "normal",
+    },
+  ],
+  variable: "--font-noto-sans-tc",
+  display: "swap",
+});
+
+const notoSerifTC = Noto_Serif_TC({
+  weight: ["400", "700"],
+  display: "swap",
+  variable: "--font-serif-tc",
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -23,12 +53,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+    <html lang="zh-TW">
+      <body className={`${notoSansTC.variable} antialiased`}>{children}</body>
     </html>
   );
 }
