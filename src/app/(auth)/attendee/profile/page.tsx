@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { isAfter, isBefore, subYears } from "date-fns";
 import { User } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -122,6 +122,14 @@ const countryOptions = [
   { label: "其他 +0", value: "+0" },
 ];
 
+function toLocalDateOnly(dateStr: string | Date): Date {
+  if (dateStr instanceof Date) {
+    return new Date(dateStr.getFullYear(), dateStr.getMonth(), dateStr.getDate());
+  }
+  const [year, month, day] = dateStr.split(/[-\/]/).map(Number);
+  return new Date(year, month - 1, day); // JS 月份從 0 開始
+}
+
 function CountryCodeSelect({
   value,
   onChange,
@@ -180,32 +188,20 @@ export default function ProfilePage() {
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
-    defaultValues,
   });
 
-  useEffect(() => {
-    if (profile?.avatar) {
-      setPhotoUrl(profile.avatar);
-    } else {
-      setPhotoUrl("");
-    }
-  }, [profile?.avatar]);
-
-  useEffect(() => {
-    loadProfile();
-  }, []);
-
-  useEffect(() => {
-    if (profile?.email) {
-      form.setValue("email", profile.email);
-    }
-  }, [profile?.email, form]);
-
-  // 載入個人檔案資料
-  const loadProfile = async () => {
+  const loadProfile = useCallback(async () => {
     try {
       const response = await getProfile();
+      console.log(toLocalDateOnly(response.birthday));
       setProfile(response);
+      form.reset({
+        ...response,
+        region: response.region ?? "",
+        birthday: response.birthday
+          ? toLocalDateOnly(response.birthday)
+          : toLocalDateOnly(new Date()),
+      });
       if (response.avatar) {
         setPhotoUrl(response.avatar);
       } else {
@@ -218,15 +214,31 @@ export default function ProfilePage() {
         toast.error("載入個人檔案失敗");
       }
     }
-  };
+  }, [form.reset]);
+
+  useEffect(() => {
+    loadProfile();
+  }, [loadProfile]);
 
   async function onSubmit(data: ProfileFormValues) {
+    console.log(
+      data.birthday.toLocaleDateString("zh-TW", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      })
+    );
     try {
       const response = await updateProfile({
         ...data,
-        birthday: data.birthday.toISOString().split("T")[0].replace(/-/g, "/"),
+        birthday: data.birthday.toLocaleDateString("zh-TW", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }),
       });
       setProfile(response);
+      loadProfile();
       toast.success("個人檔案更新成功");
     } catch (error) {
       if (error instanceof Error) {
@@ -466,7 +478,7 @@ export default function ProfilePage() {
                           <FormItem>
                             <Select
                               onValueChange={field.onChange}
-                              defaultValue={field.value}
+                              value={field.value}
                             >
                               <FormControl>
                                 <SelectTrigger>
