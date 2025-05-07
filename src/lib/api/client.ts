@@ -88,13 +88,14 @@ class ApiClient {
         throw new Error(`HTTP error! status: ${finalResponse.status}`);
       }
 
-      const result = (await finalResponse.json()) as ApiResponse<T>;
+      let result = await finalResponse.json();
 
-      if (!result.status) {
-        throw new Error(result.message || "API 請求失敗");
+      // 應用回應攔截器
+      for (const interceptor of this.responseInterceptors) {
+        result = await interceptor(result);
       }
 
-      return result;
+      return result.data;
     } catch (error) {
       // 應用錯誤攔截器
       return this.applyErrorInterceptors(error as Error);
