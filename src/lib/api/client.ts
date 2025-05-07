@@ -1,5 +1,11 @@
 import { getToken } from "@/lib/auth";
 
+interface ApiResponse<T> {
+  message: string;
+  status: boolean;
+  data: T;
+}
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
 // 定義攔截器類型
 type RequestInterceptor = (config: RequestInit) => RequestInit | Promise<RequestInit>;
@@ -66,7 +72,6 @@ class ApiClient {
           "Content-Type": "application/json",
           ...config.headers,
         },
-        credentials: "include",
       };
 
       // 應用請求攔截器
@@ -83,7 +88,13 @@ class ApiClient {
         throw new Error(`HTTP error! status: ${finalResponse.status}`);
       }
 
-      return finalResponse.json();
+      const result = (await finalResponse.json()) as ApiResponse<T>;
+
+      if (!result.status) {
+        throw new Error(result.message || "API 請求失敗");
+      }
+
+      return result;
     } catch (error) {
       // 應用錯誤攔截器
       return this.applyErrorInterceptors(error as Error);
