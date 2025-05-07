@@ -29,7 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { type ProfileResponse, getProfile, updateProfile } from "@/lib/api/user";
+import { type ProfileData, getProfile, updateProfile } from "@/lib/api/user";
 
 const birthdaySchema = z
   .date({
@@ -45,7 +45,7 @@ const birthdaySchema = z
 const profileFormSchema = z.object({
   name: z.string().min(2, { message: "姓名至少需要2個字符" }),
   displayName: z.string().min(2, { message: "顯示名稱至少需要2個字符" }),
-  email: z.string().email(),
+  email: z.string(),
   countryCode: z.string().nonempty("請選擇國碼"),
   phoneNumber: z.string().min(10, "手機號碼格式錯誤"),
   birthday: birthdaySchema,
@@ -53,7 +53,7 @@ const profileFormSchema = z.object({
   region: z.string({ required_error: "請選擇居住地" }),
   address: z.string().optional(),
   identity: z.enum(["general", "student", "retiree"], { required_error: "請選擇身分" }),
-  avatar: z.string().optional(),
+  avatar: z.string().nullable().optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
@@ -152,21 +152,21 @@ function CountryCodeSelect({
 }
 
 export default function ProfilePage() {
-  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
-  const [profile, setProfile] = useState<ProfileResponse | null>(null);
+  const [photoUrl, setPhotoUrl] = useState<string>("");
+  const [profile, setProfile] = useState<ProfileData | null>(null);
 
   const defaultValues: Partial<ProfileFormValues> = {
-    name: profile?.name || "",
-    displayName: profile?.displayName || "",
-    email: profile?.email || "user@example.com",
-    countryCode: profile?.countryCode || "+886",
-    phoneNumber: profile?.phoneNumber || "",
-    birthday: profile?.birthday ? new Date(profile.birthday) : undefined,
-    gender: profile?.gender || "male",
-    region: profile?.region || "",
-    address: profile?.address || "",
-    identity: profile?.identity || "general",
-    avatar: profile?.avatar || "",
+    name: profile?.name ?? "",
+    displayName: profile?.displayName ?? "",
+    email: profile?.email ?? "",
+    countryCode: profile?.countryCode ?? "+886",
+    phoneNumber: profile?.phoneNumber ?? "",
+    birthday: profile?.birthday ? new Date(profile.birthday) : new Date(),
+    gender: profile?.gender ?? "male",
+    region: profile?.region ?? "",
+    address: profile?.address ?? "",
+    identity: profile?.identity ?? "general",
+    avatar: profile?.avatar ?? "",
   };
 
   const today = new Date();
@@ -183,41 +183,57 @@ export default function ProfilePage() {
     defaultValues,
   });
 
-  // 載入個人檔案資料
   useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        const data = await getProfile();
-        setProfile(data);
-        setPhotoUrl(data.avatar);
-        // 更新表單預設值
-        form.reset({
-          name: data.name,
-          displayName: data.displayName,
-          email: data.email,
-          countryCode: data.countryCode,
-          phoneNumber: data.phoneNumber,
-          birthday: new Date(data.birthday),
-          gender: data.gender,
-          region: data.region,
-          address: data.address,
-          identity: data.identity,
-          avatar: data.avatar,
-        });
-      } catch (error) {
-        toast.error("無法載入個人檔案資料，請稍後再試");
-      }
-    };
+    if (profile?.avatar) {
+      setPhotoUrl(profile.avatar);
+    } else {
+      setPhotoUrl("");
+    }
+  }, [profile?.avatar]);
 
+  useEffect(() => {
     loadProfile();
-  }, [form]);
+  }, []);
+
+  useEffect(() => {
+    if (profile?.email) {
+      form.setValue("email", profile.email);
+    }
+  }, [profile?.email, form]);
+
+  // 載入個人檔案資料
+  const loadProfile = async () => {
+    try {
+      const response = await getProfile();
+      setProfile(response);
+      if (response.avatar) {
+        setPhotoUrl(response.avatar);
+      } else {
+        setPhotoUrl("");
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("載入個人檔案失敗");
+      }
+    }
+  };
 
   async function onSubmit(data: ProfileFormValues) {
     try {
-      await updateProfile(data);
-      toast.success("您的個人檔案已成功更新");
+      const response = await updateProfile({
+        ...data,
+        birthday: data.birthday.toISOString().split("T")[0].replace(/-/g, "/"),
+      });
+      setProfile(response);
+      toast.success("個人檔案更新成功");
     } catch (error) {
-      toast.error("更新個人檔案時發生錯誤，請稍後再試");
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("更新個人檔案失敗");
+      }
     }
   }
 
@@ -307,8 +323,10 @@ export default function ProfilePage() {
                           className="bg-gray-100"
                           disabled
                           readOnly
+                          value={profile?.email || ""}
                         />
                       </FormControl>
+                      <FormMessage className="text-red-500" />
                     </FormItem>
                   )}
                 />
@@ -408,6 +426,7 @@ export default function ProfilePage() {
                                 onChange={field.onChange}
                               />
                             </FormControl>
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
@@ -426,12 +445,12 @@ export default function ProfilePage() {
                                 placeholder="請輸入手機號碼"
                               />
                             </FormControl>
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
                     </div>
                   </div>
-                  <FormMessage />
                 </FormItem>
 
                 <FormItem>
@@ -484,7 +503,6 @@ export default function ProfilePage() {
                       />
                     </div>
                   </div>
-                  <FormMessage />
                 </FormItem>
 
                 <FormField
