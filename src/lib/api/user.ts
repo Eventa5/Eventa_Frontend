@@ -1,6 +1,7 @@
 import apiClient from "./client";
 
 export interface ProfileData {
+  id: string;
   memberId: string;
   name: string;
   displayName: string;
@@ -12,7 +13,7 @@ export interface ProfileData {
   region: string;
   address?: string;
   identity: "general" | "student" | "retiree";
-  avatar?: string | null;
+  avatar: string | null;
 }
 
 export interface ProfileFormValues {
