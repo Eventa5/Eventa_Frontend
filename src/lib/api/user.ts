@@ -30,20 +30,45 @@ export interface ProfileFormValues {
   identity: "general" | "student" | "retiree";
 }
 
-export interface ApiResponse<T> {
+export interface ApiResponse<T = void> {
   message: string;
   status: boolean;
-  data: T;
+  data?: T;
 }
 
 export type ProfileResponse = ApiResponse<ProfileData>;
 
 export async function getProfile(): Promise<ProfileData> {
   const response = await apiClient.get<ApiResponse<ProfileData>>("/api/v1/users/profile");
+  if (!response.data) throw new Error(response.message);
   return response.data;
 }
 
 export async function updateProfile(data: Partial<ProfileData>): Promise<ProfileData> {
   const response = await apiClient.put<ApiResponse<ProfileData>>("/api/v1/users/profile", data);
+  if (!response.data) throw new Error(response.message);
   return response.data;
+}
+
+export interface LoginRequest extends Record<string, unknown> {
+  email: string;
+  password: string;
+}
+
+export interface SignUpRequest extends Record<string, unknown> {
+  email: string;
+  password: string;
+  checkPassword: string;
+}
+
+export interface LoginResponse {
+  token: string;
+}
+
+export async function login(data: LoginRequest): Promise<ApiResponse<string>> {
+  return apiClient.post<ApiResponse<string>>("/api/v1/users/login", data);
+}
+
+export async function signup(data: SignUpRequest): Promise<ApiResponse> {
+  return apiClient.post<ApiResponse>("/api/v1/users/signup", data);
 }

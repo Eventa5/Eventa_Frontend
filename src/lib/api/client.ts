@@ -84,7 +84,8 @@ class ApiClient {
       const finalResponse = await this.applyResponseInterceptors(response);
 
       // 處理響應
-      if (!finalResponse.ok) {
+      if (!finalResponse.status) {
+        console.log(finalResponse);
         throw new Error(`HTTP error! status: ${finalResponse.status}`);
       }
 
