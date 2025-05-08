@@ -8,16 +8,19 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
-import { useAuth } from "@/lib/auth";
+import { useAuthStore } from "@/store/auth";
 import { SquarePen, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<"signin" | "signup">("signin");
-  const { isAuthenticated } = useAuth();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const logout = useAuthStore((s) => s.logout);
+  const router = useRouter();
   return (
     <nav className="w-full bg-white md:bg-[#FFFCF5] px-4 sm:px-8 py-6 flex flex-col items-center z-50 mb-10">
       <div className="w-full max-w-6xl flex items-center justify-between">
@@ -65,15 +68,27 @@ export default function Navbar() {
         {/* 右側登入/註冊 */}
         <div className="flex-1 flex justify-end items-center">
           {isAuthenticated ? (
-            <Link
-              href="/attendee/profile"
-              className="flex items-center gap-1 text-base font-medium hover:underline focus:outline-none"
-            >
-              <span className="hidden sm:inline">建立活動</span>
-              <span className="sm:hidden">
-                <SquarePen className="w-4 h-4" />
-              </span>
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/attendee/profile"
+                className="flex items-center gap-1 text-base font-medium hover:underline focus:outline-none"
+              >
+                <span className="hidden sm:inline">會員中心</span>
+                <span className="sm:hidden">
+                  <SquarePen className="w-4 h-4" />
+                </span>
+              </Link>
+              <button
+                className="flex items-center gap-1 text-base font-medium hover:underline focus:outline-none text-red-500"
+                type="button"
+                onClick={() => {
+                  logout();
+                  router.push("/");
+                }}
+              >
+                登出
+              </button>
+            </div>
           ) : (
             <button
               className="flex items-center gap-1 text-base font-medium hover:underline focus:outline-none"

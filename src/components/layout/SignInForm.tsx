@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { login } from "@/lib/api/user";
-import { setToken, useAuth } from "@/lib/auth";
+import { setToken } from "@/lib/auth";
+import { useAuthStore } from "@/store/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -24,7 +25,7 @@ type SignInFormProps = {
 
 export default function SignInForm({ onSuccess }: SignInFormProps) {
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const loginStore = useAuthStore((s) => s.login);
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -45,7 +46,7 @@ export default function SignInForm({ onSuccess }: SignInFormProps) {
     try {
       const response = await login(data);
       if (response.status && response.data) {
-        setToken(response.data);
+        loginStore(response.data);
         toast.success("登入成功");
         if (onSuccess) {
           onSuccess();
