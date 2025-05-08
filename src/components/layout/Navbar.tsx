@@ -9,6 +9,7 @@ import {
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
 import { useAuthStore } from "@/store/auth";
+import { useDialogStore } from "@/store/dialog";
 import { SquarePen, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -16,8 +17,10 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Navbar() {
-  const [open, setOpen] = useState(false);
-  const [tab, setTab] = useState<"signin" | "signup">("signin");
+  const loginDialogOpen = useDialogStore((s) => s.loginDialogOpen);
+  const setLoginDialogOpen = useDialogStore((s) => s.setLoginDialogOpen);
+  const loginTab = useDialogStore((s) => s.loginTab);
+  const setLoginTab = useDialogStore((s) => s.setLoginTab);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const logout = useAuthStore((s) => s.logout);
   const router = useRouter();
@@ -93,8 +96,8 @@ export default function Navbar() {
             <button
               className="flex items-center gap-1 text-base font-medium hover:underline focus:outline-none"
               onClick={() => {
-                setOpen(true);
-                setTab("signin");
+                setLoginDialogOpen(true);
+                setLoginTab("signin");
               }}
               type="button"
             >
@@ -107,23 +110,23 @@ export default function Navbar() {
         </div>
       </div>
       <Dialog
-        open={open}
-        onOpenChange={setOpen}
+        open={loginDialogOpen}
+        onOpenChange={setLoginDialogOpen}
       >
         <DialogContent className="max-w-md w-full">
           <DialogHeader>
-            <DialogTitle>{tab === "signin" ? "登入" : "註冊"}</DialogTitle>
+            <DialogTitle>{loginTab === "signin" ? "登入" : "註冊"}</DialogTitle>
           </DialogHeader>
           <div className="py-2">
-            {tab === "signin" ? (
+            {loginTab === "signin" ? (
               <>
-                <SignInForm onSuccess={() => setOpen(false)} />
+                <SignInForm onSuccess={() => setLoginDialogOpen(false)} />
                 <div className="text-center mt-4 text-sm">
                   還沒有 Eventa 帳號嗎？
                   <button
                     className="text-[var(--color-primary-600)] font-bold underline ml-1"
                     type="button"
-                    onClick={() => setTab("signup")}
+                    onClick={() => setLoginTab("signup")}
                   >
                     前往註冊
                   </button>
@@ -131,13 +134,13 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <SignUpForm onSuccess={() => setTab("signin")} />
+                <SignUpForm onSuccess={() => setLoginTab("signin")} />
                 <div className="text-center mt-4 text-sm">
                   已經有 Eventa 帳號了嗎？
                   <button
                     className="text-[var(--color-primary-600)] font-bold underline ml-1"
                     type="button"
-                    onClick={() => setTab("signin")}
+                    onClick={() => setLoginTab("signin")}
                   >
                     前往登入
                   </button>
