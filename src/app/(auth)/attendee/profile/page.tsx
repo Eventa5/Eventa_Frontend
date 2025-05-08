@@ -43,17 +43,40 @@ const birthdaySchema = z
   });
 
 const profileFormSchema = z.object({
-  name: z.string().min(2, { message: "姓名至少需要2個字符" }),
-  displayName: z.string().min(2, { message: "顯示名稱至少需要2個字符" }),
+  name: z.preprocess(
+    (val) => (val === null || val === undefined ? "" : val),
+    z.string().min(2, { message: "姓名至少需要2個字符" })
+  ) as z.ZodType<string>,
+  displayName: z.preprocess(
+    (val) => (val === null || val === undefined ? "" : val),
+    z.string().min(2, { message: "顯示名稱至少需要2個字符" })
+  ) as z.ZodType<string>,
   email: z.string(),
-  countryCode: z.string().nonempty("請選擇國碼"),
-  phoneNumber: z.string().min(10, "手機號碼格式錯誤"),
+  countryCode: z.preprocess(
+    (val) => (val === null || val === undefined ? "" : val),
+    z.string().nonempty("請選擇國碼")
+  ) as z.ZodType<string>,
+  phoneNumber: z.preprocess(
+    (val) => (val === null || val === undefined ? "" : val),
+    z.string().min(10, "手機號碼格式錯誤")
+  ) as z.ZodType<string>,
   birthday: birthdaySchema,
   gender: z.enum(["male", "female", "nonBinary"]),
-  region: z.string({ required_error: "請選擇居住地" }),
-  address: z.string().optional(),
-  identity: z.enum(["general", "student", "retiree"], { required_error: "請選擇身分" }),
-  avatar: z.string().nullable().optional(),
+  region: z.preprocess(
+    (val) => (val === null || val === undefined ? "" : val),
+    z.string().nonempty("請選擇居住地")
+  ) as z.ZodType<string>,
+  address: z.preprocess(
+    (val) => (val === null || val === undefined ? "" : val),
+    z.string().min(1, { message: "請輸入詳細地址" })
+  ) as z.ZodType<string>,
+  identity: z.preprocess(
+    (val) => (val === null || val === undefined ? "" : val),
+    z.enum(["general", "student", "retiree"], { required_error: "請選擇身分" })
+  ) as z.ZodType<"general" | "student" | "retiree">,
+  avatar: z.preprocess((val) => (val === null ? "" : val), z.string().optional()) as z.ZodType<
+    string | undefined
+  >,
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
@@ -122,7 +145,10 @@ const countryOptions = [
   { label: "其他 +0", value: "+0" },
 ];
 
-function toLocalDateOnly(dateStr: string | Date): Date {
+function toLocalDateOnly(dateStr: string | Date | null): Date {
+  if (!dateStr) {
+    return subYears(new Date(), 20); // 預設 20 歲
+  }
   if (dateStr instanceof Date) {
     return new Date(dateStr.getFullYear(), dateStr.getMonth(), dateStr.getDate());
   }
@@ -163,19 +189,22 @@ export default function ProfilePage() {
   const [photoUrl, setPhotoUrl] = useState<string>("");
   const [profile, setProfile] = useState<ProfileData | null>(null);
 
-  const defaultValues: Partial<ProfileFormValues> = {
-    name: profile?.name ?? "",
-    displayName: profile?.displayName ?? "",
-    email: profile?.email ?? "",
-    countryCode: profile?.countryCode ?? "+886",
-    phoneNumber: profile?.phoneNumber ?? "",
-    birthday: profile?.birthday ? new Date(profile.birthday) : new Date(),
-    gender: profile?.gender ?? "male",
-    region: profile?.region ?? "",
-    address: profile?.address ?? "",
-    identity: profile?.identity ?? "general",
-    avatar: profile?.avatar ?? "",
-  };
+  const form = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileFormSchema),
+    defaultValues: {
+      name: "",
+      displayName: "",
+      email: "",
+      countryCode: "+886",
+      phoneNumber: "",
+      birthday: subYears(new Date(), 20),
+      gender: "male",
+      region: "",
+      address: "",
+      identity: "general",
+      avatar: "",
+    },
+  });
 
   const today = new Date();
   const minBirthDate = subYears(today, 120);
@@ -186,21 +215,22 @@ export default function ProfilePage() {
     return !isAfter(date, minBirthDate) || !isBefore(date, maxBirthDate);
   };
 
-  const form = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileFormSchema),
-  });
-
   const loadProfile = useCallback(async () => {
     try {
       const response = await getProfile();
-      console.log(toLocalDateOnly(response.birthday));
       setProfile(response);
       form.reset({
-        ...response,
+        name: response.name ?? "",
+        displayName: response.displayName ?? "",
+        email: response.email ?? "",
+        countryCode: response.countryCode ?? "+886",
+        phoneNumber: response.phoneNumber ?? "",
+        birthday: response.birthday ? toLocalDateOnly(response.birthday) : subYears(new Date(), 20),
+        gender: response.gender ?? "male",
         region: response.region ?? "",
-        birthday: response.birthday
-          ? toLocalDateOnly(response.birthday)
-          : toLocalDateOnly(new Date()),
+        address: response.address ?? "",
+        identity: response.identity ?? "general",
+        avatar: response.avatar ?? "",
       });
       if (response.avatar) {
         setPhotoUrl(response.avatar);
