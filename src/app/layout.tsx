@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Noto_Serif_TC } from "next/font/google";
 import "./globals.css";
+import Navbar from "@/components/layout/Navbar";
 import localFont from "next/font/local";
 import { Toaster } from "sonner";
 
@@ -60,6 +61,7 @@ export default function RootLayout({
   return (
     <html lang="zh-TW">
       <body className={`${notoSansTC.variable} antialiased`}>
+        <Navbar />
         {children}
         <Toaster />
       </body>
