@@ -11,6 +11,7 @@ export function FormInput({
   error,
   disabled,
   value,
+  onChange,
   endAdornment,
   className,
   ...props
@@ -24,6 +25,8 @@ export function FormInput({
         disabled={disabled}
         aria-invalid={error}
         className={cn(hasValue && "bg-input/10 text-foreground", endAdornment && "pr-8", className)}
+        onChange={onChange}
+        readOnly={value !== undefined && !onChange}
         {...props}
       />
       {endAdornment && (
