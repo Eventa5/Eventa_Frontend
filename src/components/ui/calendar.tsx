@@ -45,11 +45,10 @@ function Calendar({
           buttonVariants({ variant: "ghost" }),
           "size-8 p-0 font-normal aria-selected:opacity-100"
         ),
-        range_start:
-          "day-range-start aria-selected:bg-primary aria-selected:text-primary-foreground",
-        range_end: "day-range-end aria-selected:bg-primary aria-selected:text-primary-foreground",
+        range_start: "day-range-start aria-selected:bg-primary",
+        range_end: "day-range-end aria-selected:bg-primary",
         selected:
-          "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+          "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary rounded-md",
         today: "bg-accent text-accent-foreground",
         outside: "day-outside text-muted-foreground aria-selected:text-muted-foreground",
         disabled: "text-muted-foreground opacity-50",
