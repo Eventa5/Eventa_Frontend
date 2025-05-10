@@ -5,6 +5,8 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "個人檔案 | Eventa",
   description: "管理您在 Eventa 上的個人資料",
