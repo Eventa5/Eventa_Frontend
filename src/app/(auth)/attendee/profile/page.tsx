@@ -58,7 +58,7 @@ const profileFormSchema = z.object({
   ) as z.ZodType<string>,
   phoneNumber: z.preprocess(
     (val) => (val === null || val === undefined ? "" : val),
-    z.string().min(10, "手機號碼格式錯誤")
+    z.string().regex(/^09\d{8}$/, "手機號碼格式錯誤")
   ) as z.ZodType<string>,
   birthday: birthdaySchema,
   gender: z.enum(["male", "female", "nonBinary"]),
