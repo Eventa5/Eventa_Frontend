@@ -18,17 +18,17 @@ const geistMono = Geist_Mono({
 const notoSansTC = localFont({
   src: [
     {
-      path: "./fonts/NotoSansTC-Regular.ttf",
+      path: "../../public/fonts/NotoSansTC-Regular.ttf",
       weight: "400",
       style: "normal",
     },
     {
-      path: "./fonts/NotoSansTC-Bold.ttf",
+      path: "../../public/fonts/NotoSansTC-Bold.ttf",
       weight: "700",
       style: "normal",
     },
     {
-      path: "./fonts/NotoSansTC-Black.ttf",
+      path: "../../public/fonts/NotoSansTC-Black.ttf",
       weight: "900",
       style: "normal",
     },
