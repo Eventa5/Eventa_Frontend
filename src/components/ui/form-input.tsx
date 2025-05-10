@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/transformer";
 import type { InputHTMLAttributes, ReactNode } from "react";
 
 interface FormInputProps extends InputHTMLAttributes<HTMLInputElement> {

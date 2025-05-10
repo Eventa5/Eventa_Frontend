@@ -3,27 +3,17 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { login } from "@/lib/api/user";
-import { setToken } from "@/lib/auth";
+import { postApiV1UsersLogin } from "@/services/api/client/sdk.gen";
 import { useAuthStore } from "@/store/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
+import { signInSchema } from "../schemas";
+import type { AuthFormProps, SignInFormValues } from "../types";
 
-const signInSchema = z.object({
-  email: z.string().email("請輸入有效的電子郵件"),
-  password: z.string().min(1, "請輸入密碼"),
-});
-
-type SignInFormValues = z.infer<typeof signInSchema>;
-type SignInFormProps = {
-  onSuccess?: () => void;
-};
-
-export default function SignInForm({ onSuccess }: SignInFormProps) {
+export default function SignInForm({ onSuccess }: AuthFormProps) {
   const router = useRouter();
   const loginStore = useAuthStore((s) => s.login);
   const [isLoading, setIsLoading] = useState(false);
@@ -44,17 +34,32 @@ export default function SignInForm({ onSuccess }: SignInFormProps) {
     setIsLoading(true);
 
     try {
-      const response = await login(data);
-      if (response.status && response.data) {
-        loginStore(response.data);
-        toast.success("登入成功");
-        if (onSuccess) {
-          onSuccess();
+      // 1. 呼叫登入 API 獲取 token
+      const response = await postApiV1UsersLogin({
+        body: {
+          email: data.email,
+          password: data.password,
+        },
+      });
+
+      if (response.data?.status && response.data.data) {
+        const token = response.data.data;
+
+        // 2. 使用 useAuthStore 保存 token 到 localStorage 和 cookie
+        const success = await loginStore(token);
+
+        if (success) {
+          toast.success("登入成功");
+          if (onSuccess) {
+            onSuccess();
+          } else {
+            router.push("/attendee/profile");
+          }
         } else {
-          router.push("/attendee/profile");
+          toast.error("設置認證 token 失敗，請重試");
         }
       } else {
-        toast.error(response.message);
+        toast.error(response.error?.message || "登入失敗");
       }
     } catch (err) {
       console.error(err);

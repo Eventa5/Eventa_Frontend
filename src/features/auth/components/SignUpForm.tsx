@@ -1,36 +1,19 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signup } from "@/lib/api/user";
+import { postApiV1UsersSignup } from "@/services/api/client/sdk.gen";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
+import { signUpSchema } from "../schemas";
+import type { AuthFormProps, SignUpFormValues } from "../types";
 
-const signUpSchema = z
-  .object({
-    email: z.string().email("請輸入有效的電子郵件"),
-    password: z
-      .string()
-      .min(8, "密碼長度至少需要 8 個字符")
-      .regex(/^[a-zA-Z0-9]+$/, "密碼只能包含英文或數字"),
-    checkPassword: z.string(),
-  })
-  .refine((data) => data.password === data.checkPassword, {
-    message: "兩次輸入的密碼不一致",
-    path: ["checkPassword"],
-  });
-
-type SignUpFormValues = z.infer<typeof signUpSchema>;
-type SignUpFormProps = {
-  onSuccess?: () => void;
-};
-
-export default function SignUpForm({ onSuccess }: SignUpFormProps) {
+export default function SignUpForm({ onSuccess }: AuthFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -57,8 +40,15 @@ export default function SignUpForm({ onSuccess }: SignUpFormProps) {
     setIsLoading(true);
 
     try {
-      const response = await signup(data);
-      if (response.status) {
+      const response = await postApiV1UsersSignup({
+        body: {
+          email: data.email,
+          password: data.password,
+          checkPassword: data.checkPassword,
+        },
+      });
+
+      if (response.data?.status) {
         toast.success("註冊成功");
         if (onSuccess) {
           onSuccess();
@@ -66,7 +56,7 @@ export default function SignUpForm({ onSuccess }: SignUpFormProps) {
           router.push("/signin");
         }
       } else {
-        toast.error(response.message);
+        toast.error(response.error?.message || "註冊失敗");
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "註冊失敗，請稍後再試");
