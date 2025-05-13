@@ -1,6 +1,4 @@
 "use client";
-import SignInForm from "@/components/layout/SignInForm";
-import SignUpForm from "@/components/layout/SignUpForm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   NavigationMenu,
@@ -8,13 +6,15 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
+import SignInForm from "@/features/auth/components/SignInForm";
+import SignUpForm from "@/features/auth/components/SignUpForm";
 import { useAuthStore } from "@/store/auth";
 import { useDialogStore } from "@/store/dialog";
 import { SquarePen, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect } from "react";
 
 export default function Navbar() {
   const loginDialogOpen = useDialogStore((s) => s.loginDialogOpen);
@@ -24,6 +24,18 @@ export default function Navbar() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const logout = useAuthStore((s) => s.logout);
   const router = useRouter();
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("authRequired") === "true") {
+      useDialogStore.getState().setLoginTab("signin");
+      useDialogStore.getState().setLoginDialogOpen(true);
+
+      url.searchParams.delete("authRequired");
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, []);
+
   return (
     <nav className="w-full bg-white md:bg-[#FFFCF5] px-4 sm:px-8 py-6 flex flex-col items-center z-50 mb-10">
       <div className="w-full max-w-6xl flex items-center justify-between">
@@ -60,7 +72,6 @@ export default function Navbar() {
                 width={80}
                 height={80}
                 className="w-14 h-14 sm:w-20 sm:h-20"
-                priority
               />
             </span>
             <span className="font-black text-lg tracking-widest -mt-2 text-transparent">

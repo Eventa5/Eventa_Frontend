@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description: "會員個人檔案",
 };
 
-export default function ProfileLayout({
+export default async function ProfileLayout({
   children,
 }: {
   children: React.ReactNode;

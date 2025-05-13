@@ -1,19 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Noto_Serif_TC } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import localFont from "next/font/local";
 import { Toaster } from "sonner";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import("@/services/api/interceptors");
 
 const notoSansTC = localFont({
   src: [
@@ -35,13 +25,6 @@ const notoSansTC = localFont({
   ],
   variable: "--font-noto-sans-tc",
   display: "swap",
-});
-
-const notoSerifTC = Noto_Serif_TC({
-  weight: ["400", "700"],
-  display: "swap",
-  variable: "--font-serif-tc",
-  preload: false,
 });
 
 export const metadata: Metadata = {

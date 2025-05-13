@@ -10,9 +10,11 @@
     "lint:staged": "npx biome check --write --staged .",
     "lint-fix": "biome check --fix --unsafe .",
     "format": "npx biome format --write --staged .",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "generate:api": "openapi-ts"
   },
   "dependencies": {
+    "@hey-api/client-next": "^0.3.0",
     "@hookform/resolvers": "^5.0.1",
     "@radix-ui/react-avatar": "^1.1.7",
     "@radix-ui/react-checkbox": "^1.2.3",
@@ -45,6 +47,7 @@
     "@biomejs/biome": "^1.9.4",
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
+    "@hey-api/openapi-ts": "^0.67.3",
     "@tailwindcss/postcss": "^4.1.4",
     "@types/node": "^20",
     "@types/react": "^19",
