@@ -14,6 +14,7 @@ import { SquarePen, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Navbar() {
   const loginDialogOpen = useDialogStore((s) => s.loginDialogOpen);
@@ -23,6 +24,18 @@ export default function Navbar() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const logout = useAuthStore((s) => s.logout);
   const router = useRouter();
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("authRequired") === "true") {
+      useDialogStore.getState().setLoginTab("signin");
+      useDialogStore.getState().setLoginDialogOpen(true);
+
+      url.searchParams.delete("authRequired");
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, []);
+
   return (
     <nav className="w-full bg-white md:bg-[#FFFCF5] px-4 sm:px-8 py-6 flex flex-col items-center z-50 mb-10">
       <div className="w-full max-w-6xl flex items-center justify-between">

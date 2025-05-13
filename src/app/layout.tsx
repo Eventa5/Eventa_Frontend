@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import localFont from "next/font/local";
 import { Toaster } from "sonner";
+import("@/services/api/interceptors");
 
 const notoSansTC = localFont({
   src: [
