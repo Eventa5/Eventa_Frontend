@@ -1,5 +1,11 @@
 "use client";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -127,6 +133,9 @@ export default function Navbar() {
         <DialogContent className="max-w-md w-full">
           <DialogHeader>
             <DialogTitle>{loginTab === "signin" ? "登入" : "註冊"}</DialogTitle>
+            <DialogDescription>
+              {loginTab === "signin" ? "請輸入您的帳號密碼進行登入" : "請填寫資料完成註冊"}
+            </DialogDescription>
           </DialogHeader>
           <div className="py-2">
             {loginTab === "signin" ? (
