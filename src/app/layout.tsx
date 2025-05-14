@@ -43,7 +43,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-TW">
-      <body className={`${notoSansTC.variable} antialiased`}>
+      <body
+        className={`${notoSansTC.variable} antialiased`}
+        suppressHydrationWarning
+      >
         <Navbar />
         {children}
         <Toaster />
