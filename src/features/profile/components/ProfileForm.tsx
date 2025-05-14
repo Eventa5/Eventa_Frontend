@@ -365,7 +365,9 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                       startMonth={new Date(1900, 0)}
                       endMonth={new Date(new Date().getFullYear(), 11)}
                       defaultMonth={
-                        new Date(defaultBirthDate.getFullYear(), defaultBirthDate.getMonth())
+                        field.value
+                          ? new Date(field.value.getFullYear(), field.value.getMonth())
+                          : new Date(defaultBirthDate.getFullYear(), defaultBirthDate.getMonth())
                       }
                       disabledDates={isDateDisabled}
                       components={{ Dropdown: CustomSelectDropdown }}
