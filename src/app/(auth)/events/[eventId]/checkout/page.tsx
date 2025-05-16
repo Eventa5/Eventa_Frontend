@@ -11,9 +11,34 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useAuthStore } from "@/store/auth";
 import Image from "next/image";
+import { useState } from "react";
+
+interface TicketState {
+  quantity: number;
+  price: number;
+}
 
 export default function CheckoutPage() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const [ticketStates, setTicketStates] = useState<Record<string, TicketState>>({
+    earlyBird: { quantity: 0, price: 1400 },
+    regular: { quantity: 0, price: 1800 },
+    couple: { quantity: 0, price: 3200 },
+    family: { quantity: 0, price: 4000 },
+  });
+
+  const totalQuantity = Object.values(ticketStates).reduce((sum, state) => sum + state.quantity, 0);
+  const totalPrice = Object.values(ticketStates).reduce(
+    (sum, state) => sum + state.quantity * state.price,
+    0
+  );
+
+  const handleQuantityChange = (ticketType: string, quantity: number) => {
+    setTicketStates((prev) => ({
+      ...prev,
+      [ticketType]: { ...prev[ticketType], quantity },
+    }));
+  };
 
   if (!isAuthenticated) return null;
 
@@ -104,12 +129,14 @@ export default function CheckoutPage() {
               booking_time="2025.04.05 (六) - 04.19 (六)"
               available_time="2025.04.19 (六) 14:30 - 20:00"
               isSoldOut
+              onQuantityChange={(quantity) => handleQuantityChange("earlyBird", quantity)}
             />
             <TicketCard
               ticketTitle="全票"
               price={1800}
               booking_time="2025.04.19 (六) - 05.10 (六)"
               available_time="2025.04.19 (六) 14:30 - 20:00"
+              onQuantityChange={(quantity) => handleQuantityChange("regular", quantity)}
             />
             <TicketCard
               ticketTitle="雙人成行套票"
@@ -117,6 +144,7 @@ export default function CheckoutPage() {
               booking_time="2025.04.19 (六) - 05.10 (六)"
               available_time="2025.04.19 (六) 14:30 - 20:00"
               description="此票種適用於2人同行，購買後將獲得2張票券。"
+              onQuantityChange={(quantity) => handleQuantityChange("couple", quantity)}
             />
             <TicketCard
               ticketTitle="小家庭套票"
@@ -124,12 +152,16 @@ export default function CheckoutPage() {
               booking_time="2025.04.19 (六) - 05.10 (六)"
               available_time="2025.04.19 (六) 14:30 - 20:00"
               description="此票種適用於3-4人家庭，購買後將獲得4張票券。"
+              onQuantityChange={(quantity) => handleQuantityChange("family", quantity)}
             />
             <div className="space-y-4">
-              <span className="block text-right text-lg font-semibold">0 張票，總計 NT$ 0</span>
+              <span className="block text-right text-lg font-semibold">
+                {totalQuantity} 張票，總計 NT$ {totalPrice.toLocaleString()}
+              </span>
               <Button
                 className="w-full font-semibold"
                 size="lg"
+                disabled={totalQuantity === 0}
               >
                 前往結帳
               </Button>

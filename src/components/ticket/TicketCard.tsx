@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Collapse } from "@/components/ui/collapse";
+import { QuantityInput } from "@/components/ui/quantity-input";
 import { cn } from "@/utils/transformer";
 
 interface TicketCardProps {
@@ -10,6 +10,7 @@ interface TicketCardProps {
   available_time: string;
   description?: string;
   isSoldOut?: boolean;
+  onQuantityChange: (quantity: number) => void;
 }
 
 export function TicketCard({
@@ -19,6 +20,7 @@ export function TicketCard({
   available_time,
   description,
   isSoldOut = false,
+  onQuantityChange,
 }: TicketCardProps) {
   return (
     <Card className={cn("p-6", isSoldOut && "bg-[var(--color-neutral-100)]")}>
@@ -34,23 +36,11 @@ export function TicketCard({
             <p className="text-sm text-muted-foreground">NT$ {price.toLocaleString()}</p>
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="icon"
-                disabled={isSoldOut}
-              >
-                -
-              </Button>
-              <span className="w-8 text-center">0</span>
-              <Button
-                variant="outline"
-                size="icon"
-                disabled={isSoldOut}
-              >
-                +
-              </Button>
-            </div>
+            <QuantityInput
+              defaultValue={0}
+              onValueChange={onQuantityChange}
+              disabled={isSoldOut}
+            />
           </div>
         </div>
         <div className="space-y-4">
