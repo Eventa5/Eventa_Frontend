@@ -1,7 +1,6 @@
 "use client";
+import { TicketCard } from "@/components/ticket/TicketCard";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Collapse } from "@/components/ui/collapse";
 import {
   Select,
   SelectContent,
@@ -10,7 +9,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
 import { useAuthStore } from "@/store/auth";
 import Image from "next/image";
 
@@ -100,227 +98,33 @@ export default function CheckoutPage() {
               </Select>
             </div>
             <div className="text-md font-bold">請選擇票券</div>
-            <Card className="relative p-6 bg-[var(--color-neutral-100)]">
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold">早鳥票</h3>
-                      <span className="text-sm font-semibold text-muted-foreground ml-4">
-                        已售完
-                      </span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">NT$ 1,400</p>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        disabled
-                      >
-                        -
-                      </Button>
-                      <span className="w-8 text-center">0</span>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        disabled
-                      >
-                        +
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div className="space-y-4">
-                    <Collapse title="更多資訊">
-                      <div className="space-y-4 pt-2">
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium">售票時間</p>
-                          <p className="text-sm text-muted-foreground">
-                            2025.04.05 (六) - 04.19 (六)
-                          </p>
-                        </div>
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium">票券可使用時間</p>
-                          <p className="text-sm text-muted-foreground">
-                            2025.04.19 (六) 14:30 - 20:00
-                          </p>
-                        </div>
-                      </div>
-                    </Collapse>
-                    <Separator />
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-md font-semibold">名額釋出通知我</span>
-                        <Switch />
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        開啟通知後，當名額釋出時，你會收到候補通知 Email，提醒你第一時間搶票
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-            <Card className="p-6">
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold">全票</h3>
-                    <p className="text-sm text-muted-foreground">NT$ 1,800</p>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                      >
-                        -
-                      </Button>
-                      <span className="w-8 text-center">0</span>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                      >
-                        +
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div className="space-y-4">
-                    <Collapse title="更多資訊">
-                      <div className="space-y-4 pt-2">
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium">售票時間</p>
-                          <p className="text-sm text-muted-foreground">
-                            2025.04.19 (六) - 05.10 (六)
-                          </p>
-                        </div>
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium">票券可使用時間</p>
-                          <p className="text-sm text-muted-foreground">
-                            2025.04.19 (六) 14:30 - 20:00
-                          </p>
-                        </div>
-                      </div>
-                    </Collapse>
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-            <Card className="p-6">
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold">雙人成行套票</h3>
-                    <p className="text-sm text-muted-foreground">NT$ 3,200</p>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                      >
-                        -
-                      </Button>
-                      <span className="w-8 text-center">0</span>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                      >
-                        +
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div className="space-y-4">
-                    <Collapse title="更多資訊">
-                      <div className="space-y-4 pt-2">
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium">售票時間</p>
-                          <p className="text-sm text-muted-foreground">
-                            2025.04.19 (六) - 05.10 (六)
-                          </p>
-                        </div>
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium">票券可使用時間</p>
-                          <p className="text-sm text-muted-foreground">
-                            2025.04.19 (六) 14:30 - 20:00
-                          </p>
-                        </div>
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium">套票說明</p>
-                          <p className="text-sm text-muted-foreground">
-                            此票種適用於2人同行，購買後將獲得2張票券。
-                          </p>
-                        </div>
-                      </div>
-                    </Collapse>
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-            <Card className="p-6">
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold">小家庭套票</h3>
-                    <p className="text-sm text-muted-foreground">NT$ 4,000</p>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                      >
-                        -
-                      </Button>
-                      <span className="w-8 text-center">0</span>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                      >
-                        +
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div className="space-y-4">
-                    <Collapse title="更多資訊">
-                      <div className="space-y-4 pt-2">
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium">售票時間</p>
-                          <p className="text-sm text-muted-foreground">
-                            2025.04.19 (六) - 05.10 (六)
-                          </p>
-                        </div>
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium">票券可使用時間</p>
-                          <p className="text-sm text-muted-foreground">
-                            2025.04.19 (六) 14:30 - 20:00
-                          </p>
-                        </div>
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium">套票說明</p>
-                          <p className="text-sm text-muted-foreground">
-                            此票種適用於3-4人家庭，購買後將獲得4張票券。
-                          </p>
-                        </div>
-                      </div>
-                    </Collapse>
-                  </div>
-                </div>
-              </div>
-            </Card>
-
+            <TicketCard
+              ticketTitle="早鳥票"
+              price={1400}
+              booking_time="2025.04.05 (六) - 04.19 (六)"
+              available_time="2025.04.19 (六) 14:30 - 20:00"
+              isSoldOut
+            />
+            <TicketCard
+              ticketTitle="全票"
+              price={1800}
+              booking_time="2025.04.19 (六) - 05.10 (六)"
+              available_time="2025.04.19 (六) 14:30 - 20:00"
+            />
+            <TicketCard
+              ticketTitle="雙人成行套票"
+              price={3200}
+              booking_time="2025.04.19 (六) - 05.10 (六)"
+              available_time="2025.04.19 (六) 14:30 - 20:00"
+              description="此票種適用於2人同行，購買後將獲得2張票券。"
+            />
+            <TicketCard
+              ticketTitle="小家庭套票"
+              price={4000}
+              booking_time="2025.04.19 (六) - 05.10 (六)"
+              available_time="2025.04.19 (六) 14:30 - 20:00"
+              description="此票種適用於3-4人家庭，購買後將獲得4張票券。"
+            />
             <div className="space-y-4">
               <span className="block text-right text-lg font-semibold">0 張票，總計 NT$ 0</span>
               <Button
