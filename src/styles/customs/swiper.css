@@ -1,0 +1,20 @@
+:root {
+  --swiper-pagination-bottom: -50px;
+  --swiper-pagination-bullet-size: 10px;
+  --swiper-pagination-bullet-horizontal-gap: 8px;
+}
+
+.swiper {
+  overflow-y: visible !important;
+  overflow-x: clip !important;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: var(--color-primary-500) !important;
+}
+
+@media screen and (min-width: 768px) {
+  :root {
+    --swiper-pagination-bullet-size: 12px;
+  }
+}

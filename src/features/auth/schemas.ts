@@ -24,3 +24,10 @@ export const signUpSchema = z
     message: "兩次輸入的密碼不一致",
     path: ["checkPassword"],
   });
+
+/**
+ * 忘記密碼表單驗證 Schema
+ */
+export const forgotPasswordSchema = z.object({
+  email: z.string().email("請輸入有效的電子郵件"),
+});
