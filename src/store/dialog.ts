@@ -3,8 +3,8 @@ import { create } from "zustand";
 interface DialogState {
   loginDialogOpen: boolean;
   setLoginDialogOpen: (open: boolean) => void;
-  loginTab: "signin" | "signup";
-  setLoginTab: (tab: "signin" | "signup") => void;
+  loginTab: "signin" | "signup" | "forgot";
+  setLoginTab: (tab: "signin" | "signup" | "forgot") => void;
 }
 
 export const useDialogStore = create<DialogState>((set) => ({

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { postApiV1UsersLogin } from "@/services/api/client/sdk.gen";
 import { useAuthStore } from "@/store/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -13,7 +14,7 @@ import { toast } from "sonner";
 import { signInSchema } from "../schemas";
 import type { AuthFormProps, SignInFormValues } from "../types";
 
-export default function SignInForm({ onSuccess }: AuthFormProps) {
+export default function SignInForm({ onSuccess, onSwitchTab, isMobile = false }: AuthFormProps) {
   const router = useRouter();
   const loginStore = useAuthStore((s) => s.login);
   const [isLoading, setIsLoading] = useState(false);
@@ -74,7 +75,7 @@ export default function SignInForm({ onSuccess }: AuthFormProps) {
       className="space-y-6"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div className="space-y-4">
+      <div className="space-y-6">
         <div className="space-y-2">
           <Label htmlFor="email">電子郵件</Label>
           <Input
@@ -94,20 +95,23 @@ export default function SignInForm({ onSuccess }: AuthFormProps) {
             {...register("password")}
           />
           {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
-          <div className="text-left">
-            <a
-              href="/forgot-password"
-              className="text-[var(--color-neutral-400)] underline text-sm"
+        </div>
+        {onSwitchTab && (
+          <div className="flex justify-end">
+            <button
+              className="text-neutral-400 text-right text-[14px] hover:text-neutral-500 underline cursor-pointer"
+              type="button"
+              onClick={() => onSwitchTab("forgot")}
             >
               忘記密碼？
-            </a>
+            </button>
           </div>
-        </div>
+        )}
       </div>
       <div className="space-y-4">
         <Button
           type="submit"
-          className="w-full bg-[var(--color-primary-500)] hover:bg-[var(--color-primary-600)] text-[var(--color-neutral-800)] font-bold"
+          className="w-full bg-primary-500 hover:saturate-150 duration-200 active:scale-95 text-neutral-800 leading-6 cursor-pointer !py-3 h-auto"
           disabled={isLoading}
         >
           {isLoading ? "登入中..." : "登入"}
@@ -115,11 +119,36 @@ export default function SignInForm({ onSuccess }: AuthFormProps) {
         <Button
           type="button"
           variant="outline"
-          className="w-full border-2 font-medium flex items-center justify-center gap-2"
+          className="w-full border-2 border-neutral-300 font-medium flex items-center justify-center gap-2 cursor-pointer !py-3 h-auto mb-6"
           disabled={isLoading}
         >
-          使用 Google 帳號登入
+          <Image
+            src="/icons/google.svg"
+            width={24}
+            height={24}
+            alt="Google Login"
+          />
+          以 Google 登入
         </Button>
+
+        {onSwitchTab && (
+          <div
+            className={`flex ${
+              isMobile ? "flex-col items-center gap-2" : "flex-col sm:flex-row sm:justify-between"
+            } text-sm`}
+          >
+            <div>
+              <span className="text-neutral-400">還沒有 Eventa 帳號嗎？</span>
+              <button
+                className="text-primary-600 font-bold underline ml-1 cursor-pointer"
+                type="button"
+                onClick={() => onSwitchTab("signup")}
+              >
+                前往註冊
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </form>
   );
