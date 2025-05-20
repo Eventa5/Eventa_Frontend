@@ -18,8 +18,55 @@ interface TicketState {
   price: number;
 }
 
+// 定義票券資料類型
+interface TicketData {
+  id: string;
+  ticketTitle: string;
+  price: number;
+  booking_time: string;
+  available_time: string;
+  description?: string;
+  isSoldOut?: boolean;
+}
+
+// 票券資料
+const TICKETS_DATA: TicketData[] = [
+  {
+    id: "earlyBird",
+    ticketTitle: "早鳥票",
+    price: 1400,
+    booking_time: "2025.04.05 (六) - 04.19 (六)",
+    available_time: "2025.04.19 (六) 14:30 - 20:00",
+    isSoldOut: true,
+  },
+  {
+    id: "regular",
+    ticketTitle: "全票",
+    price: 1800,
+    booking_time: "2025.04.19 (六) - 05.10 (六)",
+    available_time: "2025.04.19 (六) 14:30 - 20:00",
+  },
+  {
+    id: "couple",
+    ticketTitle: "雙人成行套票",
+    price: 3200,
+    booking_time: "2025.04.19 (六) - 05.10 (六)",
+    available_time: "2025.04.19 (六) 14:30 - 20:00",
+    description: "此票種適用於2人同行，購買後將獲得2張票券。",
+  },
+  {
+    id: "family",
+    ticketTitle: "小家庭套票",
+    price: 4000,
+    booking_time: "2025.04.19 (六) - 05.10 (六)",
+    available_time: "2025.04.19 (六) 14:30 - 20:00",
+    description: "此票種適用於3-4人家庭，購買後將獲得4張票券。",
+  },
+];
+
 export default function CheckoutPage() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const [focusedTicketId, setFocusedTicketId] = useState<string | null>(null);
   const [ticketStates, setTicketStates] = useState<Record<string, TicketState>>({
     earlyBird: { quantity: 0, price: 1400 },
     regular: { quantity: 0, price: 1800 },
@@ -123,37 +170,16 @@ export default function CheckoutPage() {
               </Select>
             </div>
             <div className="text-md font-bold">請選擇票券</div>
-            <TicketCard
-              ticketTitle="早鳥票"
-              price={1400}
-              booking_time="2025.04.05 (六) - 04.19 (六)"
-              available_time="2025.04.19 (六) 14:30 - 20:00"
-              isSoldOut
-              onQuantityChange={(quantity) => handleQuantityChange("earlyBird", quantity)}
-            />
-            <TicketCard
-              ticketTitle="全票"
-              price={1800}
-              booking_time="2025.04.19 (六) - 05.10 (六)"
-              available_time="2025.04.19 (六) 14:30 - 20:00"
-              onQuantityChange={(quantity) => handleQuantityChange("regular", quantity)}
-            />
-            <TicketCard
-              ticketTitle="雙人成行套票"
-              price={3200}
-              booking_time="2025.04.19 (六) - 05.10 (六)"
-              available_time="2025.04.19 (六) 14:30 - 20:00"
-              description="此票種適用於2人同行，購買後將獲得2張票券。"
-              onQuantityChange={(quantity) => handleQuantityChange("couple", quantity)}
-            />
-            <TicketCard
-              ticketTitle="小家庭套票"
-              price={4000}
-              booking_time="2025.04.19 (六) - 05.10 (六)"
-              available_time="2025.04.19 (六) 14:30 - 20:00"
-              description="此票種適用於3-4人家庭，購買後將獲得4張票券。"
-              onQuantityChange={(quantity) => handleQuantityChange("family", quantity)}
-            />
+            {TICKETS_DATA.map((ticket) => (
+              <TicketCard
+                key={ticket.id}
+                {...ticket}
+                isFocused={focusedTicketId === ticket.id}
+                onQuantityFocus={() => setFocusedTicketId(ticket.id)}
+                onQuantityBlur={() => setFocusedTicketId(null)}
+                onQuantityChange={(quantity) => handleQuantityChange(ticket.id, quantity)}
+              />
+            ))}
             <div className="space-y-4">
               <span className="block text-right text-lg font-semibold">
                 {totalQuantity} 張票，總計 NT$ {totalPrice.toLocaleString()}
