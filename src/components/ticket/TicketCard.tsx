@@ -1,6 +1,7 @@
-import { Card } from "@/components/ui/card";
 import { Collapse } from "@/components/ui/collapse";
 import { QuantityInput } from "@/components/ui/quantity-input";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/utils/transformer";
 import { useState } from "react";
 
@@ -49,6 +50,7 @@ export function TicketCard({
         <div>
           <div className="flex items-center gap-2">
             <span className="font-bold text-lg tracking-wide">{ticketTitle}</span>
+            {isSoldOut && <span className="text-sm font-semibold text-neutral-400">已售完</span>}
           </div>
           <div className="mt-2 flex items-center gap-2">
             <span className="font-bold text-xl tracking-wide">NT$ {price.toLocaleString()}</span>
@@ -76,17 +78,33 @@ export function TicketCard({
             )}
           </div>
         </Collapse>
+        {isSoldOut && (
+          <>
+            <Separator className="my-4" />
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-bold text-gray-700 mb-1">名額釋出通知我</div>
+                <div className="text-sm text-muted-foreground">
+                  開啟通知後，當名額釋出時，你會收到候補通知 Email，提醒你第一時間搶票
+                </div>
+              </div>
+              <Switch className="ml-4" />
+            </div>
+          </>
+        )}
       </div>
       {/* 右側數量調整 */}
-      <div className={cn("flex flex-col justify-center items-center px-6")}>
-        <QuantityInput
-          defaultValue={0}
-          onValueChange={handleQuantityChange}
-          disabled={isSoldOut}
-          onFocus={onQuantityFocus}
-          onBlur={onQuantityBlur}
-        />
-      </div>
+      {!isSoldOut && (
+        <div className={cn("flex flex-col justify-center items-center px-6")}>
+          <QuantityInput
+            defaultValue={0}
+            onValueChange={handleQuantityChange}
+            disabled={isSoldOut}
+            onFocus={onQuantityFocus}
+            onBlur={onQuantityBlur}
+          />
+        </div>
+      )}
     </div>
   );
 }
