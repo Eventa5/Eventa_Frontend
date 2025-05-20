@@ -7,10 +7,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { forgotPasswordSchema } from "../schemas";
-import type { AuthFormProps, ForgotPasswordFormValues } from "../types";
+import { resetPasswordSchema } from "../schemas";
+import type { AuthFormProps, ResetPasswordFormValues } from "../types";
 
-export default function ForgotPasswordForm({
+export default function ResetPasswordForm({
   onSuccess,
   onSwitchTab,
   isMobile = false,
@@ -21,14 +21,16 @@ export default function ForgotPasswordForm({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ForgotPasswordFormValues>({
-    resolver: zodResolver(forgotPasswordSchema),
+  } = useForm<ResetPasswordFormValues>({
+    resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
-      email: "",
+      password: "",
+      confirmPassword: "",
+      verificationCode: "",
     },
   });
 
-  const onSubmit = async (data: ForgotPasswordFormValues) => {
+  const onSubmit = async (data: ResetPasswordFormValues) => {
     setIsLoading(true);
 
     try {
@@ -36,9 +38,9 @@ export default function ForgotPasswordForm({
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // 實際應用時可替換為真實 API
-      // await 密碼重設 API
+      // await 重設密碼 API
 
-      toast.success("驗證碼已寄送至您的信箱");
+      toast.success("密碼重設成功，請使用新密碼登入");
       if (onSuccess) {
         onSuccess();
       }
@@ -56,14 +58,38 @@ export default function ForgotPasswordForm({
     >
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="email">請輸入你的會員帳號電子郵件</Label>
+          <Label htmlFor="verificationCode">驗證碼</Label>
           <Input
-            id="email"
-            type="email"
-            placeholder="請輸入電子郵件"
-            {...register("email")}
+            id="verificationCode"
+            type="text"
+            placeholder="請輸入電子郵件收到的驗證碼"
+            {...register("verificationCode")}
           />
-          {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
+          {errors.verificationCode && (
+            <p className="text-sm text-red-500">{errors.verificationCode.message}</p>
+          )}
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="password">新密碼</Label>
+          <Input
+            id="password"
+            type="password"
+            placeholder="請輸入新密碼"
+            {...register("password")}
+          />
+          {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="confirmPassword">確認新密碼</Label>
+          <Input
+            id="confirmPassword"
+            type="password"
+            placeholder="請再次輸入新密碼"
+            {...register("confirmPassword")}
+          />
+          {errors.confirmPassword && (
+            <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>
+          )}
         </div>
       </div>
       <div className="space-y-4">
@@ -72,7 +98,7 @@ export default function ForgotPasswordForm({
           className="w-full bg-primary-500 hover:saturate-150 duration-200 active:scale-95 text-neutral-800 leading-6 cursor-pointer !py-3 h-auto mb-6"
           disabled={isLoading}
         >
-          {isLoading ? "處理中..." : "寄送驗證碼"}
+          {isLoading ? "處理中..." : "設定新密碼"}
         </Button>
 
         {onSwitchTab && (
