@@ -7,6 +7,7 @@ import {
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
 import ForgotPasswordForm from "@/features/auth/components/ForgotPasswordForm";
+import ResetPasswordForm from "@/features/auth/components/ResetPasswordForm";
 import SignInForm from "@/features/auth/components/SignInForm";
 import SignUpForm from "@/features/auth/components/SignUpForm";
 import { useIsMobile } from "@/hooks/useMediaQuery";
@@ -60,7 +61,7 @@ export default function Header() {
   }, []);
 
   // 處理身份驗證表單開啟
-  const handleAuthOpen = (tab: "signin" | "signup" | "forgot") => {
+  const handleAuthOpen = (tab: "signin" | "signup" | "forgot" | "reset") => {
     if (isMobile) {
       // 手機版: 全螢幕顯示
       setMobileMenuOpen(false);
@@ -74,7 +75,7 @@ export default function Header() {
   };
 
   // 當用戶希望切換到另一個認證標籤時的處理程序
-  const handleSwitchTab = (tab: "signin" | "signup" | "forgot") => {
+  const handleSwitchTab = (tab: "signin" | "signup" | "forgot" | "reset") => {
     setLoginTab(tab);
   };
 
@@ -96,6 +97,8 @@ export default function Header() {
         return "註冊帳號";
       case "forgot":
         return "密碼重設";
+      case "reset":
+        return "設定新密碼";
       default:
         return "會員登入";
     }
@@ -123,6 +126,14 @@ export default function Header() {
       case "forgot":
         return (
           <ForgotPasswordForm
+            onSuccess={() => handleSwitchTab("reset")}
+            onSwitchTab={handleSwitchTab}
+            isMobile={isMobile}
+          />
+        );
+      case "reset":
+        return (
+          <ResetPasswordForm
             onSuccess={() => handleSwitchTab("signin")}
             onSwitchTab={handleSwitchTab}
             isMobile={isMobile}
@@ -374,7 +385,7 @@ export default function Header() {
               type="button"
               className="p-2 flex items-center cursor-pointer"
               onClick={() => {
-                if (loginTab === "forgot" || loginTab === "signup") {
+                if (loginTab === "forgot" || loginTab === "signup" || loginTab === "reset") {
                   setLoginTab("signin");
                 } else {
                   setMobileAuthOpen(false);
