@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { signUpSchema } from "../schemas";
 import type { AuthFormProps, SignUpFormValues } from "../types";
 
-export default function SignUpForm({ onSuccess }: AuthFormProps) {
+export default function SignUpForm({ onSuccess, onSwitchTab, isMobile = false }: AuthFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -70,7 +70,7 @@ export default function SignUpForm({ onSuccess }: AuthFormProps) {
       className="space-y-6"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div className="space-y-4">
+      <div className="space-y-6">
         <div className="space-y-2">
           <Label htmlFor="email">電子郵件</Label>
           <Input
@@ -126,11 +126,24 @@ export default function SignUpForm({ onSuccess }: AuthFormProps) {
         </div>
         <Button
           type="submit"
-          className="w-full bg-[var(--color-primary-500)] hover:bg-[var(--color-primary-600)] text-[var(--color-neutral-800)] font-bold"
+          className="w-full bg-primary-500 hover:saturate-150 duration-200 active:scale-95 text-neutral-800 leading-6 !py-3 h-auto mb-6 cursor-pointer"
           disabled={isLoading}
         >
           {isLoading ? "註冊中..." : "註冊"}
         </Button>
+
+        {onSwitchTab && (
+          <div className="text-center text-sm">
+            <span className="text-neutral-400">已經有 Eventa 帳號了嗎？</span>
+            <button
+              className="text-primary-600 font-bold underline ml-1 cursor-pointer"
+              type="button"
+              onClick={() => onSwitchTab("signin")}
+            >
+              前往登入
+            </button>
+          </div>
+        )}
       </div>
     </form>
   );
