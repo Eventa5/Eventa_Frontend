@@ -4,13 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import type { OrderTabsValue } from "@/components/ui/orderTabs";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CalendarIcon } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 import type { DateRange } from "react-day-picker";
+const OrderTabs = dynamic(() => import("@/components/ui/orderTabs"), { ssr: false });
 
 type Order = {
   id: string;
@@ -58,6 +60,25 @@ export default function OrdersPage() {
     },
   ];
 
+  // 狀態對應
+  const statusMap: Record<OrderTabsValue, string[]> = {
+    all: [],
+    registered: ["已付款"],
+    pending: ["待付款"],
+    cancelled: ["已取消"],
+    expired: ["已逾期"],
+  };
+
+  // 計算各狀態數量
+  const counts = {
+    all: orders.length,
+    registered: orders.filter((o) => o.status === "已付款").length,
+    pending: orders.filter((o) => o.status === "待付款").length,
+    cancelled: orders.filter((o) => o.status === "已取消").length,
+    expired: orders.filter((o) => o.status === "已逾期").length,
+  };
+
+  const [tab, setTab] = React.useState<OrderTabsValue>("all");
   const [search, setSearch] = React.useState("");
   const today = new Date();
   const oneMonthAgo = new Date();
@@ -66,7 +87,6 @@ export default function OrdersPage() {
     from: oneMonthAgo,
     to: today,
   });
-
   const [visibleCount, setVisibleCount] = React.useState(10);
 
   // 依年月分組
@@ -80,12 +100,22 @@ export default function OrdersPage() {
     }, {});
   }
 
-  const grouped = groupOrdersByYearMonth(orders);
+  // 依 tab 狀態過濾訂單
+  const filteredOrders =
+    tab === "all" ? orders : orders.filter((o) => statusMap[tab].includes(o.status));
+
+  const grouped = groupOrdersByYearMonth(filteredOrders);
   const sortedKeys = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">訂單管理</h1>
+      <OrderTabs
+        value={tab}
+        onValueChange={setTab}
+        counts={counts}
+        className="mb-4 border-b border-neutral-300"
+      />
       <form
         className="flex flex-col md:flex-row gap-2 mb-6 items-center"
         onSubmit={(e) => {
@@ -110,10 +140,11 @@ export default function OrdersPage() {
                 {searchDate?.from ? (
                   searchDate.to ? (
                     <>
-                      {searchDate.from.toLocaleDateString()} - {searchDate.to.toLocaleDateString()}
+                      {searchDate.from.toISOString().slice(0, 10)} -{" "}
+                      {searchDate.to.toISOString().slice(0, 10)}
                     </>
                   ) : (
-                    searchDate.from.toLocaleDateString()
+                    searchDate.from.toISOString().slice(0, 10)
                   )
                 ) : (
                   <span>搜尋日期區間</span>
@@ -141,85 +172,67 @@ export default function OrdersPage() {
           搜尋
         </Button>
       </form>
-      <Tabs defaultValue="all">
-        <TabsList className="mb-4">
-          <TabsTrigger value="all">全部票券</TabsTrigger>
-          <TabsTrigger value="paid">已付款</TabsTrigger>
-          <TabsTrigger value="unpaid">未付款</TabsTrigger>
-          <TabsTrigger value="expired">已逾期</TabsTrigger>
-          <TabsTrigger value="cancelled">已取消</TabsTrigger>
-        </TabsList>
-        <TabsContent value="all">
-          {/* 依年月分組顯示訂單 */}
-          {(() => {
-            // 將所有分組的訂單攤平成一個陣列，依照原本排序
-            const allOrders: Order[] = sortedKeys.flatMap((key) => grouped[key]);
-            const visibleOrders = allOrders.slice(0, visibleCount);
-            // 重新依年月分組
-            const visibleGrouped = groupOrdersByYearMonth(visibleOrders);
-            const visibleKeys = Object.keys(visibleGrouped).sort((a, b) => b.localeCompare(a));
-            return (
-              <>
-                {visibleKeys.map((key) => {
-                  const [year, month] = key.split("-");
-                  const dateObj = new Date(`${year}-${month}-01`);
-                  return (
-                    <div
-                      key={key}
-                      className="mb-8"
+
+      {/* 依年月分組顯示訂單 */}
+      {(() => {
+        const allOrders: Order[] = sortedKeys.flatMap((key) => grouped[key]);
+        const visibleOrders = allOrders.slice(0, visibleCount);
+        const visibleGrouped = groupOrdersByYearMonth(visibleOrders);
+        const visibleKeys = Object.keys(visibleGrouped).sort((a, b) => b.localeCompare(a));
+        return (
+          <>
+            {visibleKeys.map((key) => {
+              const [year, month] = key.split("-");
+              const dateObj = new Date(`${year}-${month}-01`);
+              return (
+                <div
+                  key={key}
+                  className="mb-8"
+                >
+                  <h2 className="text-xl font-bold mb-2">
+                    {dateObj.getFullYear()} 年 {dateObj.getMonth() + 1} 月
+                  </h2>
+                  {visibleGrouped[key].map((order) => (
+                    <Link
+                      key={order.id}
+                      href={`/attendee/orders/${order.id}`}
+                      className="block w-full cursor-pointer hover:shadow mb-4"
                     >
-                      <h2 className="text-xl font-bold mb-2">
-                        {dateObj.toLocaleString("en-US", { month: "long", year: "numeric" })}
-                      </h2>
-                      {visibleGrouped[key].map((order) => (
-                        <Link
-                          key={order.id}
-                          href={`/attendee/orders/${order.id}`}
-                          className="block w-full cursor-pointer hover:shadow mb-4"
-                        >
-                          <Card className="transition-shadow">
-                            <CardHeader className="pb-2">
-                              <CardTitle className="text-lg mb-1">{order.title}</CardTitle>
-                              <CardDescription className="text-sm mb-1">
-                                {order.date}
-                              </CardDescription>
-                              <div className="text-xs text-gray-500 mb-2">訂單編號：{order.id}</div>
-                            </CardHeader>
-                            <CardContent className="flex items-center gap-2 text-sm text-gray-700 pb-0">
-                              <span className="flex items-center">📍{order.location}</span>
-                              <span className="flex items-center">💳付款方式：{order.payType}</span>
-                              <span
-                                className={`border px-4 py-1 rounded-full text-sm ml-auto flex items-center ${order.status === "待付款" ? "border-yellow-400 text-yellow-600" : order.status === "已付款" ? "border-green-400 text-green-600" : order.status === "已逾期" ? "border-blue-300 text-blue-500" : "border-gray-400 text-gray-600"}`}
-                              >
-                                {order.status}
-                              </span>
-                            </CardContent>
-                          </Card>
-                        </Link>
-                      ))}
-                    </div>
-                  );
-                })}
-                {allOrders.length > visibleCount && (
-                  <div className="flex justify-center">
-                    <Button
-                      onClick={() => setVisibleCount((c) => c + 10)}
-                      type="button"
-                      variant="outline"
-                    >
-                      查看更多
-                    </Button>
-                  </div>
-                )}
-              </>
-            );
-          })()}
-        </TabsContent>
-        <TabsContent value="paid">{/* 已付款內容 */}</TabsContent>
-        <TabsContent value="unpaid">{/* 未付款內容 */}</TabsContent>
-        <TabsContent value="expired">{/* 已逾期內容 */}</TabsContent>
-        <TabsContent value="cancelled">{/* 已取消內容 */}</TabsContent>
-      </Tabs>
+                      <Card className="transition-shadow">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-lg mb-1">{order.title}</CardTitle>
+                          <CardDescription className="text-sm mb-1">{order.date}</CardDescription>
+                          <div className="text-xs text-gray-500 mb-2">訂單編號：{order.id}</div>
+                        </CardHeader>
+                        <CardContent className="flex items-center gap-2 text-sm text-gray-700 pb-0">
+                          <span className="flex items-center">📍{order.location}</span>
+                          <span className="flex items-center">💳付款方式：{order.payType}</span>
+                          <span
+                            className={`border px-4 py-1 rounded-full text-sm ml-auto flex items-center ${order.status === "待付款" ? "border-yellow-400 text-yellow-600" : order.status === "已付款" ? "border-green-400 text-green-600" : order.status === "已逾期" ? "border-blue-300 text-blue-500" : "border-gray-400 text-gray-600"}`}
+                          >
+                            {order.status}
+                          </span>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
+              );
+            })}
+            {allOrders.length > visibleCount && (
+              <div className="flex justify-center">
+                <Button
+                  onClick={() => setVisibleCount((c) => c + 10)}
+                  type="button"
+                  variant="outline"
+                >
+                  查看更多
+                </Button>
+              </div>
+            )}
+          </>
+        );
+      })()}
     </div>
   );
 }
