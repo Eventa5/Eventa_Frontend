@@ -3,19 +3,12 @@ import { ChevronDown } from "lucide-react";
 import * as React from "react";
 
 interface CollapseProps {
-  title: React.ReactNode;
   defaultOpen?: boolean;
   children: React.ReactNode;
   className?: string;
 }
 
-export function Collapse({
-  title,
-  defaultOpen = false,
-  children,
-  className,
-  ...props
-}: CollapseProps) {
+export function Collapse({ defaultOpen = false, children, className, ...props }: CollapseProps) {
   const [isOpen, setIsOpen] = React.useState(defaultOpen);
 
   return (
