@@ -1,7 +1,7 @@
 import localFont from "next/font/local";
 import "@/styles/globals.css";
-import { Navbar } from "@/components/layout/Navbar";
-import { SidebarNav } from "@/components/layout/SidebarNav";
+import { Navbar } from "@/components/layout/navbar";
+import { SidebarNav } from "@/components/layout/sidebar-nav";
 import { Suspense } from "react";
 
 const notoSansTC = localFont({

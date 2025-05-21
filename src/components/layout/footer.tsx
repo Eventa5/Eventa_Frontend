@@ -1,6 +1,6 @@
 "use client";
 
-import HelpButton from "@/features/chatbot/components/HelpButton";
+import HelpButton from "@/features/chatbot/components/help-button";
 import { Github } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
