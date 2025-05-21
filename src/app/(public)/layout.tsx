@@ -11,17 +11,17 @@ import("@/services/api/interceptors");
 const notoSansTC = localFont({
   src: [
     {
-      path: "../../public/fonts/NotoSansTC-Regular.ttf",
+      path: "../../../public/fonts/NotoSansTC-Regular.ttf",
       weight: "400",
       style: "normal",
     },
     {
-      path: "../../public/fonts/NotoSansTC-Bold.ttf",
+      path: "../../../public/fonts/NotoSansTC-Bold.ttf",
       weight: "700",
       style: "normal",
     },
     {
-      path: "../../public/fonts/NotoSansTC-Black.ttf",
+      path: "../../../public/fonts/NotoSansTC-Black.ttf",
       weight: "900",
       style: "normal",
     },
@@ -33,17 +33,17 @@ const notoSansTC = localFont({
 const notoSerifTC = localFont({
   src: [
     {
-      path: "../../public/fonts/NotoSerifTC-Regular.ttf",
+      path: "../../../public/fonts/NotoSerifTC-Regular.ttf",
       weight: "400",
       style: "normal",
     },
     {
-      path: "../../public/fonts/NotoSerifTC-Bold.ttf",
+      path: "../../../public/fonts/NotoSerifTC-Bold.ttf",
       weight: "700",
       style: "normal",
     },
     {
-      path: "../../public/fonts/NotoSerifTC-Black.ttf",
+      path: "../../../public/fonts/NotoSerifTC-Black.ttf",
       weight: "900",
       style: "normal",
     },
