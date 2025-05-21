@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import type { OrderTabsValue } from "@/components/ui/orderTabs";
+import type { OrderTabsValue } from "@/components/ui/order-tabs";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
 import dynamic from "next/dynamic";
@@ -12,7 +12,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 import type { DateRange } from "react-day-picker";
-const OrderTabs = dynamic(() => import("@/components/ui/orderTabs"), { ssr: false });
+const OrderTabs = dynamic(() => import("@/components/ui/order-tabs"), { ssr: false });
 
 type Order = {
   id: string;
