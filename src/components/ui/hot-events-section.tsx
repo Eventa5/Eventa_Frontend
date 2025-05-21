@@ -1,7 +1,7 @@
 "use client";
 
 import { Swiper, SwiperSlide } from "swiper/react";
-import { EventCard } from "./EventCards";
+import { EventCard } from "./event-cards";
 
 interface Event {
   id: string;

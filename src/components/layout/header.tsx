@@ -6,10 +6,10 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
-import ForgotPasswordForm from "@/features/auth/components/ForgotPasswordForm";
-import ResetPasswordForm from "@/features/auth/components/ResetPasswordForm";
-import SignInForm from "@/features/auth/components/SignInForm";
-import SignUpForm from "@/features/auth/components/SignUpForm";
+import ForgotPasswordForm from "@/features/auth/components/forgot-password-form";
+import ResetPasswordForm from "@/features/auth/components/reset-password-form";
+import SignInForm from "@/features/auth/components/sign-in-form";
+import SignUpForm from "@/features/auth/components/sign-up-form";
 import { useIsMobile } from "@/hooks/useMediaQuery";
 import { useAuthStore } from "@/store/auth";
 import { useDialogStore } from "@/store/dialog";
