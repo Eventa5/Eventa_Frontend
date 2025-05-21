@@ -57,10 +57,7 @@ export function TicketCard({
             {quantity > 0 && <span className="text-[#C9A13B] font-bold text-xl">x {quantity}</span>}
           </div>
         </div>
-        <Collapse
-          title="更多資訊"
-          className="text-sm mt-6"
-        >
+        <Collapse className="text-sm mt-6">
           <div className="space-y-4 pt-2">
             <div className="space-y-2">
               <p className="text-sm font-medium">售票時間</p>
