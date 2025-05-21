@@ -38,7 +38,7 @@ export default function HotEventsSection({ events }: HotEventsSectionProps) {
       </div>
 
       {/* 平板與桌機版使用 Grid 佈局 */}
-      <div className="hidden md:grid md:gap-6 md:justify-items-center md:grid-cols-[repeat(2,_324px)] xl:grid-cols-[repeat(3,_411px)]">
+      <div className="hidden md:grid md:gap-6 md:justify-items-center md:grid-cols-[repeat(2,_324px)] 2xl:grid-cols-[repeat(3,_411px)]">
         {events.map((event) => (
           <EventCard
             key={event.id}

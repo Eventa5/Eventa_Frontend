@@ -323,7 +323,7 @@ export default function Home() {
               <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">活動</h2>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-[repeat(2,_302px)] lg:grid-cols-[repeat(3,_302px)] xl:grid-cols-[repeat(4,_302px)] gap-6 justify-items-center">
+          <div className="grid grid-cols-1 md:grid-cols-[repeat(2,_302px)] lg:grid-cols-[repeat(3,_302px)] 2xl:grid-cols-[repeat(4,_302px)] gap-6 justify-items-center">
             {otherEvents.map((event) => (
               <EventCard
                 key={event.id}

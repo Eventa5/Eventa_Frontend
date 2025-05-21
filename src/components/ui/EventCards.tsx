@@ -4,7 +4,7 @@ import { Calendar, MoveLeft, MoveRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { JSX } from "react";
-import { EffectCoverflow, Navigation, Pagination } from "swiper/modules";
+import { Autoplay, EffectCoverflow, Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 // 活動卡片類型
@@ -28,12 +28,12 @@ export const EventCard = ({
   // 預設樣式與依據尺寸的樣式組合
   const styles = {
     card: {
-      base: "rounded-t-[30px] w-[253px] md:w-[324px] xl:w-[411px]",
+      base: "rounded-t-[30px] w-[253px] md:w-[324px] 2xl:w-[411px]",
       sm: "flex-row md:flex-col rounded-tl-[20px] rounded-bl-[20px] md:rounded-bl-none md:rounded-t-[30px] md:w-full",
     },
     image: {
-      base: "h-[148px] md:h-[200px] xl:h-[274px] w-full",
-      sm: "h-[114px] w-[164px] md:h-[160px] md:w-full xl:h-[201px]",
+      base: "h-[148px] md:h-[200px] 2xl:h-[274px] w-full",
+      sm: "h-[114px] w-[164px] md:h-[160px] md:w-full 2xl:h-[201px]",
     },
     content: {
       base: "",
@@ -125,7 +125,13 @@ export const EventCarousel = ({ events }: { events: EventCardProps[] }) => {
           },
           1280: {
             slidesPerView: 3,
+            spaceBetween: -314,
           },
+        }}
+        onSwiper={(swiper) => {
+          setTimeout(() => {
+            swiper.update();
+          }, 100); // 或更久，看情況
         }}
         loop={true}
         navigation={{
@@ -133,7 +139,7 @@ export const EventCarousel = ({ events }: { events: EventCardProps[] }) => {
           nextEl: ".event-swiper-next",
           prevEl: ".event-swiper-prev",
         }}
-        autoplay={{ delay: 3000, disableOnInteraction: false }}
+        autoplay={{ delay: 5000, disableOnInteraction: false }}
         pagination={{
           clickable: true,
           el: ".swiper-pagination",
@@ -147,7 +153,7 @@ export const EventCarousel = ({ events }: { events: EventCardProps[] }) => {
           modifier: 5,
           slideShadows: false,
         }}
-        modules={[EffectCoverflow, Navigation, Pagination]}
+        modules={[Autoplay, EffectCoverflow, Navigation, Pagination]}
       >
         {events.map((event) => (
           <SwiperSlide key={event.id}>
@@ -203,8 +209,8 @@ export const ServiceCard = ({
   linkUrl,
 }: ServiceCardProps) => {
   return (
-    <div className="flex flex-col-reverse items-center justify-start  xl:flex-row bg-white rounded-[30px] rounded-tl-[160px] overflow-hidden shadow-md px-8 md:px-[45px] w-[343px] h-[405px]  xl:w-auto  xl:h-[374px]">
-      <div className="pr-4 relative shrink-0 flex items-center justify-center w-[144px] h-[144px]  xl:w-[200px]  xl:h-[200px]">
+    <div className="flex flex-col-reverse items-center justify-start  2xl:flex-row bg-white rounded-[30px] rounded-tl-[160px] overflow-hidden shadow-md px-8 md:px-[45px] w-[343px] h-[405px]  2xl:w-auto  2xl:h-[374px]">
+      <div className="pr-4 relative shrink-0 flex items-center justify-center w-[144px] h-[144px]  2xl:w-[200px]  2xl:h-[200px]">
         <Image
           src={imageUrl}
           alt={imageAlt}
@@ -213,16 +219,16 @@ export const ServiceCard = ({
           className="object-cover"
         />
       </div>
-      <div className="flex flex-col shrink-0  xl:w-[322px]">
-        <div className="space-y-4 flex flex-col items-center  xl:items-start w-[276px]  xl:w-full">
-          <h3 className="font-bold text-center whitespace-nowrap  xl:text-start text-[24px]  xl:text-[30px] text-black leading-tight font-serif-tc">
+      <div className="flex flex-col shrink-0  2xl:w-[322px]">
+        <div className="space-y-4 flex flex-col items-center  2xl:items-start w-[276px]  2xl:w-full">
+          <h3 className="font-bold text-center whitespace-nowrap  2xl:text-start text-[24px]  2xl:text-[30px] text-black leading-tight font-serif-tc">
             {title}
           </h3>
-          <div className="text-center  xl:text-start">
+          <div className="text-center  2xl:text-start">
             {description.map((item, i) => (
               <p
                 key={`desc-${item}`}
-                className="text-[#2E2E2E] text-[12px]  xl:text-[14px] whitespace-nowrap"
+                className="text-[#2E2E2E] text-[12px]  2xl:text-[14px] whitespace-nowrap"
               >
                 {item}
               </p>
@@ -231,7 +237,7 @@ export const ServiceCard = ({
         </div>
         <Link
           href={linkUrl}
-          className="mt-6 inline-flex items-center gap-2 bg-[#F07348] text-white px-6 py-3 rounded-xl font-bold  xl:self-start"
+          className="mt-6 inline-flex items-center gap-2 bg-[#F07348] text-white px-6 py-3 rounded-xl font-bold  2xl:self-start"
         >
           <span className="ml-2">→</span>
           {buttonText}

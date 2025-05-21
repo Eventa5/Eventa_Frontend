@@ -88,6 +88,8 @@
   /* 字體 */
   --font-sans-tc: var(--font-noto-sans-tc);
   --font-serif-tc: var(--font-noto-serif-tc);
+  /* 響應式 */
+  --breakpoint-2xl: 90rem;
 }
 
 :root {

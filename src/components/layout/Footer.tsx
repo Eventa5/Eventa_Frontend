@@ -111,7 +111,7 @@ export default function Footer() {
   return (
     <footer className="w-full">
       <div className="bg-[#262626] text-white py-24 px-4 md:px-8">
-        <div className="max-w-[1280px] mx-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-12">
+        <div className="max-w-[1280px] mx-auto grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-5 gap-12">
           {/* Logo 區域 */}
           <div className="flex flex-col gap-4 md:col-span-2 lg:col-span-1">
             <div className="relative">
