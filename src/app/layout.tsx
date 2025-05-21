@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
-import "./globals.css";
-import Navbar from "@/components/layout/Navbar";
+import "@/styles/globals.css";
+import Footer from "@/components/layout/Footer";
+import Header from "@/components/layout/Header";
+import Chatbot from "@/features/chatbot/components/Chatbot";
+import MobileSearchOverlay from "@/features/search/components/MobileSearchOverlay";
 import localFont from "next/font/local";
 import { Toaster } from "sonner";
 import("@/services/api/interceptors");
@@ -27,6 +30,29 @@ const notoSansTC = localFont({
   display: "swap",
 });
 
+const notoSerifTC = localFont({
+  src: [
+    {
+      path: "../../public/fonts/NotoSerifTC-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/NotoSerifTC-Bold.ttf",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/NotoSerifTC-Black.ttf",
+      weight: "900",
+      style: "normal",
+    },
+  ],
+  variable: "--font-noto-serif-tc",
+  display: "swap",
+  preload: true,
+});
+
 export const metadata: Metadata = {
   title: {
     template: "%s | Eventa",
@@ -44,11 +70,14 @@ export default function RootLayout({
   return (
     <html lang="zh-TW">
       <body
-        className={`${notoSansTC.variable} antialiased`}
+        className={`${notoSansTC.variable} ${notoSerifTC.variable} antialiased font-sans-tc`}
         suppressHydrationWarning
       >
-        <Navbar />
+        <Header />
         {children}
+        <Footer />
+        <Chatbot />
+        <MobileSearchOverlay />
         <Toaster />
       </body>
     </html>
