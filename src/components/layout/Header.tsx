@@ -145,7 +145,7 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full bg-white md:bg-[#FFFCF5] px-4 sm:px-8 py-6 flex flex-col items-center z-200 relative mb-10">
+    <header className="w-full bg-white md:bg-[#FFFCF5] px-4 sm:px-8 py-6 flex flex-col items-center z-50 relative mb-10">
       <div className="w-full max-w-6xl flex items-center justify-between">
         {/* 左側選單 */}
         <div className="hidden md:flex flex-1 items-center">
@@ -155,10 +155,12 @@ export default function Header() {
                 <NavigationMenuLink asChild>
                   <Link
                     href="/events"
-                    className="font-bold flex flex-row items-center gap-4 text-base"
+                    className="font-bold flex flex-row items-center gap-4"
                   >
                     <Ticket className="w-4 h-4 text-neutral-800" />
-                    <span className="hidden neutral-800 font-serif-tc sm:inline">探索活動</span>
+                    <span className="hidden neutral-800 font-serif-tc sm:inline text-base">
+                      探索活動
+                    </span>
                   </Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
@@ -318,11 +320,11 @@ export default function Header() {
             <div className="flex flex-col gap-4 flex-grow">
               <Link
                 href="/events"
-                className="flex items-center gap-4 py-2 px-4 font-serif-tc font-black text-base tracking-widest"
+                className="flex items-center gap-4 py-2 px-4 font-serif-tc font-black tracking-widest"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <Ticket className="w-5 h-5" />
-                <span>探索活動</span>
+                <span className="text-base">探索活動</span>
               </Link>
               {isAuthenticated ? (
                 <Link
