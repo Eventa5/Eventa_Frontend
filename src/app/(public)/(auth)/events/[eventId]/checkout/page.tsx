@@ -1,5 +1,4 @@
 "use client";
-import { TicketCard } from "@/components/ticket/TicketCard";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -9,6 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { TicketCard } from "@/components/ui/ticket-card";
 import { useAuthStore } from "@/store/auth";
 import Image from "next/image";
 import { useState } from "react";

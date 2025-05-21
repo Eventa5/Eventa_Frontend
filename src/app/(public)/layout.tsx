@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import "@/styles/globals.css";
-import Footer from "@/components/layout/Footer";
-import Header from "@/components/layout/Header";
-import Chatbot from "@/features/chatbot/components/Chatbot";
-import MobileSearchOverlay from "@/features/search/components/MobileSearchOverlay";
+import Footer from "@/components/layout/footer";
+import Header from "@/components/layout/header";
+import Chatbot from "@/features/chatbot/components/chatbot";
+import MobileSearchOverlay from "@/features/search/components/mobile-search-overlay";
 import localFont from "next/font/local";
 import { Toaster } from "sonner";
 import("@/services/api/interceptors");
