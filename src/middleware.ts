@@ -3,7 +3,12 @@ import type { NextRequest } from "next/server";
 import { isAuthenticated } from "./services/auth";
 
 // 需要認證的路徑
-const PROTECTED_PATH_REGEX = [/^\/attendee\/profile(\/|$)/, /^\/events\/[^/]+\/checkout$/];
+const PROTECTED_PATH_REGEX = [
+  /^\/attendee\/profile(\/|$)/,
+  /^\/events\/[^/]+\/checkout$/,
+  /^\/create-event(\/|$)/,
+  /^\/organizer(\/|$)/,
+];
 
 export async function middleware(request: NextRequest) {
   // 獲取當前請求的路徑
@@ -29,5 +34,10 @@ export async function middleware(request: NextRequest) {
 
 // 設置中間件應用的路徑
 export const config = {
-  matcher: ["/attendee/profile/:path*", "/events/:path*/checkout"],
+  matcher: [
+    "/attendee/profile/:path*",
+    "/events/:path*/checkout",
+    "/create-event/:path*",
+    "/organizer/:path*",
+  ],
 };
