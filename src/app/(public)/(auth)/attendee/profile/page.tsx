@@ -1,4 +1,4 @@
-import ProfileForm from "@/features/profile/components/ProfileForm";
+import ProfileForm from "@/features/profile/components/profile-form";
 import { getApiV1UsersProfile } from "@/services/api/client/sdk.gen";
 import type { UserResponse } from "@/services/api/client/types.gen";
 import type { Metadata } from "next";

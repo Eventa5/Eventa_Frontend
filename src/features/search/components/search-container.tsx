@@ -3,10 +3,10 @@
 import { useIsMobile } from "@/hooks/useMediaQuery";
 import { useSearchStore } from "@/store/search";
 import { useEffect, useRef } from "react";
-import MobileSearchOverlay from "./MobileSearchOverlay";
-import SearchButton from "./SearchButton";
-import SearchInput from "./SearchInput";
-import SearchOverlay from "./SearchOverlay";
+import MobileSearchOverlay from "./mobile-search-overlay";
+import SearchButton from "./search-button";
+import SearchInput from "./search-input";
+import SearchOverlay from "./search-overlay";
 
 export default function SearchContainer() {
   const containerRef = useRef<HTMLDivElement>(null);
