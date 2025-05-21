@@ -97,7 +97,7 @@ export default function CheckoutPage() {
           <div className="w-full md:w-[440px] space-y-6 shrink-0">
             <div className="relative h-[280px] w-full overflow-hidden rounded-lg">
               <Image
-                src="/Eventa_logo.svg"
+                src="/eventa-logo.svg"
                 alt="Eventa Logo Balloon and Ticket"
                 width={80}
                 height={80}
