@@ -48,13 +48,13 @@ const tabConfig = [
     value: "pending",
     label: "未完成",
     icon: ClipboardList,
-    iconClass: "text-yellow-400",
-    labelClass: "group-hover:text-yellow-400 group-data-[state=active]:text-yellow-400",
+    iconClass: "text-primary-600",
+    labelClass: "group-hover:text-primary-600 group-data-[state=active]:text-primary-600",
     badge:
-      "group-hover:bg-yellow-400 group-data-[state=active]:bg-yellow-400 group-hover:text-white group-data-[state=active]:text-white group-hover:border-yellow-400 group-data-[state=active]:border-yellow-400",
+      "group-hover:bg-primary-600 group-data-[state=active]:bg-primary-600 group-hover:text-white group-data-[state=active]:text-white group-hover:border-primary-600 group-data-[state=active]:border-primary-600",
     badgeActive:
-      "group-data-[state=active]:bg-yellow-400 group-data-[state=active]:text-white group-data-[state=active]:border-yellow-400",
-    underline: "yellow-400",
+      "group-data-[state=active]:bg-primary-600 group-data-[state=active]:text-white group-data-[state=active]:border-primary-600",
+    underline: "primary-600",
   },
   {
     value: "cancelled",
@@ -109,8 +109,8 @@ export const OrderTabs: React.FC<OrderTabsProps> = ({
                       tab.underline === "secondary-500",
                     "data-[state=active]:border-b-2 data-[state=active]:border-green-500":
                       tab.underline === "green-500",
-                    "data-[state=active]:border-b-2 data-[state=active]:border-yellow-400":
-                      tab.underline === "yellow-400",
+                    "data-[state=active]:border-b-2 data-[state=active]:border-primary-600":
+                      tab.underline === "primary-600",
                     "data-[state=active]:border-b-2 data-[state=active]:border-neutral-400":
                       tab.underline === "neutral-400",
                     "data-[state=active]:border-b-2 data-[state=active]:border-gray-400":

@@ -6,12 +6,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import type { OrderTabsValue } from "@/components/ui/order-tabs";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { isToday } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 import type { DateRange } from "react-day-picker";
+import "@/styles/calendar-range.css";
+
 const OrderTabs = dynamic(() => import("@/components/ui/order-tabs"), { ssr: false });
 
 type Order = {
@@ -84,8 +87,8 @@ export default function OrdersPage() {
   const oneMonthAgo = new Date();
   oneMonthAgo.setDate(today.getDate() - 30);
   const [searchDate, setSearchDate] = React.useState<DateRange | undefined>({
-    from: oneMonthAgo,
-    to: today,
+    from: undefined,
+    to: undefined,
   });
   const [visibleCount, setVisibleCount] = React.useState(10);
 
@@ -122,33 +125,29 @@ export default function OrdersPage() {
           e.preventDefault(); /* TODO: implement search */
         }}
       >
-        <Input
-          className="w-full md:w-1/3"
-          placeholder="搜尋活動"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
         <div className="w-full md:w-1/4">
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 id="date"
-                variant={"outline"}
-                className={"w-full justify-start text-left font-normal"}
+                variant="outline"
+                className="w-full flex justify-between items-center font-normal border-neutral-300 text-neutral-400 bg-white"
               >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {searchDate?.from ? (
-                  searchDate.to ? (
-                    <>
-                      {searchDate.from.toISOString().slice(0, 10)} -{" "}
-                      {searchDate.to.toISOString().slice(0, 10)}
-                    </>
+                <span className={searchDate?.from ? "text-neutral-900" : "text-neutral-400"}>
+                  {searchDate?.from ? (
+                    searchDate.to ? (
+                      <>
+                        {searchDate.from.toLocaleDateString()} -{" "}
+                        {searchDate.to.toLocaleDateString()}
+                      </>
+                    ) : (
+                      searchDate.from.toLocaleDateString()
+                    )
                   ) : (
-                    searchDate.from.toISOString().slice(0, 10)
-                  )
-                ) : (
-                  <span>搜尋日期區間</span>
-                )}
+                    "搜尋日期區間"
+                  )}
+                </span>
+                <CalendarIcon className="ml-2 h-4 w-4 text-neutral-400" />
               </Button>
             </PopoverTrigger>
             <PopoverContent
@@ -161,10 +160,26 @@ export default function OrdersPage() {
                 selected={searchDate}
                 onSelect={setSearchDate}
                 numberOfMonths={2}
+                classNames={{
+                  selected: "bg-accent",
+                  range_start:
+                    "rounded-l-md bg-primary-500 hover:bg-primary-500 custom-range-start",
+                  range_end: "rounded-r-md bg-primary-500 hover:bg-primary-500 custom-range-end",
+                  today: "bg-transparent",
+                }}
+                disabled={(date) => date > new Date()}
+                showOutsideDays={false}
               />
             </PopoverContent>
           </Popover>
         </div>
+        <Input
+          className="w-full md:w-1/3"
+          placeholder="搜尋活動"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+
         <Button
           type="submit"
           className="w-full md:w-auto"
