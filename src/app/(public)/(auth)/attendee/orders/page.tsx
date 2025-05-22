@@ -250,11 +250,10 @@ export default function OrdersPage() {
               </Button>
             </PopoverTrigger>
             <PopoverContent
-              className="w-auto p-0"
+              className="w-auto p-0 border-neutral-300"
               align="start"
             >
               <div className="flex items-center justify-between px-4 pt-2">
-                <span className="text-sm font-medium">選擇日期區間</span>
                 {searchDate?.from && (
                   <button
                     type="button"
