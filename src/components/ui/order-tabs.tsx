@@ -1,3 +1,4 @@
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { cn } from "@/utils/transformer";
 import { CalendarX, ClipboardCheck, ClipboardList, ClipboardX, WalletCards } from "lucide-react";
 import type React from "react";
@@ -91,35 +92,50 @@ export const OrderTabs: React.FC<OrderTabsProps> = ({
     <Tabs
       value={value}
       onValueChange={(v) => onValueChange(v as OrderTabsValue)}
-      className={className}
+      className={cn(className, "overflow-x-auto touch-scroll scrollbar-hide cursor-grab")}
     >
-      <TabsList className="bg-transparent p-0 gap-6 h-auto">
-        {tabConfig.map((tab) => {
-          const Icon = tab.icon;
-          return (
-            <TabsTrigger
-              key={tab.value}
-              value={tab.value}
-              className={cn(
-                `group relative flex items-center gap-1.5 px-4 py-3 bg-transparent border-0 text-base font-medium transition-none focus-visible:outline-none focus-visible:shadow-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:font-bold data-[state=active]:border-b-2 data-[state=active]:border-${tab.underline} hover:font-bold rounded-none`
-              )}
-            >
-              <Icon className={cn("size-6", tab.iconClass)} />
-
-              <span className={cn("ml-1 text-neutral-400", tab.labelClass)}>{tab.label}</span>
-              <span
+      <ScrollArea className="w-full overflow-x-auto">
+        <TabsList className="bg-transparent p-0 gap-6 h-auto">
+          {tabConfig.map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <TabsTrigger
+                key={tab.value}
+                value={tab.value}
                 className={cn(
-                  "ml-1 inline-flex items-center justify-center rounded-full px-1.5 text-xs font-normal min-w-[20px] border border-neutral-400 text-neutral-400 bg-transparent transition-colors",
-                  tab.badge,
-                  tab.badgeActive
+                  "group relative flex items-center gap-1.5 px-4 py-3 bg-transparent border-0 text-base font-medium transition-none focus-visible:outline-none focus-visible:shadow-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:font-bold hover:font-bold rounded-none",
+                  {
+                    "data-[state=active]:border-b-2 data-[state=active]:border-secondary-500":
+                      tab.underline === "secondary-500",
+                    "data-[state=active]:border-b-2 data-[state=active]:border-green-500":
+                      tab.underline === "green-500",
+                    "data-[state=active]:border-b-2 data-[state=active]:border-yellow-400":
+                      tab.underline === "yellow-400",
+                    "data-[state=active]:border-b-2 data-[state=active]:border-neutral-400":
+                      tab.underline === "neutral-400",
+                    "data-[state=active]:border-b-2 data-[state=active]:border-gray-400":
+                      tab.underline === "gray-400",
+                  }
                 )}
               >
-                {counts[tab.value as OrderTabsValue]}
-              </span>
-            </TabsTrigger>
-          );
-        })}
-      </TabsList>
+                <Icon className={cn("size-6", tab.iconClass)} />
+
+                <span className={cn("ml-1 text-neutral-400", tab.labelClass)}>{tab.label}</span>
+                <span
+                  className={cn(
+                    "ml-1 inline-flex items-center justify-center rounded-full px-1.5 text-xs font-normal min-w-[20px] border border-neutral-400 text-neutral-400 bg-transparent transition-colors",
+                    tab.badge,
+                    tab.badgeActive
+                  )}
+                >
+                  {counts[tab.value as OrderTabsValue]}
+                </span>
+              </TabsTrigger>
+            );
+          })}
+        </TabsList>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
     </Tabs>
   );
 };
