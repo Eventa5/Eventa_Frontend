@@ -1,10 +1,10 @@
-import CategorySwiper from "@/components/ui/CategorySwiper";
-import { EventCard, EventCarousel, ServiceCard } from "@/components/ui/EventCards";
-import HotEventsSection from "@/components/ui/HotEventsSection";
+import CategorySwiper from "@/components/ui/category-swiper";
+import { EventCard, EventCarousel, ServiceCard } from "@/components/ui/event-cards";
+import HotEventsSection from "@/components/ui/hot-events-section";
 import Link from "next/link";
 import "@/styles/pages/home.css";
-import ChatButton from "@/features/chatbot/components/ChatButton";
-import SearchContainer from "@/features/search/components/SearchContainer";
+import ChatButton from "@/features/chatbot/components/chat-button";
+import SearchContainer from "@/features/search/components/search-container";
 import Image from "next/image";
 
 // 首頁的模擬資料
