@@ -34,7 +34,7 @@ const tabConfig = [
   },
   {
     value: "registered",
-    label: "已報名",
+    label: "已付款",
     icon: ClipboardCheck,
     iconClass: "text-green-500",
     labelClass: "group-hover:text-green-500 group-data-[state=active]:text-green-500",
@@ -46,7 +46,7 @@ const tabConfig = [
   },
   {
     value: "pending",
-    label: "未完成",
+    label: "待付款",
     icon: ClipboardList,
     iconClass: "text-primary-600",
     labelClass: "group-hover:text-primary-600 group-data-[state=active]:text-primary-600",
@@ -120,7 +120,9 @@ export const OrderTabs: React.FC<OrderTabsProps> = ({
               >
                 <Icon className={cn("size-6", tab.iconClass)} />
 
-                <span className={cn("ml-1 text-neutral-400", tab.labelClass)}>{tab.label}</span>
+                <span className={cn("ml-1 text-neutral-400 text-sm md:text-lg", tab.labelClass)}>
+                  {tab.label}
+                </span>
                 <span
                   className={cn(
                     "ml-1 inline-flex items-center justify-center rounded-full px-1.5 text-xs font-normal min-w-[20px] border border-neutral-400 text-neutral-400 bg-transparent transition-colors",
