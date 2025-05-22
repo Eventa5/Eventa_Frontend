@@ -1,0 +1,6 @@
+.custom-range-start button:hover {
+  background-color: var(--color-primary-500);
+}
+.custom-range-end button:hover {
+  background-color: var(--color-primary-500);
+}
