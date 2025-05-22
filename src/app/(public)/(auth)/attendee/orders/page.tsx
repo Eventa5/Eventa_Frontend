@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { OrderCard } from "@/components/ui/order-card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-import "@/styles/calendar-range.css";
+import "@/styles/customs/calendar-range.css";
 
 const OrderTabs = dynamic(() => import("@/components/ui/order-tabs"), { ssr: false });
 
@@ -60,7 +60,7 @@ export default function OrdersPage() {
       paidExpiredAt: "2025-04-18 23:10:00",
       paymentMethod: null,
       activity: {
-        title: "復古黑膠﻿派對之夜",
+        title: "復古黑膠 派對之夜",
         location: "台北市",
         startTime: "2025-05-10 20:00:00",
         endTime: "2025-05-10 23:30:00",
@@ -93,7 +93,7 @@ export default function OrdersPage() {
       },
     },
     {
-      id: "2501011234567890123456",
+      id: "2501011234567890123455",
       status: "已使用",
       paidAt: "2025-05-01 12:00:00",
       paidExpiredAt: "2025-05-01 12:10:00",
@@ -134,7 +134,7 @@ export default function OrdersPage() {
     from: undefined,
     to: undefined,
   });
-  const [visibleCount, setVisibleCount] = React.useState(10);
+  const [visibleCount, setVisibleCount] = React.useState(3);
   const [filteredOrders, setFilteredOrders] = React.useState<Order[]>(orders);
 
   // 依年月分組
@@ -209,7 +209,7 @@ export default function OrdersPage() {
   }, [handleSearch]);
 
   return (
-    <div className="container mx-auto p-4 pb-16 md:pb-[200px]">
+    <div className="container mx-auto p-4 py-16 md:pb-[200px]">
       <h1 className="text-center md:text-left text-lg md:text-2xl font-bold mb-4">訂單管理</h1>
       <OrderTabs
         value={tab}
@@ -356,9 +356,10 @@ export default function OrdersPage() {
             {tabFilteredOrders.length > visibleCount && (
               <div className="flex justify-center">
                 <Button
-                  onClick={() => setVisibleCount((c) => c + 10)}
+                  onClick={() => {}}
                   type="button"
                   variant="outline"
+                  className="border-neutral-600 text-neutral-600 hover:cursor-pointer px-15 py-3"
                 >
                   查看更多
                 </Button>
