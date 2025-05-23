@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { isAfter, isBefore, subYears } from "date-fns";
 import { User } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -30,7 +30,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { profileFormSchema } from "@/features/profile/schemas";
-import { getApiV1UsersProfile, putApiV1UsersProfile } from "@/services/api/client/sdk.gen";
+import {
+  getApiV1UsersProfile,
+  postApiV1UsersProfileAvatar,
+  putApiV1UsersProfile,
+} from "@/services/api/client/sdk.gen";
 import type { UserResponse } from "@/services/api/client/types.gen";
 import type { z } from "zod";
 
@@ -164,6 +168,8 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const today = new Date();
   const minBirthDate = subYears(today, 120);
@@ -244,6 +250,58 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
     }
   }
 
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // 檢查檔案類型
+    if (!file.type.startsWith("image/")) {
+      toast.error("請上傳圖片檔案");
+      return;
+    }
+
+    // 檢查檔案大小（限制為 4MB）
+    if (file.size > 4 * 1024 * 1024) {
+      toast.error("圖片大小不能超過 4MB");
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+      const formData = new FormData();
+      formData.append("avatar", file);
+
+      const response = await postApiV1UsersProfileAvatar({
+        body: {
+          avatar: file,
+        },
+      });
+
+      if (response.data?.status) {
+        await mutate();
+        toast.success("大頭貼更新成功");
+      } else {
+        throw new Error(response.error?.message || "上傳失敗");
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("上傳大頭貼失敗");
+      }
+    } finally {
+      setIsUploading(false);
+      // 清空檔案輸入框，允許重複上傳相同檔案
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
   // 顯示錯誤訊息
   if (error) {
     toast.error("載入個人檔案時發生錯誤");
@@ -259,7 +317,17 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
           className="space-y-6"
         >
           <div className="flex flex-col items-center space-y-2">
-            <div className="relative h-24 w-24 overflow-hidden rounded-full bg-gray-200">
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+            <div
+              className="relative h-24 w-24 overflow-hidden rounded-full bg-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
+              onClick={handleAvatarClick}
+            >
               {photoUrl ? (
                 <Image
                   src={photoUrl}
@@ -270,6 +338,11 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
               ) : (
                 <div className="flex h-full w-full items-center justify-center">
                   <User className="h-10 w-10 text-gray-400" />
+                </div>
+              )}
+              {isUploading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                  <div className="h-6 w-6 animate-spin rounded-full border-2 border-white border-t-transparent" />
                 </div>
               )}
             </div>
