@@ -29,6 +29,9 @@ export default function EventDetailPage() {
   const setLoginTab = useDialogStore((s) => s.setLoginTab);
   const router = useRouter();
 
+  // 活動地點變數
+  const eventLocation = "苗栗縣大埔鄉興正路 121 巷 8 弄 20 號";
+
   const handleCheckout = () => {
     if (isAuthenticated) {
       router.push(`/events/${eventId}/checkout`);
@@ -134,7 +137,7 @@ export default function EventDetailPage() {
                     <MapPin className="w-5 h-5" />
                     活動地點
                   </span>
-                  <span className="text-neutral-800">苗栗縣大埔鄉興正路 121 巷 8 弄 20 號</span>
+                  <span className="text-neutral-800">{eventLocation}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="inline-flex items-center gap-2 text-neutral-800 font-bold">
@@ -190,13 +193,18 @@ export default function EventDetailPage() {
                 </h2>
               </div>
             </div>
-            <div className="w-full max-w-[845px]">
-              <Image
-                src="/images/google-map.png"
-                alt="地圖"
-                width={845}
-                height={309}
-                className="rounded-[16px]"
+            <div className="w-full max-w-[845px] rounded-[16px] overflow-hidden">
+              <iframe
+                title="活動地圖"
+                width="100%"
+                height="309"
+                style={{ border: 0 }}
+                loading="lazy"
+                allowFullScreen
+                referrerPolicy="no-referrer-when-downgrade"
+                src={`https://www.google.com/maps?q=${encodeURIComponent(
+                  eventLocation
+                )}&output=embed`}
               />
             </div>
           </section>
