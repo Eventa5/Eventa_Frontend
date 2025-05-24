@@ -209,7 +209,7 @@ export default function OrdersPage() {
   }, [handleSearch]);
 
   return (
-    <div className="container mx-auto p-4 py-16 md:pb-[200px]">
+    <div className="container max-w-6xl mx-auto p-4 py-16 md:pb-[200px]">
       <h1 className="text-center md:text-left text-lg md:text-2xl font-bold mb-4">訂單管理</h1>
       <OrderTabs
         value={tab}

@@ -225,11 +225,11 @@ export default function Header() {
                     <ul className="py-2">
                       <li>
                         <Link
-                          href="#"
+                          href="/attendee/orders"
                           className="flex items-center cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                         >
-                          <Calendar className="w-4 h-4 mr-3 text-gray-500" />
-                          我的票券
+                          <Ticket className="w-4 h-4 mr-3 text-gray-500" />
+                          訂單管理
                         </Link>
                       </li>
                       <li>

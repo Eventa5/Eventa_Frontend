@@ -58,7 +58,7 @@ export default function OrderDetailPage() {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container max-w-6xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">訂單詳情</h1>
       <div className="border rounded p-4 mb-4">
         <div className="text-lg font-semibold mb-1">{order.title}</div>
