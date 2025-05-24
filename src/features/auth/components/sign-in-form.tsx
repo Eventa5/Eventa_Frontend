@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { postApiV1UsersLogin } from "@/services/api/client/sdk.gen";
+import { getApiV1UsersGoogleLogin, postApiV1UsersLogin } from "@/services/api/client/sdk.gen";
 import { useAuthStore } from "@/store/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
@@ -18,6 +18,7 @@ export default function SignInForm({ onSuccess, onSwitchTab, isMobile = false }:
   const router = useRouter();
   const loginStore = useAuthStore((s) => s.login);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const {
     register,
@@ -30,6 +31,65 @@ export default function SignInForm({ onSuccess, onSwitchTab, isMobile = false }:
       password: "",
     },
   });
+
+  const handleGoogleLogin = async () => {
+    setIsGoogleLoading(true);
+    try {
+      // 呼叫 API 取得 Google 登入網址
+      const response = await getApiV1UsersGoogleLogin();
+      // 斷言 response 為 { data?: { url?: string } }
+      const googleAuthUrl = (response as { data?: { url?: string } }).data?.url;
+      if (!googleAuthUrl) {
+        toast.error("無法取得 Google 登入網址");
+        setIsGoogleLoading(false);
+        return;
+      }
+
+      // 開新視窗導向 Google 登入
+      const loginWindow = window.open(
+        googleAuthUrl,
+        "Google 登入",
+        "width=500,height=600,left=200,top=200"
+      );
+
+      // 監聽 postMessage
+      const messageHandler = (event: MessageEvent) => {
+        if (event.data?.type === "google-callback") {
+          const token = event.data.token;
+          if (token) {
+            loginStore(token).then((success) => {
+              if (success) {
+                loginWindow?.close();
+                toast.success("登入成功");
+                if (onSuccess) {
+                  onSuccess();
+                } else {
+                  router.push("/");
+                }
+              } else {
+                toast.error("設置認證 token 失敗，請重試");
+              }
+            });
+          } else {
+            loginWindow?.close();
+            toast.error("登入未完成，請重新嘗試登入", {
+              action: {
+                label: "重新登入",
+                onClick: () => handleGoogleLogin(),
+              },
+            });
+          }
+          window.removeEventListener("message", messageHandler);
+        }
+      };
+      window.addEventListener("message", messageHandler);
+    } catch (err) {
+      console.error(err);
+      toast.error(err instanceof Error ? err.message : "Google 登入失敗，請稍後再試");
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
 
   const onSubmit = async (data: SignInFormValues) => {
     setIsLoading(true);
@@ -54,7 +114,7 @@ export default function SignInForm({ onSuccess, onSwitchTab, isMobile = false }:
           if (onSuccess) {
             onSuccess();
           } else {
-            router.push("/attendee/profile");
+            router.push("/");
           }
         } else {
           toast.error("設置認證 token 失敗，請重試");
@@ -120,7 +180,8 @@ export default function SignInForm({ onSuccess, onSwitchTab, isMobile = false }:
           type="button"
           variant="outline"
           className="w-full border-2 border-neutral-300 font-medium flex items-center justify-center gap-2 cursor-pointer !py-3 h-auto mb-6"
-          disabled={isLoading}
+          disabled={isGoogleLoading}
+          onClick={handleGoogleLogin}
         >
           <Image
             src="/icons/google.svg"
@@ -128,7 +189,7 @@ export default function SignInForm({ onSuccess, onSwitchTab, isMobile = false }:
             height={24}
             alt="Google Login"
           />
-          以 Google 登入
+          {isGoogleLoading ? "處理中..." : "以 Google 登入"}
         </Button>
 
         {onSwitchTab && (

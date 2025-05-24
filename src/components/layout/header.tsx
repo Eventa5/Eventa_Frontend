@@ -1,5 +1,11 @@
 "use client";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -431,6 +437,12 @@ export default function Header() {
           <DialogContent className="max-w-md w-full">
             <DialogHeader>
               <DialogTitle>{getAuthTitle()}</DialogTitle>
+              <DialogDescription>
+                {loginTab === "signin" && "請輸入您的帳號密碼進行登入"}
+                {loginTab === "signup" && "請填寫以下資料完成註冊"}
+                {loginTab === "forgot" && "請輸入您的電子郵件，我們將發送重設密碼連結"}
+                {loginTab === "reset" && "請輸入您的新密碼"}
+              </DialogDescription>
             </DialogHeader>
             <div className="py-2">{renderAuthForm()}</div>
           </DialogContent>
