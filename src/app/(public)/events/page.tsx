@@ -3,6 +3,7 @@
 import { EventCard, EventCarousel } from "@/components/ui/event-cards";
 import HotEventsSection from "@/components/ui/hot-events-section";
 import SearchContainer from "@/features/search/components/search-container";
+import { useSearchStore } from "@/store/search";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -149,6 +150,13 @@ const otherEvents = [
 ];
 
 export default function EventsPage() {
+  const searchValue = useSearchStore((s) => s.searchValue);
+  const filteredEvents = searchValue
+    ? otherEvents.filter(
+        (event) => event.title.includes(searchValue) || event.location.includes(searchValue)
+      )
+    : otherEvents;
+
   return (
     <main className="flex flex-col w-full min-h-screen bg-primary-50">
       {/* 搜尋容器 */}
@@ -157,28 +165,73 @@ export default function EventsPage() {
           <SearchContainer />
         </div>
       </section>
-      {/* 最新強檔 */}
-      <section className="py-20 md:py-32 px-4 md:px-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col items-center mb-3 md:mb-8">
-            <div className="flex items-center gap-6 mb-6 font-serif-tc">
-              <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">最新強檔</h2>
-              <Image
-                src="/images/balloon.png"
-                width={50}
-                height={100}
-                className="w-6 h-12 md:w-10 md:h-20"
-                alt="氣球"
-              />
-              <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">話題不斷</h2>
-            </div>
-            <p className="text-[14px] md:text-[18px] text-[#525252] text-center max-w-3xl">
-              不只是活動，更是讓生活亮起來的機會，錯過這波話題活動，就真的只能看別人打卡了！
-            </p>
+      {/* 其他活動（搜尋時搬到最上面） */}
+      {searchValue && (
+        <section className="py-20 md:py-32 px-4 md:px-8">
+          <div className="flex flex-col items-center">
+            {filteredEvents.length > 0 ? (
+              <>
+                <div className="flex flex-col items-center mb-12">
+                  <div className="flex items-end gap-6 mb-6 font-serif-tc">
+                    <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">搜尋</h2>
+                    <Image
+                      src="/images/balloon-red.png"
+                      width={50}
+                      height={100}
+                      className="w-6 h-12 md:w-10 md:h-20"
+                      alt="氣球"
+                    />
+                    <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">結果</h2>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-[repeat(2,_302px)] lg:grid-cols-[repeat(3,_302px)] 2xl:grid-cols-[repeat(4,_302px)] gap-6 justify-items-center mx-auto">
+                  {filteredEvents.map((event) => (
+                    <EventCard
+                      key={event.id}
+                      {...event}
+                      size="sm"
+                    />
+                  ))}
+                </div>
+                <div className="mt-12 flex justify-center">
+                  <Link
+                    href="/events"
+                    className="px-8 py-3 border border-[#525252] rounded-xl text-[#525252] hover:bg-[#F5F5F5] transition-colors"
+                  >
+                    查看更多
+                  </Link>
+                </div>
+              </>
+            ) : (
+              <div className="text-gray-400 text-xl py-24">目前沒有相符的搜尋結果</div>
+            )}
           </div>
-          <EventCarousel events={newEvents} />
-        </div>
-      </section>
+        </section>
+      )}
+      {/* 最新強檔（搜尋時隱藏） */}
+      {!searchValue && (
+        <section className="py-20 md:py-32 px-4 md:px-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex flex-col items-center mb-3 md:mb-8">
+              <div className="flex items-center gap-6 mb-6 font-serif-tc">
+                <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">最新強檔</h2>
+                <Image
+                  src="/images/balloon.png"
+                  width={50}
+                  height={100}
+                  className="w-6 h-12 md:w-10 md:h-20"
+                  alt="氣球"
+                />
+                <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">話題不斷</h2>
+              </div>
+              <p className="text-[14px] md:text-[18px] text-[#525252] text-center max-w-3xl">
+                不只是活動，更是讓生活亮起來的機會，錯過這波話題活動，就真的只能看別人打卡了！
+              </p>
+            </div>
+            <EventCarousel events={newEvents} />
+          </div>
+        </section>
+      )}
       {/* 熱門活動 */}
       <section className="pt-[116px] pb-[116px] md:pt-[200px] md:pb-[173px] px-4 md:px-8 bg-hot-activity">
         <div className="flex flex-col items-center">
@@ -203,41 +256,43 @@ export default function EventsPage() {
           <HotEventsSection events={hotEvents} />
         </div>
       </section>
-      {/* 其他活動 */}
-      <section className="py-20 md:py-32 px-4 md:px-8">
-        <div className="flex flex-col items-center">
-          <div className="flex flex-col items-center mb-12">
-            <div className="flex items-end gap-6 mb-6 font-serif-tc">
-              <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">其他</h2>
-              <Image
-                src="/images/balloon-red.png"
-                width={50}
-                height={100}
-                className="w-6 h-12 md:w-10 md:h-20"
-                alt="氣球"
-              />
-              <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">活動</h2>
+      {/* 其他活動（搜尋時以外才顯示） */}
+      {!searchValue && (
+        <section className="py-20 md:py-32 px-4 md:px-8">
+          <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center mb-12">
+              <div className="flex items-end gap-6 mb-6 font-serif-tc">
+                <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">其他</h2>
+                <Image
+                  src="/images/balloon-red.png"
+                  width={50}
+                  height={100}
+                  className="w-6 h-12 md:w-10 md:h-20"
+                  alt="氣球"
+                />
+                <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">活動</h2>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-[repeat(2,_302px)] lg:grid-cols-[repeat(3,_302px)] 2xl:grid-cols-[repeat(4,_302px)] gap-6 justify-items-center mx-auto">
+              {filteredEvents.map((event) => (
+                <EventCard
+                  key={event.id}
+                  {...event}
+                  size="sm"
+                />
+              ))}
+            </div>
+            <div className="mt-12 flex justify-center">
+              <Link
+                href="/events"
+                className="px-8 py-3 border border-[#525252] rounded-xl text-[#525252] hover:bg-[#F5F5F5] transition-colors"
+              >
+                查看更多
+              </Link>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-[repeat(2,_302px)] lg:grid-cols-[repeat(3,_302px)] 2xl:grid-cols-[repeat(4,_302px)] gap-6 justify-items-center">
-            {otherEvents.map((event) => (
-              <EventCard
-                key={event.id}
-                {...event}
-                size="sm"
-              />
-            ))}
-          </div>
-          <div className="mt-12 flex justify-center">
-            <Link
-              href="/events"
-              className="px-8 py-3 border border-[#525252] rounded-xl text-[#525252] hover:bg-[#F5F5F5] transition-colors"
-            >
-              查看更多
-            </Link>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
     </main>
   );
 }
