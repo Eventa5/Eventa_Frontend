@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { putApiV1UsersResetPassword } from "@/services/api/client/sdk.gen";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -26,7 +27,7 @@ export default function ResetPasswordForm({
     defaultValues: {
       password: "",
       confirmPassword: "",
-      verificationCode: "",
+      resetToken: "",
     },
   });
 
@@ -34,15 +35,21 @@ export default function ResetPasswordForm({
     setIsLoading(true);
 
     try {
-      // 目前模擬 API 呼叫
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await putApiV1UsersResetPassword({
+        body: {
+          newPassword: data.password,
+          confirmNewPassword: data.confirmPassword,
+          resetToken: data.resetToken,
+        },
+      });
 
-      // 實際應用時可替換為真實 API
-      // await 重設密碼 API
-
-      toast.success("密碼重設成功，請使用新密碼登入");
-      if (onSuccess) {
-        onSuccess();
+      if (response.data?.status) {
+        toast.success("密碼重設成功，請使用新密碼登入");
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        toast.error(response.data?.message || "重設密碼失敗");
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "發生錯誤，請稍後再試");
@@ -58,16 +65,14 @@ export default function ResetPasswordForm({
     >
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="verificationCode">驗證碼</Label>
+          <Label htmlFor="resetToken">重設密碼驗證碼</Label>
           <Input
-            id="verificationCode"
+            id="resetToken"
             type="text"
-            placeholder="請輸入電子郵件收到的驗證碼"
-            {...register("verificationCode")}
+            placeholder="請輸入郵件中的驗證碼"
+            {...register("resetToken")}
           />
-          {errors.verificationCode && (
-            <p className="text-sm text-red-500">{errors.verificationCode.message}</p>
-          )}
+          {errors.resetToken && <p className="text-sm text-red-500">{errors.resetToken.message}</p>}
         </div>
         <div className="space-y-2">
           <Label htmlFor="password">新密碼</Label>

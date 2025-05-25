@@ -24,7 +24,7 @@ export type CreateClientConfig<T extends DefaultClientOptions = ClientOptions> =
 export const client = createClient(
   createClientConfig(
     createConfig<ClientOptions>({
-      baseUrl: "http://localhost:3001",
+      baseUrl: "https://eventa-backend-pgun.onrender.com",
     })
   )
 );
