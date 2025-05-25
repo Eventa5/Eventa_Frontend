@@ -5,6 +5,7 @@ import { isAuthenticated } from "./services/auth";
 // 需要認證的路徑
 const PROTECTED_PATH_REGEX = [
   /^\/attendee\/profile(\/|$)/,
+  /^\/attendee\/orders(\/|$)/,
   /^\/events\/[^/]+\/checkout$/,
   /^\/create-event(\/|$)/,
   /^\/organizer(\/|$)/,
@@ -36,6 +37,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     "/attendee/profile/:path*",
+    "/attendee/orders/:path*",
     "/events/:path*/checkout",
     "/create-event/:path*",
     "/organizer/:path*",

@@ -24,7 +24,7 @@ async function getProfileData(): Promise<UserResponse> {
   } catch (error) {
     console.error("獲取用戶檔案失敗:", error);
     // 如果是認證錯誤，重定向到登入頁面
-    redirect("/signin?redirect=/attendee/profile");
+    redirect("/?redirect=/attendee/profile");
   }
 }
 

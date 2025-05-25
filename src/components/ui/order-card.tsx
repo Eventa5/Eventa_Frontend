@@ -62,10 +62,10 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
   return (
     <Link
       href={`/attendee/orders/${order.id}`}
-      className={`block w-full cursor-pointer mb-4 border transition-shadow ${order.status === "已取消" || order.status === "已逾期" ? "bg-gray-100 text-gray-400" : "bg-white"}`}
+      className={`block w-full cursor-pointer mb-4 transition-shadow ${order.status === "已取消" || order.status === "已逾期" ? "bg-gray-100 text-gray-400" : "bg-white"}`}
     >
       <div
-        className={`w-full border transition-shadow bg-white flex items-center px-8 py-6 pr-16 ${order.status === "已使用" || order.status === "已逾期" ? "opacity-60" : ""}`}
+        className={`w-full transition-shadow bg-white flex items-center px-8 py-6 pr-16 border border-neutral-300 hover:border-neutral-800 ${order.status === "已使用" || order.status === "已逾期" ? "opacity-60" : ""}`}
       >
         <div className="w-full md:flex md:flex-row md:items-center">
           <div className="flex-shrink-0 flex items-center h-full mb-4 md:mb-0 order-1 md:order-2">
