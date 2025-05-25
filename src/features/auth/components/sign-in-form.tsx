@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getApiV1UsersGoogleLogin, postApiV1UsersLogin } from "@/services/api/client/sdk.gen";
+import { postApiV1UsersLogin } from "@/services/api/client/sdk.gen";
 import { useAuthStore } from "@/store/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
@@ -35,19 +35,8 @@ export default function SignInForm({ onSuccess, onSwitchTab, isMobile = false }:
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);
     try {
-      // 呼叫 API 取得 Google 登入網址
-      const response = await getApiV1UsersGoogleLogin();
-      // 斷言 response 為 { data?: { url?: string } }
-      const googleAuthUrl = (response as { data?: { url?: string } }).data?.url;
-      if (!googleAuthUrl) {
-        toast.error("無法取得 Google 登入網址");
-        setIsGoogleLoading(false);
-        return;
-      }
-
-      // 開新視窗導向 Google 登入
       const loginWindow = window.open(
-        googleAuthUrl,
+        "https://eventa-backend-pgun.onrender.com/api/v1/users/google/login",
         "Google 登入",
         "width=500,height=600,left=200,top=200"
       );
