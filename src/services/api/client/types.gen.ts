@@ -1172,5 +1172,5 @@ export type PostApiV1UsersProfileAvatarResponse =
   PostApiV1UsersProfileAvatarResponses[keyof PostApiV1UsersProfileAvatarResponses];
 
 export type ClientOptions = {
-  baseUrl: "http://localhost:3000" | (string & {});
+  baseUrl: "https://eventa-backend-pgun.onrender.com" | (string & {});
 };

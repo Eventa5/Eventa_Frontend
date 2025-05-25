@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { putApiV1UsersForget } from "@/services/api/client/sdk.gen";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -32,15 +33,19 @@ export default function ForgotPasswordForm({
     setIsLoading(true);
 
     try {
-      // 目前模擬 API 呼叫
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await putApiV1UsersForget({
+        body: {
+          email: data.email,
+        },
+      });
 
-      // 實際應用時可替換為真實 API
-      // await 密碼重設 API
-
-      toast.success("驗證碼已寄送至您的信箱");
-      if (onSuccess) {
-        onSuccess();
+      if (response.data?.status) {
+        toast.success("重設密碼郵件已寄送至您的信箱");
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        toast.error(response.data?.message || "發送重設密碼郵件失敗");
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "發生錯誤，請稍後再試");
@@ -72,7 +77,7 @@ export default function ForgotPasswordForm({
           className="w-full bg-primary-500 hover:saturate-150 duration-200 active:scale-95 text-neutral-800 leading-6 cursor-pointer !py-3 h-auto mb-6"
           disabled={isLoading}
         >
-          {isLoading ? "處理中..." : "寄送驗證碼"}
+          {isLoading ? "處理中..." : "寄送重設密碼郵件"}
         </Button>
 
         {onSwitchTab && (
