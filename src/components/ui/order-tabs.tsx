@@ -125,7 +125,7 @@ export const OrderTabs: React.FC<OrderTabsProps> = ({
                 </span>
                 <span
                   className={cn(
-                    "ml-1 inline-flex items-center justify-center rounded-full px-1.5 text-xs font-normal min-w-[20px] border border-neutral-400 text-neutral-400 bg-transparent transition-colors",
+                    "ml-1 inline-flex items-center justify-center rounded-full px-2 text-xs font-normal min-w-[20px] border border-neutral-400 text-neutral-400 bg-transparent transition-colors",
                     tab.badge,
                     tab.badgeActive
                   )}
