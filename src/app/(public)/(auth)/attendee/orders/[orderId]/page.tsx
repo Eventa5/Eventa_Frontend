@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -8,9 +9,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
 import { getApiV1ActivitiesByActivityId } from "@/services/api/client/sdk.gen";
 import type { ActivityResponse } from "@/services/api/client/types.gen";
-import { useRouter } from "next/navigation";
+import { FileText } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState, useEffect } from "react";
 
 export default function OrderDetailPage() {
@@ -19,6 +22,8 @@ export default function OrderDetailPage() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogType, setDialogType] = useState<"split" | "refund" | null>(null);
+  const searchParams = useSearchParams();
+  const orderId = searchParams.get("orderId");
 
   useEffect(() => {
     const fetchActivityData = async () => {
@@ -46,6 +51,7 @@ export default function OrderDetailPage() {
     id: "2022121720571882545141",
     status: "待付款",
     payType: "－",
+    totalPrice: "1,000",
   };
   const tickets = [
     {
@@ -80,6 +86,27 @@ export default function OrderDetailPage() {
     }
   };
 
+  let statusClass = "text-gray-600";
+  switch (order.status) {
+    case "待付款":
+      statusClass = "text-neutral-800 bg-primary-200";
+      break;
+    case "已付款":
+      statusClass = "text-neutral-800 bg-green-100";
+      break;
+    case "已逾期":
+      statusClass = "text-neutral-500 bg-neutral-200";
+      break;
+    case "已取消":
+      statusClass = "text-secondary-500 bg-secondary-100";
+      break;
+    case "已使用":
+      statusClass = "text-white bg-neutral-400";
+      break;
+    default:
+      statusClass = "text-gray-600";
+  }
+
   return (
     <div className="container max-w-6xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">訂單詳情</h1>
@@ -110,51 +137,95 @@ export default function OrderDetailPage() {
             </h2>
             <div className="flex">
               <div className="flex gap-2 mb-6">
-                <p
+                <h3
                   className="text-xl font-semibold mb-4 leading-[1.2] font-serif-tc py-6 tracking-[0.15em]"
                   style={{ writingMode: "vertical-rl", textOrientation: "mixed" }}
                 >
                   訂單資訊
-                </p>
+                </h3>
               </div>
-              <div>
-                {/* 活動簡介 */}
-                <div className="text-gray-700 mb-4">
-                  {activity.summary || activity.descriptionMd || "這裡是活動簡介"}
-                </div>
-                {/* 活動資訊欄 */}
-                <div className="space-y-3 text-base">
-                  <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-lg text-gray-500">event</span>
-                    <span className="font-semibold">活動時間</span>
-                    <span>
-                      {activity.startTime && activity.endTime
-                        ? `${new Date(activity.startTime as string).toLocaleDateString("zh-TW", { year: "numeric", month: "2-digit", day: "2-digit", weekday: "short" })} ${new Date(activity.startTime as string).toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" })} - ${new Date(activity.endTime as string).toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" })}`
-                        : "-"}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-lg text-gray-500">
-                      location_on
-                    </span>
-                    <span className="font-semibold">活動地點</span>
-                    <span>{activity.location || "-"}</span>
-                  </div>
-                  {/* 相關連結（可依需求調整） */}
-                  <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-lg text-gray-500">link</span>
-                    <span className="font-semibold">相關連結</span>
-                    <a
-                      href="https://www.facebook.com/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 underline"
-                    >
-                      心樂山螢火蟲保留區粉絲專頁
-                    </a>
-                  </div>
-                </div>
+              <ul className="text-neutral-800 text-base">
+                <li className="mb-4 flex items-center gap-2">
+                  <FileText className="w-6 h-6" />
+                  <span className="font-semibold">訂單編號</span>
+                  <span>{orderId}</span>
+                </li>
+                <li className="mb-4 flex items-center gap-2">
+                  <FileText className="w-6 h-6" />
+                  <span className="font-semibold">總價</span>
+                  {order.totalPrice}
+                </li>
+                <li className="mb-4 flex items-center gap-2">
+                  <FileText className="w-6 h-6" />
+                  <span className="font-semibold">付款方式</span>
+                  {order.payType}
+                </li>
+                <li className="mb-4 flex items-center gap-2">
+                  <FileText className="w-6 h-6" />
+                  <span className="font-semibold">訂單狀態</span>
+                  <span className={`px-4 py-1 rounded-full text-sm font-medium ${statusClass}`}>
+                    {order.status}
+                  </span>
+                </li>
+                {/* 狀態對應操作按鈕 */}
+                <li className="mb-4 flex items-center gap-2">
+                  {order.status === "待付款" && (
+                    <>
+                      <Button
+                        type="button"
+                        className="bg-primary-500 text-neutral-800 px-4 py-1 rounded hover:bg-primary-600 mr-2"
+                        onClick={() => router.push(`/attendee/orders/${order.id}/pay`)}
+                      >
+                        前往付款
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="border-neutral-300 text-neutral-600 px-4 py-1 rounded hover:bg-neutral-400 hover:text-white"
+                        onClick={() => router.push(`/attendee/orders/${order.id}/cancel`)}
+                      >
+                        取消報名
+                      </Button>
+                    </>
+                  )}
+                  {/* 已付款與已逾期不顯示主操作按鈕 */}
+                </li>
+              </ul>
+            </div>
+            <Separator className="my-4 w-[90%] mx-auto" />
+            <div className="flex">
+              <div className="flex gap-2 mb-6">
+                <h3
+                  className="text-xl font-semibold mb-4 leading-[1.2] font-serif-tc py-6 tracking-[0.15em]"
+                  style={{ writingMode: "vertical-rl", textOrientation: "mixed" }}
+                >
+                  參加者資訊
+                </h3>
               </div>
+              <ul className="text-neutral-800 text-base">
+                <li className="mb-4 flex items-center gap-2">
+                  <FileText className="w-6 h-6" />
+                  <span className="font-semibold">訂單編號</span>
+                  <span>{order.id}</span>
+                </li>
+                <li className="mb-4 flex items-center gap-2">
+                  <FileText className="w-6 h-6" />
+                  <span className="font-semibold">總價</span>
+                  {order.totalPrice}
+                </li>
+                <li className="mb-4 flex items-center gap-2">
+                  <FileText className="w-6 h-6" />
+                  <span className="font-semibold">付款方式</span>
+                  {order.payType}
+                </li>
+                <li className="mb-4 flex items-center gap-2">
+                  <FileText className="w-6 h-6" />
+                  <span className="font-semibold">訂單狀態</span>
+                  <span className={`px-4 py-1 rounded-full text-sm font-medium ${statusClass}`}>
+                    {order.status}
+                  </span>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
@@ -174,7 +245,8 @@ export default function OrderDetailPage() {
             <div className="text-sm mb-1">票券持有者：{ticket.owner}</div>
           </div>
           <div className="flex flex-col items-end gap-2 min-w-[100px]">
-            {ticket.status === "未分票" ? (
+            {/* 只有已付款且未分票才顯示退票按鈕，否則維持原本邏輯 */}
+            {ticket.status === "未分票" && order.status === "已付款" ? (
               <>
                 <span className="border border-yellow-400 text-yellow-600 px-4 py-1 rounded-full text-sm mb-2">
                   未分票
@@ -186,15 +258,6 @@ export default function OrderDetailPage() {
                   <DialogTrigger asChild>
                     <button
                       type="button"
-                      className="bg-blue-600 text-white px-4 py-1 rounded mb-1 hover:bg-blue-700"
-                      onClick={() => handleDialogOpen("split")}
-                    >
-                      分票
-                    </button>
-                  </DialogTrigger>
-                  <DialogTrigger asChild>
-                    <button
-                      type="button"
                       className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700"
                       onClick={() => handleDialogOpen("refund")}
                     >
@@ -202,13 +265,7 @@ export default function OrderDetailPage() {
                     </button>
                   </DialogTrigger>
                   <DialogContent>
-                    <DialogTitle>
-                      {dialogType === "split"
-                        ? "是否進行分票？"
-                        : dialogType === "refund"
-                          ? "是否進行退票？"
-                          : ""}
-                    </DialogTitle>
+                    <DialogTitle>是否進行退票？</DialogTitle>
                     <DialogFooter>
                       <DialogClose asChild>
                         <button
@@ -227,6 +284,27 @@ export default function OrderDetailPage() {
                       </button>
                     </DialogFooter>
                   </DialogContent>
+                </Dialog>
+              </>
+            ) : ticket.status === "未分票" ? (
+              <>
+                <span className="border border-yellow-400 text-yellow-600 px-4 py-1 rounded-full text-sm mb-2">
+                  未分票
+                </span>
+                <Dialog
+                  open={dialogOpen}
+                  onOpenChange={setDialogOpen}
+                >
+                  <DialogTrigger asChild>
+                    <button
+                      type="button"
+                      className="bg-blue-600 text-white px-4 py-1 rounded mb-1 hover:bg-blue-700"
+                      onClick={() => handleDialogOpen("split")}
+                    >
+                      分票
+                    </button>
+                  </DialogTrigger>
+                  {/* 退票按鈕不顯示 */}
                 </Dialog>
               </>
             ) : (
