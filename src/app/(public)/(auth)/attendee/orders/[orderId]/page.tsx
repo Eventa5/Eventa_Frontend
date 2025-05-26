@@ -8,18 +8,43 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { getApiV1ActivitiesByActivityId } from "@/services/api/client/sdk.gen";
+import type { ActivityResponse } from "@/services/api/client/types.gen";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 export default function OrderDetailPage() {
   const router = useRouter();
+  const [activity, setActivity] = useState<ActivityResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogType, setDialogType] = useState<"split" | "refund" | null>(null);
+
+  useEffect(() => {
+    const fetchActivityData = async () => {
+      try {
+        // TODO: 從訂單資料中獲取活動 ID
+        const activityId = 1; // 這裡需要從訂單資料中獲取
+        const response = await getApiV1ActivitiesByActivityId({
+          path: { activityId },
+        });
+        if (response.data?.data) {
+          setActivity(response.data.data);
+        }
+      } catch (error) {
+        console.error("獲取活動資料失敗:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchActivityData();
+  }, []);
+
   // 假資料
   const order = {
     id: "2022121720571882545141",
-    title: "復古黑膠派對之夜",
-    date: "2025.05.10 (六) 20:00 - 23:30",
     status: "待付款",
-    location: "台北市",
     payType: "－",
   };
   const tickets = [
@@ -40,8 +65,6 @@ export default function OrderDetailPage() {
       status: "已分票",
     },
   ];
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogType, setDialogType] = useState<"split" | "refund" | null>(null);
 
   const handleDialogOpen = (type: "split" | "refund") => {
     setDialogType(type);
@@ -60,18 +83,82 @@ export default function OrderDetailPage() {
   return (
     <div className="container max-w-6xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">訂單詳情</h1>
-      <div className="border rounded p-4 mb-4">
-        <div className="text-lg font-semibold mb-1">{order.title}</div>
-        <div className="text-sm text-gray-600 mb-1">{order.date}</div>
-        <div className="text-xs text-gray-500 mb-2">可單號：{order.id}</div>
-        <div className="flex items-center gap-2 text-sm text-gray-700 mb-2">
-          <span>📍{order.location}</span>
-          <span>💳付款方式：{order.payType}</span>
+
+      {/* 活動資訊區塊 */}
+      {activity && (
+        <div className="flex flex-col md:flex-row gap-6 mb-8">
+          {/* 左側主內容 */}
+          <div className="flex-1 min-w-0">
+            {/* 標籤列 */}
+            <div className="flex gap-2 mb-6">
+              {activity?.categories?.map((category) => (
+                <span
+                  key={category.id}
+                  className="bg-secondary-100 text-secondary-500 px-6 py-2 rounded-lg text-lg font-semibold"
+                >
+                  {category.name}
+                </span>
+              ))}
+              <span className="bg-secondary-100 text-secondary-500 px-6 py-2 rounded-lg text-lg font-semibold">
+                {" "}
+                {activity?.isOnline ? "線上活動" : "線下活動"}
+              </span>
+            </div>
+            {/* 標題 */}
+            <h2 className="text-3xl md:text-5xl font-extrabold mb-6 md:mb-16 font-serif-tc">
+              {activity.title}
+            </h2>
+            <div className="flex">
+              <div className="flex gap-2 mb-6">
+                <p
+                  className="text-xl font-semibold mb-4 leading-[1.2] font-serif-tc py-6 tracking-[0.15em]"
+                  style={{ writingMode: "vertical-rl", textOrientation: "mixed" }}
+                >
+                  訂單資訊
+                </p>
+              </div>
+              <div>
+                {/* 活動簡介 */}
+                <div className="text-gray-700 mb-4">
+                  {activity.summary || activity.descriptionMd || "這裡是活動簡介"}
+                </div>
+                {/* 活動資訊欄 */}
+                <div className="space-y-3 text-base">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-lg text-gray-500">event</span>
+                    <span className="font-semibold">活動時間</span>
+                    <span>
+                      {activity.startTime && activity.endTime
+                        ? `${new Date(activity.startTime as string).toLocaleDateString("zh-TW", { year: "numeric", month: "2-digit", day: "2-digit", weekday: "short" })} ${new Date(activity.startTime as string).toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" })} - ${new Date(activity.endTime as string).toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" })}`
+                        : "-"}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-lg text-gray-500">
+                      location_on
+                    </span>
+                    <span className="font-semibold">活動地點</span>
+                    <span>{activity.location || "-"}</span>
+                  </div>
+                  {/* 相關連結（可依需求調整） */}
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-lg text-gray-500">link</span>
+                    <span className="font-semibold">相關連結</span>
+                    <a
+                      href="https://www.facebook.com/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 underline"
+                    >
+                      心樂山螢火蟲保留區粉絲專頁
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <span className="border border-yellow-400 text-yellow-600 px-4 py-1 rounded-full text-sm">
-          {order.status}
-        </span>
-      </div>
+      )}
 
       {/* 票券卡片 */}
       {tickets.map((ticket, idx) => (
