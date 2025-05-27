@@ -19,7 +19,17 @@ import {
   getApiV1UsersProfile,
 } from "@/services/api/client/sdk.gen";
 import type { ActivityResponse, UserResponse } from "@/services/api/client/types.gen";
-import { Calendar, CreditCard, Hash, Info, Mail, Phone, Receipt, User } from "lucide-react";
+import {
+  Calendar,
+  CreditCard,
+  Hash,
+  Info,
+  Mail,
+  Phone,
+  Receipt,
+  Ticket as TicketIcon,
+  User,
+} from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import useSWR from "swr";
 
@@ -149,7 +159,7 @@ export default function OrderDetailPage() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>{orderId}</BreadcrumbPage>
+            <BreadcrumbPage>{`訂單詳情（${orderId}）`}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -166,14 +176,14 @@ export default function OrderDetailPage() {
               {activity?.categories?.map((category) => (
                 <span
                   key={category.id}
-                  className="bg-secondary-100 text-secondary-500 px-2 md:px-6 py-1 md:py-2 rounded-lg text-sm md:text-lg font-semibold cursor-pointer hover:bg-secondary-200 transition-colors"
+                  className="bg-secondary-100 text-secondary-500 px-4 md:px-6 py-1 md:py-2 rounded-lg text-sm md:text-lg font-semibold cursor-pointer hover:bg-secondary-200 transition-colors"
                   onClick={() => handleCategoryClick(category.name)}
                 >
                   {category.name}
                 </span>
               ))}
               <span
-                className="bg-secondary-100 text-secondary-500 px-2 md:px-6 py-1 md:py-2 rounded-lg text-sm md:text-lg font-semibold cursor-pointer hover:bg-secondary-200 transition-colors"
+                className="bg-secondary-100 text-secondary-500 px-4 md:px-6 py-1 md:py-2 rounded-lg text-sm md:text-lg font-semibold cursor-pointer hover:bg-secondary-200 transition-colors"
                 onClick={() => handleCategoryClick(activity?.isOnline ? "線上活動" : "線下活動")}
               >
                 {" "}
@@ -204,7 +214,7 @@ export default function OrderDetailPage() {
                 </Badge>
               ))}
             </div>
-            <div>
+            <div className="bg-neutral-50 p-4 rounded-lg">
               <div>
                 <h3 className="flex items-center gap-2 text-2xl font-semibold leading-[1.2] font-serif-tc mb-6">
                   <Info className="w-6 h-6 text-neutral-500" />
@@ -317,66 +327,72 @@ export default function OrderDetailPage() {
           </div>
         </div>
       )}
+      <div className="mb-16 md:mb-32">
+        <h3 className="flex items-center gap-2 text-2xl font-semibold leading-[1.2] font-serif-tc mb-6">
+          <TicketIcon className="w-5 h-5 md:w-6 md:h-6 text-neutral-500" />
+          訂單票券
+        </h3>
 
-      {/* 票券卡片 */}
-      {mockTickets.map((ticket, idx) => {
-        const statusColor = getTicketStatusColor(ticket.status);
-        return (
-          <Card
-            key={ticket.id}
-            className="mb-4 border-neutral-300"
-          >
-            <CardContent className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6 md:p-8">
-              <div className="flex-1 min-w-0">
-                <div className="text-lg font-bold mb-2 md:mb-4">{ticket.name}</div>
-                <div className="text-sm mb-1 text-neutral-600">票券編號：{ticket.id}</div>
-                <div className="text-sm mb-1 text-neutral-600">
-                  有效期限：{ticket.startTime?.slice(0, 10)} {ticket.startTime?.slice(11, 16)} ~{" "}
-                  {ticket.endTime?.slice(11, 16)}
-                </div>
-                <div className="text-sm mb-1 text-neutral-600">
-                  票價：<span className="font-semibold">{ticket.price.toLocaleString()} 元</span>
-                </div>
-                <div className="text-sm mb-1 text-neutral-600">
-                  票券持有者：
-                  {ticket.assignedName
-                    ? `${ticket.assignedName}${ticket.assignedEmail ? `, ${ticket.assignedEmail}` : ""}`
-                    : "－"}
-                </div>
-              </div>
-              <div className="flex flex-col md:items-end gap-2 min-w-[120px]">
-                {ticket.status && (
-                  <span
-                    className={`border px-4 py-1 rounded-full text-sm mb-2 text-center ${statusColor}`}
-                  >
-                    {ticket.status}
-                  </span>
-                )}
-                {/* 狀態按鈕區塊 */}
-                {!["已取消", "已逾期", "已使用"].includes(ticket.status) ? (
-                  <div className="flex md:flex-col items-center md:items-stretch gap-2">
-                    <Button
-                      type="button"
-                      className="px-4 py-1 rounded"
-                      onClick={() => router.push(`/attendee/tickets/${ticket.id}`)}
-                    >
-                      查看票券
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="border-neutral-300 text-neutral-600 px-4 py-1 rounded hover:bg-neutral-400 hover:text-white"
-                      onClick={() => router.push(`/attendee/orders/${orderId}/refund`)}
-                    >
-                      退票
-                    </Button>
+        {/* 票券卡片 */}
+        {mockTickets.map((ticket, idx) => {
+          const statusColor = getTicketStatusColor(ticket.status);
+          return (
+            <Card
+              key={ticket.id}
+              className="mb-4 border-neutral-300"
+            >
+              <CardContent className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6 md:p-8">
+                <div className="flex-1 min-w-0">
+                  <div className="text-lg font-bold mb-2 md:mb-4">{ticket.name}</div>
+                  <div className="text-sm mb-1 text-neutral-600">票券編號：{ticket.id}</div>
+                  <div className="text-sm mb-1 text-neutral-600">
+                    有效期限：{ticket.startTime?.slice(0, 10)} {ticket.startTime?.slice(11, 16)} ~{" "}
+                    {ticket.endTime?.slice(11, 16)}
                   </div>
-                ) : null}
-              </div>
-            </CardContent>
-          </Card>
-        );
-      })}
+                  <div className="text-sm mb-1 text-neutral-600">
+                    票價：<span className="font-semibold">{ticket.price.toLocaleString()} 元</span>
+                  </div>
+                  <div className="text-sm mb-1 text-neutral-600">
+                    票券持有者：
+                    {ticket.assignedName
+                      ? `${ticket.assignedName}${ticket.assignedEmail ? `, ${ticket.assignedEmail}` : ""}`
+                      : "－"}
+                  </div>
+                </div>
+                <div className="flex flex-col md:items-end gap-2 min-w-[120px]">
+                  {ticket.status && (
+                    <span
+                      className={`border px-6 py-2 rounded-full text-sm mb-2 text-center ${statusColor}`}
+                    >
+                      {ticket.status}
+                    </span>
+                  )}
+                  {/* 狀態按鈕區塊 */}
+                  {!["已取消", "已逾期", "已使用"].includes(ticket.status) ? (
+                    <div className="flex md:flex-col items-center md:items-stretch gap-2">
+                      <Button
+                        type="button"
+                        className="px-6 py-2 rounded"
+                        onClick={() => router.push(`/attendee/tickets/${ticket.id}`)}
+                      >
+                        查看票券
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="border-neutral-300 text-neutral-600 px-6 py-2 rounded hover:bg-neutral-400 hover:text-white w-[120px] md:w-auto block"
+                        onClick={() => router.push(`/attendee/orders/${orderId}/refund`)}
+                      >
+                        退票
+                      </Button>
+                    </div>
+                  ) : null}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
     </div>
   );
 }
