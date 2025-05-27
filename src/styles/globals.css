@@ -85,6 +85,10 @@
   --color-neutral-800: #262626;
   --color-neutral-900: #171717;
   --color-neutral-950: #0a0a0a;
+  /* Green 色系分級 */
+  --color-green-100: #e3efda;
+  --color-green-300: #aad091;
+  --color-green-500: #71b047;
   /* 字體 */
   --font-sans-tc: var(--font-noto-sans-tc);
   --font-serif-tc: var(--font-noto-serif-tc);
@@ -159,4 +163,11 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
 }
