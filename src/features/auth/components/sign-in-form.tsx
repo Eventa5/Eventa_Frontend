@@ -35,10 +35,14 @@ export default function SignInForm({ onSuccess, onSwitchTab, isMobile = false }:
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);
     try {
+      const width = 500;
+      const height = 600;
+      const left = (window.screen.width - width) / 2;
+      const top = (window.screen.height - height) / 2;
       const loginWindow = window.open(
         "https://eventa-backend-pgun.onrender.com/api/v1/users/google/login",
         "Google 登入",
-        "width=500,height=600,left=200,top=200"
+        `width=${width},height=${height},left=${left},top=${top}`
       );
 
       // 監聽 postMessage
