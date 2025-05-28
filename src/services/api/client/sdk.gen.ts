@@ -36,27 +36,9 @@ import type {
   GetApiV1UsersProfileData,
   GetApiV1UsersProfileError,
   GetApiV1UsersProfileResponse,
-  PatchApiV1ActivitiesByActivityIdBasicData,
-  PatchApiV1ActivitiesByActivityIdBasicError,
-  PatchApiV1ActivitiesByActivityIdBasicResponse,
-  PatchApiV1ActivitiesByActivityIdCancelData,
-  PatchApiV1ActivitiesByActivityIdCancelError,
-  PatchApiV1ActivitiesByActivityIdCancelResponse,
-  PatchApiV1ActivitiesByActivityIdCategoriesData,
-  PatchApiV1ActivitiesByActivityIdCategoriesError,
-  PatchApiV1ActivitiesByActivityIdCategoriesResponse,
-  PatchApiV1ActivitiesByActivityIdContentData,
-  PatchApiV1ActivitiesByActivityIdContentError,
-  PatchApiV1ActivitiesByActivityIdContentResponse,
-  PatchApiV1ActivitiesByActivityIdPublishData,
-  PatchApiV1ActivitiesByActivityIdPublishError,
-  PatchApiV1ActivitiesByActivityIdPublishResponse,
   PostApiV1ActivitiesByActivityIdTicketTypesData,
   PostApiV1ActivitiesByActivityIdTicketTypesError,
   PostApiV1ActivitiesByActivityIdTicketTypesResponse,
-  PostApiV1ActivitiesData,
-  PostApiV1ActivitiesError,
-  PostApiV1ActivitiesResponse,
   PostApiV1CurrenciesData,
   PostApiV1CurrenciesError,
   PostApiV1CurrenciesResponse,
@@ -72,9 +54,6 @@ import type {
   PostApiV1UsersSignupData,
   PostApiV1UsersSignupError,
   PostApiV1UsersSignupResponse,
-  PutApiV1ActivitiesByActivityIdData,
-  PutApiV1ActivitiesByActivityIdError,
-  PutApiV1ActivitiesByActivityIdResponse,
   PutApiV1ActivitiesByActivityIdTicketTypesByTicketTypeIdData,
   PutApiV1ActivitiesByActivityIdTicketTypesByTicketTypeIdError,
   PutApiV1ActivitiesByActivityIdTicketTypesByTicketTypeIdResponse,
@@ -129,33 +108,6 @@ export const getApiV1Activities = <ThrowOnError extends boolean = false>(
     ],
     url: "/api/v1/activities",
     ...options,
-  });
-};
-
-/**
- * 新增一筆活動資料
- * 在選擇活動形式為線上或線下後，即新增一筆活動資料到db中
- */
-export const postApiV1Activities = <ThrowOnError extends boolean = false>(
-  options: Options<PostApiV1ActivitiesData, ThrowOnError>
-) => {
-  return (options.client ?? _heyApiClient).post<
-    PostApiV1ActivitiesResponse,
-    PostApiV1ActivitiesError,
-    ThrowOnError
-  >({
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/api/v1/activities",
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
   });
 };
 
@@ -282,160 +234,6 @@ export const getApiV1ActivitiesByActivityId = <ThrowOnError extends boolean = fa
       },
     ],
     url: "/api/v1/activities/{activityId}",
-    ...options,
-  });
-};
-
-/**
- * 更新活動資料
- * 更新活動資料
- */
-export const putApiV1ActivitiesByActivityId = <ThrowOnError extends boolean = false>(
-  options: Options<PutApiV1ActivitiesByActivityIdData, ThrowOnError>
-) => {
-  return (options.client ?? _heyApiClient).put<
-    PutApiV1ActivitiesByActivityIdResponse,
-    PutApiV1ActivitiesByActivityIdError,
-    ThrowOnError
-  >({
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/api/v1/activities/{activityId}",
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
-  });
-};
-
-/**
- * 新增活動時，設定活動主題步驟
- * 設定活動主題，至少要選擇一個主題，最多兩個，帶入主題ID array
- */
-export const patchApiV1ActivitiesByActivityIdCategories = <ThrowOnError extends boolean = false>(
-  options: Options<PatchApiV1ActivitiesByActivityIdCategoriesData, ThrowOnError>
-) => {
-  return (options.client ?? _heyApiClient).patch<
-    PatchApiV1ActivitiesByActivityIdCategoriesResponse,
-    PatchApiV1ActivitiesByActivityIdCategoriesError,
-    ThrowOnError
-  >({
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/api/v1/activities/{activityId}/categories",
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
-  });
-};
-
-/**
- * 新增活動時，設定基本資料步驟
- * 新增活動時的基本資料步驟，包含活動名稱、活動起迄時間、活動地點
- */
-export const patchApiV1ActivitiesByActivityIdBasic = <ThrowOnError extends boolean = false>(
-  options: Options<PatchApiV1ActivitiesByActivityIdBasicData, ThrowOnError>
-) => {
-  return (options.client ?? _heyApiClient).patch<
-    PatchApiV1ActivitiesByActivityIdBasicResponse,
-    PatchApiV1ActivitiesByActivityIdBasicError,
-    ThrowOnError
-  >({
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/api/v1/activities/{activityId}/basic",
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
-  });
-};
-
-/**
- * 新增活動時，設定詳細內容步驟
- * 新增活動時的詳細內容步驟，包含活動簡介、活動詳細內容
- */
-export const patchApiV1ActivitiesByActivityIdContent = <ThrowOnError extends boolean = false>(
-  options: Options<PatchApiV1ActivitiesByActivityIdContentData, ThrowOnError>
-) => {
-  return (options.client ?? _heyApiClient).patch<
-    PatchApiV1ActivitiesByActivityIdContentResponse,
-    PatchApiV1ActivitiesByActivityIdContentError,
-    ThrowOnError
-  >({
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/api/v1/activities/{activityId}/content",
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
-  });
-};
-
-/**
- * 新增活動時最後一步驟，發布活動
- * 前置步驟都設定完成後的最後一步，發布活動，所有使用者皆可看到此活動
- */
-export const patchApiV1ActivitiesByActivityIdPublish = <ThrowOnError extends boolean = false>(
-  options: Options<PatchApiV1ActivitiesByActivityIdPublishData, ThrowOnError>
-) => {
-  return (options.client ?? _heyApiClient).patch<
-    PatchApiV1ActivitiesByActivityIdPublishResponse,
-    PatchApiV1ActivitiesByActivityIdPublishError,
-    ThrowOnError
-  >({
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/api/v1/activities/{activityId}/publish",
-    ...options,
-  });
-};
-
-/**
- * 取消活動
- * 將活動狀態改為canceled
- */
-export const patchApiV1ActivitiesByActivityIdCancel = <ThrowOnError extends boolean = false>(
-  options: Options<PatchApiV1ActivitiesByActivityIdCancelData, ThrowOnError>
-) => {
-  return (options.client ?? _heyApiClient).patch<
-    PatchApiV1ActivitiesByActivityIdCancelResponse,
-    PatchApiV1ActivitiesByActivityIdCancelError,
-    ThrowOnError
-  >({
-    security: [
-      {
-        scheme: "bearer",
-        type: "http",
-      },
-    ],
-    url: "/api/v1/activities/{activityId}/cancel",
     ...options,
   });
 };
