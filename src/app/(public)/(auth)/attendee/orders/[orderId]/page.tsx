@@ -29,6 +29,7 @@ import {
   Receipt,
   Ticket as TicketIcon,
   User,
+  VenusAndMars,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import useSWR from "swr";
@@ -168,7 +169,7 @@ export default function OrderDetailPage() {
 
       {/* 活動資訊區塊 */}
       {activity && (
-        <div className="flex flex-col md:flex-row gap-6 mb-8">
+        <div className="flex flex-col md:flex-row gap-6">
           {/* 左側主內容 */}
           <div className="flex-1 min-w-0">
             {/* 標籤列 */}
@@ -214,7 +215,7 @@ export default function OrderDetailPage() {
                 </Badge>
               ))}
             </div>
-            <div className="bg-neutral-50 p-4 rounded-lg shadow">
+            <div>
               <div>
                 <h3 className="flex items-center gap-2 text-2xl font-semibold leading-[1.2] font-serif-tc mb-6">
                   <Info className="w-5 h-5 md:w-6 md:h-6 text-neutral-500" />
@@ -314,7 +315,7 @@ export default function OrderDetailPage() {
                       </div>
                     </li>
                     <li className="mb-4 flex item-start md:items-center gap-3 md:w-full">
-                      <User className="w-5 h-5 md:w-6 md:h-6 text-neutral-500 mt-1" />
+                      <VenusAndMars className="w-5 h-5 md:w-6 md:h-6 text-neutral-500 mt-1" />
                       <div className="space-y-1 md:grow-1 md:flex items-center gap-2">
                         <p className="font-semibold md:w-1/5 md:mb-0 mb-2">性別</p>
                         <div className="flex md:w-4/5 gap-2 items-center">
@@ -329,6 +330,7 @@ export default function OrderDetailPage() {
           </div>
         </div>
       )}
+      <Separator className="my-4" />
       <div className="mb-16 md:mb-32">
         <h3 className="flex items-center gap-2 text-2xl font-semibold leading-[1.2] font-serif-tc mb-6">
           <TicketIcon className="w-5 h-5 md:w-6 md:h-6 text-neutral-500" />
@@ -354,12 +356,12 @@ export default function OrderDetailPage() {
                   <div className="text-sm mb-1 text-neutral-600">
                     票價：<span className="font-semibold">{ticket.price.toLocaleString()} 元</span>
                   </div>
-                  <div className="text-sm mb-1 text-neutral-600">
+                  {/* <div className="text-sm mb-1 text-neutral-600">
                     票券持有者：
                     {ticket.assignedName
                       ? `${ticket.assignedName}${ticket.assignedEmail ? `, ${ticket.assignedEmail}` : ""}`
                       : "－"}
-                  </div>
+                  </div> */}
                 </div>
                 <div className="flex flex-col md:items-end gap-2 min-w-[120px]">
                   {ticket.status && (
