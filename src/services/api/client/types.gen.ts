@@ -8,19 +8,18 @@ export type ActivitiesResponse = {
   isOnline?: boolean;
   startTime?: string;
   endTime?: string;
-  status?: string;
 };
 
 export type ActivityResponse = {
   id?: string;
-  organizationId?: number;
+  organizerId?: number;
   cover?: string;
   title?: string;
   location?: string;
   startTime?: string;
   endTime?: string;
   isOnline?: boolean;
-  tags?: Array<string>;
+  tags?: string;
   status?: string;
   descriptionMd?: string;
   viewCount?: number;
@@ -38,73 +37,6 @@ export type ActivityResponse = {
     isFavorited?: boolean;
     isRegistered?: boolean;
   };
-};
-
-export type CreateActivityRequest = {
-  organizationId: number;
-  isOnline: boolean;
-  livestreamUrl?: string;
-};
-
-export type CreateActivityResponse = {
-  message?: string;
-  status?: boolean;
-  data?: {
-    id?: number;
-    currentStep?: string;
-  };
-};
-
-export type PatchActivityCategoriesRequest = {
-  categoryIds: Array<number>;
-};
-
-export type PatchActivityBasicRequest = {
-  cover?: string;
-  title?: string;
-  location?: string;
-  startTime?: string;
-  endTime?: string;
-  tags?: Array<string>;
-};
-
-export type PatchActivityContentRequest = {
-  summary?: string;
-  descriptionMd?: string;
-  notes?: string;
-};
-
-export type PatchActivityResponse = {
-  message?: string;
-  status?: boolean;
-  data?: {
-    id?: number;
-    currentStep?: string;
-  };
-};
-
-export type PatchActivityStatusResponse = {
-  message?: string;
-  status?: boolean;
-  data?: {
-    id?: number;
-    status?: string;
-  };
-};
-
-export type EditActivityRequest = {
-  cover?: string;
-  title?: string;
-  location?: string;
-  startTime?: string;
-  endTime?: string;
-  isOnline?: boolean;
-  livestreamUrl?: string;
-  tags?: Array<string>;
-  summary?: string;
-  descriptionMd?: string;
-  notes?: string;
-  categoryIds?: Array<number>;
 };
 
 export type ErrorResponse = {
@@ -539,11 +471,7 @@ export type GetApiV1ActivitiesData = {
     /**
      * 主辦單位 ID
      */
-    organizationId?: number;
-    /**
-     * 活動狀態 draft | published | ended | canceled
-     */
-    status?: string;
+    organizerId?: number;
   };
   url: "/api/v1/activities";
 };
@@ -571,40 +499,6 @@ export type GetApiV1ActivitiesResponses = {
 
 export type GetApiV1ActivitiesResponse =
   GetApiV1ActivitiesResponses[keyof GetApiV1ActivitiesResponses];
-
-export type PostApiV1ActivitiesData = {
-  body: CreateActivityRequest;
-  path?: never;
-  query?: never;
-  url: "/api/v1/activities";
-};
-
-export type PostApiV1ActivitiesErrors = {
-  /**
-   * 格式錯誤
-   */
-  400: ErrorResponse;
-  /**
-   * 未登入
-   */
-  401: ErrorResponse;
-  /**
-   * 無權限，非主辦單位成員
-   */
-  403: ErrorResponse;
-};
-
-export type PostApiV1ActivitiesError = PostApiV1ActivitiesErrors[keyof PostApiV1ActivitiesErrors];
-
-export type PostApiV1ActivitiesResponses = {
-  /**
-   * 成功新增一筆活動資料
-   */
-  201: CreateActivityResponse;
-};
-
-export type PostApiV1ActivitiesResponse =
-  PostApiV1ActivitiesResponses[keyof PostApiV1ActivitiesResponses];
 
 export type GetApiV1ActivitiesByActivityIdTicketTypesData = {
   body?: never;
@@ -840,253 +734,6 @@ export type GetApiV1ActivitiesByActivityIdResponses = {
 
 export type GetApiV1ActivitiesByActivityIdResponse =
   GetApiV1ActivitiesByActivityIdResponses[keyof GetApiV1ActivitiesByActivityIdResponses];
-
-export type PutApiV1ActivitiesByActivityIdData = {
-  body: EditActivityRequest;
-  path: {
-    /**
-     * 活動 ID
-     */
-    activityId: number;
-  };
-  query?: never;
-  url: "/api/v1/activities/{activityId}";
-};
-
-export type PutApiV1ActivitiesByActivityIdErrors = {
-  /**
-   * 格式錯誤
-   */
-  400: ErrorResponse;
-  /**
-   * 未登入
-   */
-  401: ErrorResponse;
-  /**
-   * 無權限，非主辦單位成員
-   */
-  403: ErrorResponse;
-  /**
-   * 活動不存在
-   */
-  404: ErrorResponse;
-};
-
-export type PutApiV1ActivitiesByActivityIdError =
-  PutApiV1ActivitiesByActivityIdErrors[keyof PutApiV1ActivitiesByActivityIdErrors];
-
-export type PutApiV1ActivitiesByActivityIdResponses = {
-  /**
-   * 成功更新活動資料
-   */
-  200: {
-    message?: string;
-    status?: boolean;
-  };
-};
-
-export type PutApiV1ActivitiesByActivityIdResponse =
-  PutApiV1ActivitiesByActivityIdResponses[keyof PutApiV1ActivitiesByActivityIdResponses];
-
-export type PatchApiV1ActivitiesByActivityIdCategoriesData = {
-  body: PatchActivityCategoriesRequest;
-  path: {
-    /**
-     * 活動 ID
-     */
-    activityId: number;
-  };
-  query?: never;
-  url: "/api/v1/activities/{activityId}/categories";
-};
-
-export type PatchApiV1ActivitiesByActivityIdCategoriesErrors = {
-  /**
-   * 格式錯誤
-   */
-  400: ErrorResponse;
-  /**
-   * 未登入
-   */
-  401: ErrorResponse;
-  /**
-   * 無權限，非主辦單位成員
-   */
-  403: ErrorResponse;
-};
-
-export type PatchApiV1ActivitiesByActivityIdCategoriesError =
-  PatchApiV1ActivitiesByActivityIdCategoriesErrors[keyof PatchApiV1ActivitiesByActivityIdCategoriesErrors];
-
-export type PatchApiV1ActivitiesByActivityIdCategoriesResponses = {
-  /**
-   * 成功設定活動主題
-   */
-  200: PatchActivityResponse;
-};
-
-export type PatchApiV1ActivitiesByActivityIdCategoriesResponse =
-  PatchApiV1ActivitiesByActivityIdCategoriesResponses[keyof PatchApiV1ActivitiesByActivityIdCategoriesResponses];
-
-export type PatchApiV1ActivitiesByActivityIdBasicData = {
-  body: PatchActivityBasicRequest;
-  path: {
-    /**
-     * 活動 ID
-     */
-    activityId: number;
-  };
-  query?: never;
-  url: "/api/v1/activities/{activityId}/basic";
-};
-
-export type PatchApiV1ActivitiesByActivityIdBasicErrors = {
-  /**
-   * 格式錯誤
-   */
-  400: ErrorResponse;
-  /**
-   * 未登入
-   */
-  401: ErrorResponse;
-  /**
-   * 無權限，非主辦單位成員
-   */
-  403: ErrorResponse;
-};
-
-export type PatchApiV1ActivitiesByActivityIdBasicError =
-  PatchApiV1ActivitiesByActivityIdBasicErrors[keyof PatchApiV1ActivitiesByActivityIdBasicErrors];
-
-export type PatchApiV1ActivitiesByActivityIdBasicResponses = {
-  /**
-   * 成功設定活動基本資料
-   */
-  200: PatchActivityResponse;
-};
-
-export type PatchApiV1ActivitiesByActivityIdBasicResponse =
-  PatchApiV1ActivitiesByActivityIdBasicResponses[keyof PatchApiV1ActivitiesByActivityIdBasicResponses];
-
-export type PatchApiV1ActivitiesByActivityIdContentData = {
-  body: PatchActivityContentRequest;
-  path: {
-    /**
-     * 活動 ID
-     */
-    activityId: number;
-  };
-  query?: never;
-  url: "/api/v1/activities/{activityId}/content";
-};
-
-export type PatchApiV1ActivitiesByActivityIdContentErrors = {
-  /**
-   * 格式錯誤
-   */
-  400: ErrorResponse;
-  /**
-   * 未登入
-   */
-  401: ErrorResponse;
-  /**
-   * 無權限，非主辦單位成員
-   */
-  403: ErrorResponse;
-};
-
-export type PatchApiV1ActivitiesByActivityIdContentError =
-  PatchApiV1ActivitiesByActivityIdContentErrors[keyof PatchApiV1ActivitiesByActivityIdContentErrors];
-
-export type PatchApiV1ActivitiesByActivityIdContentResponses = {
-  /**
-   * 成功設定詳細內容
-   */
-  200: PatchActivityResponse;
-};
-
-export type PatchApiV1ActivitiesByActivityIdContentResponse =
-  PatchApiV1ActivitiesByActivityIdContentResponses[keyof PatchApiV1ActivitiesByActivityIdContentResponses];
-
-export type PatchApiV1ActivitiesByActivityIdPublishData = {
-  body?: never;
-  path: {
-    /**
-     * 活動 ID
-     */
-    activityId: number;
-  };
-  query?: never;
-  url: "/api/v1/activities/{activityId}/publish";
-};
-
-export type PatchApiV1ActivitiesByActivityIdPublishErrors = {
-  /**
-   * 格式錯誤
-   */
-  400: ErrorResponse;
-  /**
-   * 未登入
-   */
-  401: ErrorResponse;
-  /**
-   * 無權限，非主辦單位成員
-   */
-  403: ErrorResponse;
-};
-
-export type PatchApiV1ActivitiesByActivityIdPublishError =
-  PatchApiV1ActivitiesByActivityIdPublishErrors[keyof PatchApiV1ActivitiesByActivityIdPublishErrors];
-
-export type PatchApiV1ActivitiesByActivityIdPublishResponses = {
-  /**
-   * 成功發布活動
-   */
-  200: PatchActivityStatusResponse;
-};
-
-export type PatchApiV1ActivitiesByActivityIdPublishResponse =
-  PatchApiV1ActivitiesByActivityIdPublishResponses[keyof PatchApiV1ActivitiesByActivityIdPublishResponses];
-
-export type PatchApiV1ActivitiesByActivityIdCancelData = {
-  body?: never;
-  path: {
-    /**
-     * 活動 ID
-     */
-    activityId: number;
-  };
-  query?: never;
-  url: "/api/v1/activities/{activityId}/cancel";
-};
-
-export type PatchApiV1ActivitiesByActivityIdCancelErrors = {
-  /**
-   * 格式錯誤
-   */
-  400: ErrorResponse;
-  /**
-   * 未登入
-   */
-  401: ErrorResponse;
-  /**
-   * 無權限，非主辦單位成員
-   */
-  403: ErrorResponse;
-};
-
-export type PatchApiV1ActivitiesByActivityIdCancelError =
-  PatchApiV1ActivitiesByActivityIdCancelErrors[keyof PatchApiV1ActivitiesByActivityIdCancelErrors];
-
-export type PatchApiV1ActivitiesByActivityIdCancelResponses = {
-  /**
-   * 成功取消活動
-   */
-  200: PatchActivityStatusResponse;
-};
-
-export type PatchApiV1ActivitiesByActivityIdCancelResponse =
-  PatchApiV1ActivitiesByActivityIdCancelResponses[keyof PatchApiV1ActivitiesByActivityIdCancelResponses];
 
 export type GetApiV1CurrenciesData = {
   body?: never;
