@@ -214,23 +214,23 @@ export default function OrderDetailPage() {
                 </Badge>
               ))}
             </div>
-            <div className="bg-neutral-50 p-4 rounded-lg">
+            <div className="bg-neutral-50 p-4 rounded-lg shadow">
               <div>
                 <h3 className="flex items-center gap-2 text-2xl font-semibold leading-[1.2] font-serif-tc mb-6">
-                  <Info className="w-6 h-6 text-neutral-500" />
+                  <Info className="w-5 h-5 md:w-6 md:h-6 text-neutral-500" />
                   訂單資訊
                 </h3>
 
                 <ul className="text-neutral-800 text-base">
                   <li className="mb-4 flex item-start md:items-center gap-3 md:w-full">
-                    <Hash className="w-6 h-6 text-neutral-500" />
+                    <Hash className="w-5 h-5 md:w-6 md:h-6 text-neutral-500" />
                     <div className="space-y-1 md:grow-1 md:flex items-center gap-2">
                       <p className="font-semibold md:w-1/5 md:mb-0 mb-2">訂單編號</p>
                       <div className="md:w-4/5">{orderId}</div>
                     </div>
                   </li>
                   <li className="mb-4 flex item-start md:items-center gap-3 md:w-full">
-                    <Receipt className="w-6 h-6 text-neutral-500" />
+                    <Receipt className="w-5 h-5 md:w-6 md:h-6 text-neutral-500" />
                     <div className="space-y-1 md:grow-1 md:flex items-center gap-2">
                       <p className="font-semibold md:w-1/5 md:mb-0 mb-2">總價</p>
                       <div className="flex md:w-4/5 gap-2 items-center text-xl font-bold">
@@ -239,41 +239,43 @@ export default function OrderDetailPage() {
                     </div>
                   </li>
                   <li className="mb-4 flex item-start md:items-center gap-3 md:w-full">
-                    <CreditCard className="w-6 h-6 text-neutral-500" />
+                    <CreditCard className="w-5 h-5 md:w-6 md:h-6 text-neutral-500" />
                     <div className="space-y-1 md:grow-1 md:flex items-center gap-2">
                       <p className="font-semibold md:w-1/5 md:mb-0 mb-2">付款方式</p>
                       <div className="flex md:w-4/5 gap-2 items-center">{order.payType}</div>
                     </div>
                   </li>
                   <li className="flex item-start md:items-center gap-3 md:w-full">
-                    <Calendar className="w-6 h-6 text-neutral-500" />
+                    <Calendar className="w-5 h-5 md:w-6 md:h-6 text-neutral-500" />
                     <div className="space-y-1 md:grow-1 md:flex items-center gap-2">
                       <p className="font-semibold md:w-1/5 md:mb-0 mb-2">訂單狀態</p>
-                      <div className="flex md:w-4/5 gap-2 items-center">
+                      <div className="md:flex md:w-4/5 gap-2 items-center">
                         <span
-                          className={`px-4 py-1 rounded-full text-sm font-medium ${statusClass}`}
+                          className={`inline-block px-4 py-1 rounded-full text-sm font-medium ${statusClass} mb-2 md:mb-0`}
                         >
                           {order.status}
                         </span>
-                        {order.status === "待付款" && (
-                          <>
-                            <Button
-                              type="button"
-                              className="px-4 py-1 rounded mr-2 font-semibold"
-                              onClick={() => router.push(`/attendee/orders/${order.id}/pay`)}
-                            >
-                              前往付款
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              className="border-neutral-300 text-neutral-600 px-4 py-1 rounded hover:bg-neutral-400 hover:text-white"
-                              onClick={() => router.push(`/attendee/orders/${order.id}/cancel`)}
-                            >
-                              取消報名
-                            </Button>
-                          </>
-                        )}
+                        <div>
+                          {order.status === "待付款" && (
+                            <>
+                              <Button
+                                type="button"
+                                className="px-4 py-1 rounded mr-2 font-semibold"
+                                onClick={() => router.push(`/attendee/orders/${order.id}/pay`)}
+                              >
+                                前往付款
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                className="border-neutral-300 text-neutral-600 px-4 py-1 rounded hover:bg-neutral-400 hover:text-white"
+                                onClick={() => router.push(`/attendee/orders/${order.id}/cancel`)}
+                              >
+                                取消報名
+                              </Button>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </li>
@@ -282,28 +284,28 @@ export default function OrderDetailPage() {
               <Separator className="my-4" />
               <div>
                 <h3 className="flex items-center gap-2 text-2xl font-semibold leading-[1.2] font-serif-tc mb-6">
-                  <Info className="w-6 h-6 text-neutral-500" />
+                  <Info className="w-5 h-5 md:w-6 md:h-6 text-neutral-500" />
                   參加者資訊
                 </h3>
 
                 <div>
                   <ul className="mb-6">
                     <li className="mb-4 flex item-start md:items-center gap-3 md:w-full">
-                      <User className="w-6 h-6 text-neutral-500 mt-1" />
+                      <User className="w-5 h-5 md:w-6 md:h-6 text-neutral-500 mt-1" />
                       <div className="space-y-1 md:grow-1 md:flex items-center gap-2">
                         <p className="font-semibold md:w-1/5 md:mb-0 mb-2">姓名</p>
                         <div className="flex md:w-4/5 gap-2 items-center">{userProfile?.name}</div>
                       </div>
                     </li>
                     <li className="mb-4 flex item-start md:items-center gap-3 md:w-full">
-                      <Mail className="w-6 h-6 text-neutral-500 mt-1" />
+                      <Mail className="w-5 h-5 md:w-6 md:h-6 text-neutral-500 mt-1" />
                       <div className="space-y-1 md:grow-1 md:flex items-center gap-2">
                         <p className="font-semibold md:w-1/5 md:mb-0 mb-2">電子郵件</p>
                         <div className="flex md:w-4/5 gap-2 items-center">{userProfile?.email}</div>
                       </div>
                     </li>
                     <li className="mb-4 flex item-start md:items-center gap-3 md:w-full">
-                      <Phone className="w-6 h-6 text-neutral-500 mt-1" />
+                      <Phone className="w-5 h-5 md:w-6 md:h-6 text-neutral-500 mt-1" />
                       <div className="space-y-1 md:grow-1 md:flex items-center gap-2">
                         <p className="font-semibold md:w-1/5 md:mb-0 mb-2">行動電話</p>
                         <div className="flex md:w-4/5 gap-2 items-center">
@@ -312,7 +314,7 @@ export default function OrderDetailPage() {
                       </div>
                     </li>
                     <li className="mb-4 flex item-start md:items-center gap-3 md:w-full">
-                      <User className="w-6 h-6 text-neutral-500 mt-1" />
+                      <User className="w-5 h-5 md:w-6 md:h-6 text-neutral-500 mt-1" />
                       <div className="space-y-1 md:grow-1 md:flex items-center gap-2">
                         <p className="font-semibold md:w-1/5 md:mb-0 mb-2">性別</p>
                         <div className="flex md:w-4/5 gap-2 items-center">
@@ -362,7 +364,7 @@ export default function OrderDetailPage() {
                 <div className="flex flex-col md:items-end gap-2 min-w-[120px]">
                   {ticket.status && (
                     <span
-                      className={`border px-6 py-2 rounded-full text-sm mb-2 text-center ${statusColor}`}
+                      className={`border px-4 py-1 md:px-6 md:py-2 rounded-full text-sm mb-2 text-center ${statusColor}`}
                     >
                       {ticket.status}
                     </span>
@@ -372,7 +374,7 @@ export default function OrderDetailPage() {
                     <div className="flex md:flex-col items-center md:items-stretch gap-2">
                       <Button
                         type="button"
-                        className="px-6 py-2 rounded"
+                        className="px-6 py-2 md:px-8 md:py-2.5 rounded w-[120px] md:w-auto h-auto"
                         onClick={() => router.push(`/attendee/tickets/${ticket.id}`)}
                       >
                         查看票券
@@ -380,7 +382,7 @@ export default function OrderDetailPage() {
                       <Button
                         type="button"
                         variant="outline"
-                        className="border-neutral-300 text-neutral-600 px-6 py-2 rounded hover:bg-neutral-400 hover:text-white w-[120px] md:w-auto block"
+                        className="border-neutral-300 text-neutral-600 px-6 py-2 md:px-8 md:py-2.5 rounded hover:bg-neutral-400 hover:text-white w-[120px] md:w-auto block h-auto"
                         onClick={() => router.push(`/attendee/orders/${orderId}/refund`)}
                       >
                         退票
