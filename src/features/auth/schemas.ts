@@ -41,8 +41,8 @@ export const resetPasswordSchema = z
       .string()
       .min(8, "密碼長度至少需要 8 個字符")
       .regex(/^[a-zA-Z0-9]+$/, "密碼只能包含英文或數字"),
-    confirmPassword: z.string(),
-    verificationCode: z.string().min(4, "請輸入驗證碼").max(8, "驗證碼格式不正確"),
+    confirmPassword: z.string().min(1, "請確認密碼"),
+    resetToken: z.string().min(1, "請輸入重設密碼驗證碼"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "兩次輸入的密碼不一致",

@@ -76,8 +76,8 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
           <div className="flex-1 min-w-0 flex items-center order-2 md:order-1">
             <div className="flex-1 min-w-0">
               <div className="text-lg font-bold mb-4">{order.activity.title}</div>
-              <div className="flex items-center text-sm text-gray-600 mb-2 gap-6">
-                <span className="flex items-center gap-1">
+              <div className="md:flex items-center text-sm text-gray-600 mb-2 gap-6">
+                <span className="flex items-center gap-1 mb-2 md:mb-0">
                   <CalendarIcon className="w-4 h-4" />
                   {formatEventTime(order.activity.startTime, order.activity.endTime)}
                 </span>

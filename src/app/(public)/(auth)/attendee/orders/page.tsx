@@ -317,7 +317,6 @@ export default function OrdersPage() {
                   <Accordion
                     type="multiple"
                     defaultValue={openMonths}
-                    className="mb-8"
                   >
                     {openMonths
                       .sort((a, b) => b.localeCompare(a))
@@ -325,9 +324,9 @@ export default function OrdersPage() {
                         <AccordionItem
                           key={month}
                           value={month}
-                          className="border-none"
+                          className="border-none mb-2 md:mb-6"
                         >
-                          <AccordionTrigger className="flex items-center mb-2 px-1 py-2 group hover:no-underline">
+                          <AccordionTrigger className="flex items-center px-1 py-2 group hover:no-underline">
                             <span className="flex items-center gap-2">
                               <span className="text-2xl font-bold leading-none">
                                 {monthMap[month as keyof typeof monthMap].zh}
@@ -337,7 +336,7 @@ export default function OrdersPage() {
                               </span>
                             </span>
                           </AccordionTrigger>
-                          <AccordionContent>
+                          <AccordionContent className="pb-0">
                             {grouped[year][month].map((order) => (
                               <OrderCard
                                 key={order.id}
@@ -353,7 +352,7 @@ export default function OrdersPage() {
             })}
             {/* 查看更多按鈕 */}
             {tabFilteredOrders.length > visibleCount && (
-              <div className="flex justify-center">
+              <div className="flex justify-center pt-6">
                 <Button
                   onClick={() => {}}
                   type="button"

@@ -40,6 +40,7 @@ export type ActivityResponse = {
   };
 };
 
+
 export type CreateActivityRequest = {
   organizationId: number;
   isOnline: boolean;
@@ -106,6 +107,7 @@ export type EditActivityRequest = {
   notes?: string;
   categoryIds?: Array<number>;
 };
+
 
 export type ErrorResponse = {
   message?: string;
@@ -925,6 +927,7 @@ export type PatchApiV1ActivitiesByActivityIdCategoriesResponses = {
   200: PatchActivityResponse;
 };
 
+
 export type PatchApiV1ActivitiesByActivityIdCategoriesResponse =
   PatchApiV1ActivitiesByActivityIdCategoriesResponses[keyof PatchApiV1ActivitiesByActivityIdCategoriesResponses];
 
@@ -941,6 +944,7 @@ export type PatchApiV1ActivitiesByActivityIdBasicData = {
 };
 
 export type PatchApiV1ActivitiesByActivityIdBasicErrors = {
+
   /**
    * 格式錯誤
    */
