@@ -282,7 +282,7 @@ export default function EventDetailPage() {
                 height={48}
                 className="rounded-full"
               />
-              <div className="flex flex-col items-center">
+              <div className="flex flex-col items-start">
                 <span className="font-bold text-lg text-white">心樂山螢火蟲保護園區</span>
                 <span className="text-sm text-[#E5E5E5]">Xinyue Firefly Reserve</span>
               </div>
@@ -319,7 +319,7 @@ export default function EventDetailPage() {
             </div>
           </div>
           {/* 活動熱度 */}
-          <div className="rounded-lg p-6 flex gap-4 items-center justify-between">
+          <div className="rounded-lg px-6 flex gap-4 items-center justify-between">
             <div className="flex flex-col items-center gap-2">
               <div className="flex items-center gap-2">
                 <EyeIcon className="w-5 h-5 text-neutral-500" />
