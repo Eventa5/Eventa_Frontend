@@ -12,6 +12,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import RefundConfirmDialog from "@/features/orders/components/refund-confirm-dialog";
+import RefundFailDialog from "@/features/orders/components/refund-fail-dialog";
+import RefundSuccessDialog from "@/features/orders/components/refund-success-dialog";
 import { Ticket, getTicketStatusColor, mockTickets } from "@/features/orders/orderDetail";
 import {
   getApiV1Activities,
@@ -32,6 +35,7 @@ import {
   VenusAndMars,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
 import useSWR from "swr";
 
 const activityFetcher = async (activityId: number) => {
@@ -69,6 +73,13 @@ const similarActivitiesFetcher = async (categoryIds: number[]) => {
 export default function OrderDetailPage() {
   const router = useRouter();
   const { orderId } = useParams();
+  const [showRefundConfirm, setShowRefundConfirm] = useState(false);
+  const [showRefundSuccess, setShowRefundSuccess] = useState(false);
+  const [showRefundFail, setShowRefundFail] = useState(false);
+  const [refundResult, setRefundResult] = useState<{
+    activityName: string;
+    cancelTime: string;
+  } | null>(null);
 
   // 使用 useSWR 獲取活動資料
   const {
@@ -122,26 +133,26 @@ export default function OrderDetailPage() {
     }
   };
 
-  let statusClass = "text-gray-600";
-  switch (order.status) {
-    case "待付款":
-      statusClass = "text-neutral-800 bg-primary-200";
-      break;
-    case "已付款":
-      statusClass = "text-neutral-800 bg-green-100";
-      break;
-    case "已逾期":
-      statusClass = "text-neutral-500 bg-neutral-200";
-      break;
-    case "已取消":
-      statusClass = "text-secondary-500 bg-secondary-100";
-      break;
-    case "已使用":
-      statusClass = "text-white bg-neutral-400";
-      break;
-    default:
-      statusClass = "text-gray-600";
-  }
+  // let statusClass = "text-gray-600";
+  // switch (order.status) {
+  //   case "待付款":
+  //     statusClass = "text-neutral-800 bg-primary-200";
+  //     break;
+  //   case "已付款":
+  //     statusClass = "text-neutral-800 bg-green-100";
+  //     break;
+  //   case "已逾期":
+  //     statusClass = "text-neutral-500 bg-neutral-200";
+  //     break;
+  //   case "已取消":
+  //     statusClass = "text-secondary-500 bg-secondary-100";
+  //     break;
+  //   case "已使用":
+  //     statusClass = "text-white bg-neutral-400";
+  //     break;
+  //   default:
+  //     statusClass = "text-gray-600";
+  // }
 
   const genderMap = {
     male: "男",
@@ -150,6 +161,21 @@ export default function OrderDetailPage() {
   };
 
   const mockTags = ["文青最愛", "聽團仔"];
+
+  // 退票流程
+  const handleRefund = async () => {
+    setShowRefundConfirm(false);
+    try {
+      // const res = await refundApiCall(orderId); // 實際請求
+      // 假設回傳 { activityName: activity?.title, cancelTime: new Date().toLocaleString() }
+      const res = { activityName: activity?.title ?? "", cancelTime: new Date().toLocaleString() };
+      setRefundResult(res);
+      // setShowRefundSuccess(true);
+      setShowRefundFail(true);
+    } catch (e) {
+      setShowRefundFail(true);
+    }
+  };
 
   return (
     <div className="container max-w-6xl mx-auto p-4 pt-10">
@@ -251,17 +277,15 @@ export default function OrderDetailPage() {
                     <div className="space-y-1 md:grow-1 md:flex items-center gap-2">
                       <p className="font-semibold md:w-1/5 md:mb-0 mb-2">訂單狀態</p>
                       <div className="md:flex md:w-4/5 gap-2 items-center">
-                        <span
-                          className={`inline-block px-4 py-1 rounded-full text-sm font-medium ${statusClass} mb-2 md:mb-0`}
-                        >
+                        <span className="inline-block py-1 rounded-full font-medium mb-2 md:mb-0">
                           {order.status}
                         </span>
                         <div>
-                          {order.status === "待付款" && (
+                          {["已付款", "待付款"].includes(order.status) && (
                             <>
                               <Button
                                 type="button"
-                                className="px-4 py-1 rounded mr-2 font-semibold"
+                                className="py-2 md:py-2.5 rounded mr-2 font-semibold h-auto w-[120px]"
                                 onClick={() => router.push(`/attendee/orders/${order.id}/pay`)}
                               >
                                 前往付款
@@ -269,10 +293,10 @@ export default function OrderDetailPage() {
                               <Button
                                 type="button"
                                 variant="outline"
-                                className="border-neutral-300 text-neutral-600 px-4 py-1 rounded hover:bg-neutral-400 hover:text-white"
-                                onClick={() => router.push(`/attendee/orders/${order.id}/cancel`)}
+                                className="border-neutral-300 text-neutral-600 py-2 md:py-2.5 rounded hover:bg-neutral-400 hover:text-white w-[120px] h-auto"
+                                onClick={() => setShowRefundConfirm(true)}
                               >
-                                取消報名
+                                退票
                               </Button>
                             </>
                           )}
@@ -381,14 +405,6 @@ export default function OrderDetailPage() {
                       >
                         查看票券
                       </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="border-neutral-300 text-neutral-600 px-6 py-2 md:px-8 md:py-2.5 rounded hover:bg-neutral-400 hover:text-white w-[120px] md:w-auto block h-auto"
-                        onClick={() => router.push(`/attendee/orders/${orderId}/refund`)}
-                      >
-                        退票
-                      </Button>
                     </div>
                   ) : null}
                 </div>
@@ -397,6 +413,23 @@ export default function OrderDetailPage() {
           );
         })}
       </div>
+      <RefundConfirmDialog
+        open={showRefundConfirm}
+        onConfirm={handleRefund}
+        onCancel={() => setShowRefundConfirm(false)}
+      />
+      <RefundSuccessDialog
+        open={showRefundSuccess}
+        onClose={() => {
+          setShowRefundSuccess(false);
+        }}
+        activityName={refundResult?.activityName}
+        cancelTime={refundResult?.cancelTime}
+      />
+      <RefundFailDialog
+        open={showRefundFail}
+        onClose={() => setShowRefundFail(false)}
+      />
     </div>
   );
 }
