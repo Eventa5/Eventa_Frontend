@@ -43,15 +43,15 @@ export default function EventDetailPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-primary-50">
+    <div className="min-h-screen flex flex-col bg-primary-50 px-10">
       {/* Banner 區塊 */}
-      <div className="w-full flex justify-center">
+      <div className="w-full max-w-[1680px] mx-auto flex justify-center">
         <Image
           src="/images/single_activity_cover.png"
           alt="活動 Banner"
           width={1680}
           height={840}
-          className="rounded-[40px] object-cover w-full max-w-[1680px] h-[840px]"
+          className="rounded-[40px] object-cover w-full aspect-[2/1] max-w-[1680px]"
         />
       </div>
       {/* 標題與標籤區塊 */}
