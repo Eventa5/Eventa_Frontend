@@ -13,6 +13,7 @@ import {
   ChevronDown,
   ChevronUp,
   Clock,
+  Link as LinkIcon,
   Mail,
   MapPin,
   Phone,
@@ -48,7 +49,7 @@ export default function TicketDetailPage() {
       title: "藝術市集：創意手作與在地文創展覽",
       summary: "全台最盛大的戶外音樂祭！結合親子、野餐、星空與搖滾，讓你在仲夏夜盡情狂歡！",
       location: "苗栗縣大埔鄉東正路121巷8弄20號",
-      link: "",
+      link: "https://www.google.com",
       startTime: "2025-04-19T14:30:00+08:00",
       endTime: "2025-05-10T20:30:00+08:00",
       notes:
@@ -85,7 +86,9 @@ export default function TicketDetailPage() {
                 {ticket.activity.title}
               </h1>
 
-              <Badge className="text-neutral-900 w-fit text-lg md:text-3xl font-bold">一般票</Badge>
+              <Badge className="text-neutral-900 w-fit text-lg md:text-2xl font-bold md:py-1">
+                一般票
+              </Badge>
             </div>
           </CardHeader>
 
@@ -93,13 +96,13 @@ export default function TicketDetailPage() {
             {/* Event Details */}
             <div className="p-6 space-y-6">
               {/* Date & Time */}
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center">
+              <div className="sm:flex items-start gap-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center mb-2 sm:mb-0">
                   <Calendar className="h-5 w-5 md:h-6 md:w-6 text-neutral-600" />
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-gray-900 mb-1 md:text-lg">活動日期</h3>
-                  <p className="text-gray-700 text-lg">
+                  <p className="text-gray-700 md:text-lg">
                     {format(new Date(ticket.activity.startTime), "yyyy.MM.dd")}（
                     {format(new Date(ticket.activity.startTime), "EEEE", { locale: zhTW }).replace(
                       "星期",
@@ -118,8 +121,8 @@ export default function TicketDetailPage() {
 
               {/* Location */}
               {ticket.activity.location && (
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center">
+                <div className="sm:flex items-start gap-4">
+                  <div className="flex-shrink-0 w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center mb-2 sm:mb-0">
                     <MapPin className="h-5 w-5 md:h-6 md:w-6 text-neutral-600" />
                   </div>
                   <div className="flex-1">
@@ -133,22 +136,29 @@ export default function TicketDetailPage() {
                   </div>
                 </div>
               )}
+              {/* Activity Link */}
               {ticket.activity.link && (
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center">
+                <div className="sm:flex items-start gap-4">
+                  <div className="flex-shrink-0 w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center mb-2 sm:mb-0">
+                    <LinkIcon className="h-5 w-5 md:h-6 md:w-6 text-neutral-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 mb-1 md:text-lg">活動連結</h3>
                     <Link
                       href={ticket.activity.link}
-                      className="h-5 w-5 md:h-6 md:w-6 text-neutral-600"
+                      className="text-blue-600 hover:text-blue-800 hover:underline break-all"
+                      target="_blank"
+                      rel="noopener noreferrer"
                     >
-                      <p className="text-gray-700 md:text-lg mb-2">{ticket.activity.link}</p>
+                      {ticket.activity.link}
                     </Link>
                   </div>
                 </div>
               )}
 
               {/* Event Hours */}
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center">
+              <div className="sm:flex items-start gap-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center mb-2 sm:mb-0">
                   <Clock className="h-5 w-5 md:h-6 md:w-6 text-neutral-600" />
                 </div>
                 <div className="flex-1">
@@ -201,7 +211,7 @@ export default function TicketDetailPage() {
                     </div>
                   </div>
                 </div>
-                <Button className="w-full py-6 md:text-lg">報到</Button>
+                <Button className="w-full py-6 text-base md:text-lg">報到</Button>
                 <p className="text-sm text-gray-500 text-center">僅供活動工作人員確認入場</p>
 
                 <div className="space-y-2 bg-white rounded-lg p-4">
@@ -389,7 +399,7 @@ export default function TicketDetailPage() {
                           </p>
                         </div>
                       </div>
-                      <ul className="space-y-2">
+                      <ul className="space-y-2 text-base md:text-lg">
                         <li className="flex items-start gap-2">
                           <div className="w-1.5 h-1.5 bg-neutral-400 rounded-full mt-2 flex-shrink-0" />
                           <span>請於活動當日攜帶此票券入場</span>
