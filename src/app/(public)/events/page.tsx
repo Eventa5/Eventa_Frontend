@@ -158,7 +158,7 @@ export default function EventsPage() {
     : otherEvents;
 
   return (
-    <main className="flex flex-col w-full min-h-screen bg-primary-50">
+    <main className="flex flex-col w-full min-h-screen bg-primary-50 pt-10 -mt-10">
       {/* 搜尋容器 */}
       <section className="flex justify-center">
         <div className="w-full max-w-[1280px] px-8 py-10">

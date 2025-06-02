@@ -152,7 +152,7 @@ const otherEvents = [
 
 export default function Home() {
   return (
-    <main className="flex flex-col w-full min-h-screen bg-[#FDFBF5]">
+    <main className="flex flex-col w-full min-h-screen bg-[#FDFBF5] pt-10 -mt-10">
       {/* 首頁橫幅 */}
       <section className="relative w-full px-4 md:px-8  flex items-center justify-center overflow-x-clip">
         <div className="max-w-[1680px] w-full h-[638px] lg:h-[840px]  flex items-center justify-center z-10 bg-banner rounded-[40px]">
