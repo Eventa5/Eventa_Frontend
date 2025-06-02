@@ -43,7 +43,7 @@ export default function EventDetailPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-primary-50 px-10">
+    <div className="min-h-screen flex flex-col bg-primary-50 px-10 pt-10 -mt-10">
       {/* Banner 區塊 */}
       <div className="w-full max-w-[1680px] mx-auto flex justify-center">
         <Image
