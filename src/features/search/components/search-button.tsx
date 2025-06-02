@@ -2,15 +2,19 @@
 
 import { useSearchStore } from "@/store/search";
 import { Search } from "lucide-react";
-
-export default function SearchButton() {
+interface SearchButtonProps {
+  showBorder?: boolean;
+}
+export default function SearchButton({ showBorder = false }: SearchButtonProps) {
   const toggleSearch = useSearchStore((s) => s.toggleSearch);
 
   return (
     <button
       type="button"
       onClick={toggleSearch}
-      className="w-full bg-white rounded-xl px-6 py-3 flex items-center justify-center gap-2 cursor-pointer"
+      className={`w-full bg-white rounded-xl px-6 py-3 flex items-center justify-center gap-2 cursor-pointe ${
+        showBorder ? "rounded-xl border border-primary-500 border-2" : ""
+      }`}
       aria-label="開啟搜尋"
     >
       <Search
