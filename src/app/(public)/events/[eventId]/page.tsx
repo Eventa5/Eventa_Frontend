@@ -96,7 +96,7 @@ export default function EventDetailPage() {
             </div>
             <div className="flex-1 flex flex-col gap-10">
               {/* 關於活動 */}
-              <p className="text-base text-neutral-800 leading-relaxed">
+              <p className="text-base text-neutral-800 leading-relaxed mt-16">
                 非集團同仁也可報名本年度心樂山林螢火蟲季初夏螢光遊樂園，開放喜愛大自然的您入園夜觀賞如同星空閃耀的流螢！還有美味餐食及滿滿親子活動：繪本故事屋、兒童手作、蟲舞燈光秀，一起和孩子度過難忘的螢火蟲時光吧✨
               </p>
               <div className="flex flex-wrap gap-2">
@@ -193,7 +193,7 @@ export default function EventDetailPage() {
                 </h2>
               </div>
             </div>
-            <div className="w-full max-w-[845px] rounded-[16px] overflow-hidden">
+            <div className="w-full max-w-[845px] rounded-[16px] overflow-hidden mt-16">
               <iframe
                 title="活動地圖"
                 width="100%"
@@ -224,7 +224,7 @@ export default function EventDetailPage() {
                 </h2>
               </div>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 mt-16">
               <h2 className="font-bold text-lg text-neutral-800">
                 2025 心樂山林親子螢火蟲季 ✧ 初夏星夜夢樂園
               </h2>
