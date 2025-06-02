@@ -84,7 +84,7 @@ export default function EventDetailPage() {
             <div className="flex flex-col items-start">
               <div className="flex flex-col items-center gap-4">
                 <Image
-                  src="/ballon_yellow.svg"
+                  src="/images/balloon.png"
                   alt="Ballon Yellow"
                   width={24}
                   height={48}
@@ -183,7 +183,7 @@ export default function EventDetailPage() {
             <div className="flex flex-col items-start">
               <div className="flex flex-col items-center gap-4">
                 <Image
-                  src="/ballon_yellow.svg"
+                  src="/images/balloon.png"
                   alt="Ballon Yellow"
                   width={24}
                   height={48}
@@ -214,7 +214,7 @@ export default function EventDetailPage() {
             <div className="flex flex-col items-start">
               <div className="flex flex-col items-center gap-4">
                 <Image
-                  src="/ballon_yellow.svg"
+                  src="/images/balloon.png"
                   alt="Ballon Yellow"
                   width={24}
                   height={48}
