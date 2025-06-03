@@ -333,6 +333,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                   src={photoUrl}
                   alt="Profile"
                   fill
+                  sizes="96px"
                   className="object-cover"
                 />
               ) : (

@@ -1,5 +1,11 @@
 "use client";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -225,11 +231,11 @@ export default function Header() {
                     <ul className="py-2">
                       <li>
                         <Link
-                          href="#"
+                          href="/attendee/orders"
                           className="flex items-center cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                         >
-                          <Calendar className="w-4 h-4 mr-3 text-gray-500" />
-                          我的票券
+                          <Ticket className="w-4 h-4 mr-3 text-gray-500" />
+                          訂單管理
                         </Link>
                       </li>
                       <li>
@@ -431,6 +437,12 @@ export default function Header() {
           <DialogContent className="max-w-md w-full">
             <DialogHeader>
               <DialogTitle>{getAuthTitle()}</DialogTitle>
+              <DialogDescription>
+                {loginTab === "signin" && "請輸入您的帳號密碼進行登入"}
+                {loginTab === "signup" && "請填寫以下資料完成註冊"}
+                {loginTab === "forgot" && "請輸入您的電子郵件，我們將發送重設密碼連結"}
+                {loginTab === "reset" && "請輸入您的新密碼"}
+              </DialogDescription>
             </DialogHeader>
             <div className="py-2">{renderAuthForm()}</div>
           </DialogContent>
