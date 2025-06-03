@@ -170,6 +170,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(null);
 
   const today = new Date();
   const minBirthDate = subYears(today, 120);
@@ -220,9 +221,24 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
     try {
       setIsSubmitting(true);
 
+      // 如果有選擇新的頭貼，先上傳頭貼
+      if (selectedAvatarFile) {
+        const avatarResponse = await postApiV1UsersProfileAvatar({
+          body: {
+            avatar: selectedAvatarFile,
+          },
+        });
+
+        if (!avatarResponse.data?.status) {
+          throw new Error(avatarResponse.error?.message || "上傳頭貼失敗");
+        }
+      }
+
+      // 更新個人資料
       const response = await putApiV1UsersProfile({
         body: {
           ...data,
+          avatar: profile?.avatar || data.avatar,
           birthday: data.birthday.toLocaleDateString("zh-TW", {
             year: "numeric",
             month: "2-digit",
@@ -233,6 +249,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
 
       if (response.data?.status) {
         await mutate();
+        setSelectedAvatarFile(null);
         toast.success("個人檔案更新成功");
       } else {
         throw new Error(response.error?.message || "更新失敗");
@@ -283,6 +300,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
 
       if (response.data?.status) {
         await mutate();
+        setSelectedAvatarFile(file);
         toast.success("大頭貼更新成功");
       } else {
         throw new Error(response.error?.message || "上傳失敗");
