@@ -43,34 +43,60 @@ export default function EventDetailPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-primary-50 px-10 pt-10 -mt-10">
-      {/* Banner 區塊 */}
-      <div className="w-full max-w-[1680px] mx-auto flex justify-center">
-        <Image
-          src="/images/single_activity_cover.png"
-          alt="活動 Banner"
-          width={1680}
-          height={840}
-          className="rounded-[40px] object-cover w-full aspect-[2/1] max-w-[1680px]"
-        />
+    <div className="min-h-screen flex flex-col bg-primary-50 px-4 pt-4 pb-24 relative -mt-10">
+      {/* Banner區塊：手機滿版，桌機維持原本寬度 */}
+      <div className="relative">
+        {/* 手機版滿版 Banner */}
+        <div className="block md:hidden relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
+          <Image
+            src="/images/single_activity_cover.png"
+            alt="活動 Banner"
+            width={1680}
+            height={840}
+            className="w-full h-auto object-cover rounded-none aspect-[2/1]"
+            priority
+          />
+        </div>
+        {/* 桌機版 Banner */}
+        <div className="hidden md:block w-full rounded-2xl overflow-hidden">
+          <Image
+            src="/images/single_activity_cover.png"
+            alt="活動 Banner"
+            width={1680}
+            height={840}
+            className="object-cover w-full aspect-[2/1]"
+          />
+        </div>
+      </div>
+      {/* 手機版感興趣/喜歡區塊（Banner下方，非覆蓋，滿版） */}
+      <div className="flex justify-center items-center bg-[#FFD56B] md:hidden w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] relative">
+        <div className="flex items-center gap-1 justify-center w-1/2">
+          <EyeIcon className="w-5 h-5 text-neutral-700" />
+          <span className="text-neutral-700 text-sm font-bold">1,473 人</span>
+        </div>
+        <div className="h-6 w-px bg-neutral-700 mx-2" />
+        <div className="flex items-center gap-1 justify-center w-1/2">
+          <HeartIcon className="w-5 h-5 text-neutral-700" />
+          <span className="text-neutral-700 text-sm font-bold">66 人</span>
+        </div>
       </div>
       {/* 標題與標籤區塊 */}
       <div className="w-full max-w-[1280px] mx-auto px-4 pt-10 pb-6">
         <div className="flex gap-4 mb-4">
           <Link
             href="/events"
-            className="bg-secondary-100 text-secondary-500 rounded-lg px-6 py-2 font-bold text-base"
+            className="bg-secondary-100 text-secondary-500 rounded-lg px-6 py-2 font-bold text-sm md:text-base"
           >
             精選
           </Link>
           <Link
             href="/events"
-            className="bg-secondary-100 text-secondary-500 rounded-lg px-6 py-2 font-bold text-base"
+            className="bg-secondary-100 text-secondary-500 rounded-lg px-6 py-2 font-bold text-sm md:text-base"
           >
             線下活動
           </Link>
         </div>
-        <h1 className="font-black text-4xl font-serif-tc md:text-5xl text-[#000] leading-tight">
+        <h1 className="font-black text-3xl font-serif-tc md:text-5xl text-[#000] leading-tight">
           2025 心樂山林星光夜祭 · 初夏閃耀夢樂園
         </h1>
       </div>
@@ -96,7 +122,7 @@ export default function EventDetailPage() {
             </div>
             <div className="flex-1 flex flex-col gap-10">
               {/* 關於活動 */}
-              <p className="text-base text-neutral-800 leading-relaxed mt-16">
+              <p className="text-neutral-800 leading-relaxed mt-16">
                 非集團同仁也可報名本年度心樂山林螢火蟲季初夏螢光遊樂園，開放喜愛大自然的您入園夜觀賞如同星空閃耀的流螢！還有美味餐食及滿滿親子活動：繪本故事屋、兒童手作、蟲舞燈光秀，一起和孩子度過難忘的螢火蟲時光吧✨
               </p>
               <div className="flex flex-wrap gap-2">
@@ -272,7 +298,7 @@ export default function EventDetailPage() {
           </section>
         </div>
         {/* 右側主辦單位資訊 */}
-        <aside className="w-full md:w-[320px] flex flex-col gap-8">
+        <aside className="w-full hidden md:flex md:w-[320px] flex-col gap-8">
           <div className="bg-neutral-800 rounded-lg p-6 flex flex-col gap-4 items-center">
             <div className="flex items-center gap-4">
               <Image
@@ -319,7 +345,7 @@ export default function EventDetailPage() {
             </div>
           </div>
           {/* 活動熱度 */}
-          <div className="rounded-lg px-6 flex gap-4 items-center justify-between">
+          <div className="hidden md:flex rounded-lg px-6 gap-4 items-center justify-between">
             <div className="flex flex-col items-center gap-2">
               <div className="flex items-center gap-2">
                 <EyeIcon className="w-5 h-5 text-neutral-500" />
