@@ -134,7 +134,7 @@ function CountryCodeSelect({
       <SelectTrigger className="w-full px-3">
         <SelectValue placeholder="選擇國碼" />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="border border-neutral-300">
         {countryOptions.map((country) => (
           <SelectItem
             key={country.value}
@@ -342,7 +342,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                 </div>
               )}
               {isUploading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                <div className="absolute inset-0 flex items-center justify-center bg-neutral-500 bg-opacity-50">
                   <div className="h-6 w-6 animate-spin rounded-full border-2 border-white border-t-transparent" />
                 </div>
               )}
@@ -410,8 +410,10 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
               )}
             />
 
-            <div className="rounded-md bg-blue-100 p-3">
-              <p className="text-sm text-blue-800">為了確保您的帳戶安全，電子郵件地址無法更改</p>
+            <div className="rounded-md bg-secondary-100 p-3">
+              <p className="text-sm text-secondary-800">
+                為了確保您的帳戶安全，電子郵件地址無法更改
+              </p>
             </div>
 
             <FormField
@@ -445,6 +447,8 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                       }
                       disabledDates={isDateDisabled}
                       components={{ Dropdown: CustomSelectDropdown }}
+                      className="border-neutral-300"
+                      popoverContentClassName="border border-neutral-300"
                     />
                   </FormControl>
                   <FormMessage />
@@ -465,6 +469,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                       type="button"
                       variant={field.value === "male" ? "default" : "outline"}
                       onClick={() => form.setValue("gender", "male")}
+                      className="border-neutral-300"
                     >
                       男性
                     </Button>
@@ -472,6 +477,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                       type="button"
                       variant={field.value === "female" ? "default" : "outline"}
                       onClick={() => form.setValue("gender", "female")}
+                      className="border-neutral-300"
                     >
                       女性
                     </Button>
@@ -479,6 +485,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                       type="button"
                       variant={field.value === "nonBinary" ? "default" : "outline"}
                       onClick={() => form.setValue("gender", "nonBinary")}
+                      className="border-neutral-300"
                     >
                       多元
                     </Button>
@@ -548,14 +555,32 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                           value={field.value}
                         >
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className="w-full">
                               <SelectValue placeholder="國家/地區" />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent>
-                            <SelectItem value="台北市">台北市</SelectItem>
+                          <SelectContent className="border border-neutral-300">
+                            <SelectItem value="南投縣">南投縣</SelectItem>
+                            <SelectItem value="嘉義市">嘉義市</SelectItem>
+                            <SelectItem value="嘉義縣">嘉義縣</SelectItem>
+                            <SelectItem value="基隆市">基隆市</SelectItem>
+                            <SelectItem value="宜蘭縣">宜蘭縣</SelectItem>
+                            <SelectItem value="屏東縣">屏東縣</SelectItem>
+                            <SelectItem value="彰化縣">彰化縣</SelectItem>
                             <SelectItem value="新北市">新北市</SelectItem>
-                            <SelectItem value="台中市">台中市</SelectItem>
+                            <SelectItem value="新竹市">新竹市</SelectItem>
+                            <SelectItem value="新竹縣">新竹縣</SelectItem>
+                            <SelectItem value="桃園市">桃園市</SelectItem>
+                            <SelectItem value="澎湖縣">澎湖縣</SelectItem>
+                            <SelectItem value="臺中市">臺中市</SelectItem>
+                            <SelectItem value="臺北市">臺北市</SelectItem>
+                            <SelectItem value="臺南市">臺南市</SelectItem>
+                            <SelectItem value="臺東縣">臺東縣</SelectItem>
+                            <SelectItem value="花蓮縣">花蓮縣</SelectItem>
+                            <SelectItem value="苗栗縣">苗栗縣</SelectItem>
+                            <SelectItem value="連江縣">連江縣</SelectItem>
+                            <SelectItem value="金門縣">金門縣</SelectItem>
+                            <SelectItem value="雲林縣">雲林縣</SelectItem>
                             <SelectItem value="高雄市">高雄市</SelectItem>
                           </SelectContent>
                         </Select>
@@ -597,6 +622,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                       type="button"
                       variant={field.value === "general" ? "default" : "outline"}
                       onClick={() => form.setValue("identity", "general")}
+                      className="border-neutral-300"
                     >
                       社會人士
                     </Button>
@@ -604,6 +630,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                       type="button"
                       variant={field.value === "student" ? "default" : "outline"}
                       onClick={() => form.setValue("identity", "student")}
+                      className="border-neutral-300"
                     >
                       學生
                     </Button>
@@ -611,6 +638,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                       type="button"
                       variant={field.value === "retiree" ? "default" : "outline"}
                       onClick={() => form.setValue("identity", "retiree")}
+                      className="border-neutral-300"
                     >
                       退休人士
                     </Button>
