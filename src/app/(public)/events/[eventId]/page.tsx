@@ -81,7 +81,7 @@ export default function EventDetailPage() {
         </div>
       </div>
       {/* 標題與標籤區塊 */}
-      <div className="w-full max-w-[1280px] mx-auto px-4 pt-10 pb-6">
+      <div className="w-full max-w-[1280px] mx-auto px-4 pt-10 sm:pt-10 sm:pb-6">
         <div className="flex gap-4 mb-4">
           <Link
             href="/events"
@@ -101,14 +101,14 @@ export default function EventDetailPage() {
         </h1>
       </div>
       {/* 主內容與右側資訊欄雙欄排版 */}
-      <div className="flex flex-col md:flex-row md:items-start w-full max-w-[1280px] mx-auto px-4 py-10 mb-16 gap-8">
+      <div className="flex flex-col md:flex-row md:items-start w-full max-w-[1280px] mx-auto px-4 py-0 sm:py-10 mb-16 gap-8">
         {/* 左側主內容（flex-1） */}
         <div className="flex-1 flex flex-col gap-32">
           {/* 內容區塊 */}
-          <section className="flex gap-8">
+          <section className="flex flex-col md:flex-row gap-8">
             {/* 左側主內容 */}
             <div className="flex flex-col items-start">
-              <div className="flex flex-col items-center gap-4">
+              <div className="hidden md:flex flex-col items-center gap-4">
                 <Image
                   src="/images/balloon.png"
                   alt="Ballon Yellow"
@@ -122,68 +122,102 @@ export default function EventDetailPage() {
             </div>
             <div className="flex-1 flex flex-col gap-10">
               {/* 關於活動 */}
-              <p className="text-neutral-800 leading-relaxed mt-16">
+              <p className="text-neutral-800 leading-relaxed mt-0 sm:mt-16">
                 非集團同仁也可報名本年度心樂山林螢火蟲季初夏螢光遊樂園，開放喜愛大自然的您入園夜觀賞如同星空閃耀的流螢！還有美味餐食及滿滿親子活動：繪本故事屋、兒童手作、蟲舞燈光秀，一起和孩子度過難忘的螢火蟲時光吧✨
               </p>
               <div className="flex flex-wrap gap-2">
-                <span className="border border-neutral-500 rounded-full px-4 py-1 text-neutral-500 text-sm">
+                <span className="border border-neutral-500 rounded-full px-4 py-1 text-neutral-500 text-base sm:text-sm">
                   #螢火蟲
                 </span>
-                <span className="border border-neutral-500 rounded-full px-4 py-1 text-neutral-500 text-sm">
+                <span className="border border-neutral-500 rounded-full px-4 py-1 text-neutral-500 text-base sm:text-sm">
                   #生態導覽
                 </span>
-                <span className="border border-neutral-500 rounded-full px-4 py-1 text-neutral-500 text-sm">
+                <span className="border border-neutral-500 rounded-full px-4 py-1 text-neutral-500 text-base sm:text-sm">
                   #賞螢
                 </span>
-                <span className="border border-neutral-500 rounded-full px-4 py-1 text-neutral-500 text-sm">
+                <span className="border border-neutral-500 rounded-full px-4 py-1 text-neutral-500 text-base sm:text-sm">
                   #親子活動
                 </span>
               </div>
               <Separator />
               {/* 活動資訊表格 */}
-              <div className="flex flex-col gap-6">
-                <div className="flex items-center gap-3">
-                  <span className="inline-flex items-center gap-2 text-neutral-800 font-bold">
-                    <Calendar className="w-5 h-5" />
-                    活動時間
-                  </span>
-                  <span className="text-neutral-800">
-                    2025.04.19 (六) 14:30 - 05.10 (六)20:30 (GMT+8)
-                  </span>
-                  <button
-                    type="button"
-                    className="flex items-center gap-1 text-sm text-primary-700 font-bold cursor-pointer"
-                  >
-                    <PlusIcon className="w-4 h-4" />
-                    加入行事曆
-                  </button>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="inline-flex items-center gap-2 text-neutral-800 font-bold">
-                    <MapPin className="w-5 h-5" />
-                    活動地點
-                  </span>
-                  <span className="text-neutral-800">{eventLocation}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="inline-flex items-center gap-2 text-neutral-800 font-bold">
-                    <LinkIcon className="w-5 h-5" />
-                    相關連結
-                  </span>
-                  <a
-                    href="https://www.facebook.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-neutral-800 underline"
-                  >
-                    心樂山螢火蟲保護園區粉絲專頁
-                  </a>
+              <div className="flex flex-col sm:flex-row items-start gap-3">
+                <span className="inline-flex items-center gap-2 text-neutral-800 font-bold">
+                  <Calendar className="w-5 h-5" />
+                  活動時間
+                </span>
+                <span className="text-neutral-800">
+                  2025.04.19 (六) 14:30 - 05.10 (六)20:30 (GMT+8)
+                </span>
+                <button
+                  type="button"
+                  className="flex items-center gap-1 text-sm text-primary-700 font-bold cursor-pointer"
+                >
+                  <PlusIcon className="w-4 h-4" />
+                  加入行事曆
+                </button>
+              </div>
+              <div className="flex flex-col sm:flex-row items-start gap-3">
+                <span className="inline-flex items-center gap-2 text-neutral-800 font-bold">
+                  <MapPin className="w-5 h-5" />
+                  活動地點
+                </span>
+                <span className="text-neutral-800">{eventLocation}</span>
+              </div>
+              <div className="flex flex-col sm:flex-row items-start gap-3">
+                <span className="inline-flex items-center gap-2 text-neutral-800 font-bold">
+                  <LinkIcon className="w-5 h-5" />
+                  相關連結
+                </span>
+                <a
+                  href="https://www.facebook.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-neutral-800 underline"
+                >
+                  心樂山螢火蟲保護園區粉絲專頁
+                </a>
+                {/* 手機版主辦單位資訊 */}
+                <div className="w-full bg-neutral-800 rounded-lg p-8 flex gap-4 items-center md:hidden">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="flex flex-col items-start">
+                      <span className="font-bold text-lg text-white">心樂山螢火蟲保護園區</span>
+                      <span className="text-sm text-[#E5E5E5]">Xinyue Firefly Reserve</span>
+                    </div>
+                    <div className="flex gap-10 mt-2">
+                      <button
+                        type="button"
+                        className="text-white cursor-pointer"
+                      >
+                        <HeartIcon />
+                      </button>
+                      <button
+                        type="button"
+                        className="text-white cursor-pointer"
+                      >
+                        <Facebook />
+                      </button>
+                      <button
+                        type="button"
+                        className="text-white cursor-pointer"
+                      >
+                        <Mail />
+                      </button>
+                    </div>
+                  </div>
+                  <Image
+                    src="/images/single_activity_avatar.png"
+                    alt="主辦單位頭貼"
+                    width={90}
+                    height={90}
+                    className="rounded-full w-full"
+                  />
                 </div>
               </div>
               <Separator />
               {/* 注意事項 */}
-              <div className="bg-[#FFF7E1] rounded-full flex items-center gap-8 px-8 py-6">
-                <span className="inline-flex items-center gap-2 text-neutral-800 font-bold">
+              <div className="bg-[#FFF7E1] rounded-[24px] p-6 flex flex-col gap-4 md:rounded-full md:flex-row md:items-center md:gap-8 md:px-8 md:py-6">
+                <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg md:text-base">
                   <Cone className="w-5 h-5" />
                   線下活動
                 </span>
@@ -195,7 +229,7 @@ export default function EventDetailPage() {
                 </div>
                 <button
                   type="button"
-                  className="flex items-center gap-1 text-sm text-primary-700 font-bold cursor-pointer"
+                  className="flex items-center gap-1 text-base text-primary-700 font-bold cursor-pointer mt-2 md:mt-0"
                 >
                   <InfoIcon className="w-5 h-5" />
                   如何取票
@@ -205,8 +239,8 @@ export default function EventDetailPage() {
           </section>
 
           {/* 活動地圖區塊 */}
-          <section className="flex gap-8">
-            <div className="flex flex-col items-start">
+          <section className="flex sm:flex-row flex-col gap-0 sm:gap-8">
+            <div className="hidden sm:flex flex-col items-start">
               <div className="flex flex-col items-center gap-4">
                 <Image
                   src="/images/balloon.png"
@@ -219,7 +253,23 @@ export default function EventDetailPage() {
                 </h2>
               </div>
             </div>
-            <div className="w-full max-w-[845px] rounded-[16px] overflow-hidden mt-16">
+            {/* 手機版活動地圖標題 */}
+            <div className="flex items-end  justify-center gap-8 mb-6 sm:hidden">
+              <span className="font-bold font-serif-tc text-3xl sm:text-2xl text-neutral-800">
+                活動
+              </span>
+              <Image
+                src="/images/balloon.png"
+                alt="Ballon Yellow"
+                width={32}
+                height={32}
+                className="mx-2"
+              />
+              <span className="font-bold font-serif-tc text-3xl sm:text-2xl text-neutral-800">
+                地圖
+              </span>
+            </div>
+            <div className="w-full max-w-[845px] rounded-[16px] overflow-hidden mt-0 sm:mt-16">
               <iframe
                 title="活動地圖"
                 width="100%"
@@ -236,8 +286,8 @@ export default function EventDetailPage() {
           </section>
 
           {/* 活動簡介區塊 */}
-          <section className="flex gap-8">
-            <div className="flex flex-col items-start">
+          <section className="flex flex-col md:flex-row gap-0 sm:gap-8">
+            <div className="hidden sm:flex flex-col items-start">
               <div className="flex flex-col items-center gap-4">
                 <Image
                   src="/images/balloon.png"
@@ -250,7 +300,23 @@ export default function EventDetailPage() {
                 </h2>
               </div>
             </div>
-            <div className="flex flex-col gap-2 mt-16">
+            {/* 手機版活動簡介標題 */}
+            <div className="flex items-end  justify-center gap-8 mb-6 sm:hidden">
+              <span className="font-bold font-serif-tc text-3xl sm:text-2xl text-neutral-800">
+                活動
+              </span>
+              <Image
+                src="/images/balloon.png"
+                alt="Ballon Yellow"
+                width={32}
+                height={32}
+                className="mx-2"
+              />
+              <span className="font-bold font-serif-tc text-3xl sm:text-2xl text-neutral-800">
+                簡介
+              </span>
+            </div>
+            <div className="flex flex-col gap-2 mt-0 sm:mt-16">
               <h2 className="font-bold text-lg text-neutral-800">
                 2025 心樂山林親子螢火蟲季 ✧ 初夏星夜夢樂園
               </h2>
