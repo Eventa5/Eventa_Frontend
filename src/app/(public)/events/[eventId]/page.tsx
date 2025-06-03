@@ -431,6 +431,18 @@ export default function EventDetailPage() {
           </div>
         </aside>
       </div>
+      {/* 手機版底部固定報名 bar */}
+      <div className="fixed bottom-0 left-0 w-full bg-transparent z-50 sm:hidden px-8 pb-8 pointer-events-none">
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            className="bg-primary-500 hover:bg-[#FFCA28] transition-colors cursor-pointer rounded-[12px] h-12 flex items-center justify-center text-base font-bold shadow-lg text-neutral-800 pointer-events-auto w-[80%]"
+            onClick={handleCheckout}
+          >
+            立即報名
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
