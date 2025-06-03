@@ -146,7 +146,7 @@ export default function TicketDetailPage() {
                     <h3 className="font-semibold text-gray-900 mb-1 md:text-lg">活動連結</h3>
                     <Link
                       href={ticket.activity.link}
-                      className="text-blue-600 hover:text-blue-800 hover:underline break-all"
+                      className="text-neutral-800 hover:text-neutral-600 underline break-all"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -400,18 +400,18 @@ export default function TicketDetailPage() {
                         </div>
                       </div>
                       <ul className="space-y-2 text-base md:text-lg">
-                        <li className="flex items-start gap-2">
-                          <div className="w-1.5 h-1.5 bg-neutral-400 rounded-full mt-2 flex-shrink-0" />
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-neutral-400 rounded-full flex-shrink-0" />
                           <span>請於活動當日攜帶此票券入場</span>
                         </li>
                         {ticket.activity.location && (
-                          <li className="flex items-start gap-2">
-                            <div className="w-1.5 h-1.5 bg-neutral-400 rounded-full mt-2 flex-shrink-0" />
+                          <li className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 bg-neutral-400 rounded-full flex-shrink-0" />
                             <span>線下活動如遇天候不佳將另行通知</span>
                           </li>
                         )}
-                        <li className="flex items-start gap-2">
-                          <div className="w-1.5 h-1.5 bg-neutral-400 rounded-full mt-2 flex-shrink-0" />
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-neutral-400 rounded-full flex-shrink-0" />
                           <span>禁止攜帶危險物品入場</span>
                         </li>
                       </ul>
