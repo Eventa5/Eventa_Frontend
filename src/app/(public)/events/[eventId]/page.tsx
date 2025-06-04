@@ -74,7 +74,7 @@ export default function EventDetailPage() {
           <EyeIcon className="w-5 h-5 text-neutral-700" />
           <span className="text-neutral-700 text-sm font-bold">1,473 人</span>
         </div>
-        <div className="h-6 w-px bg-neutral-700 mx-2" />
+        <div className="h-8 w-px bg-neutral-700 mx-2" />
         <div className="flex items-center gap-1 justify-center w-1/2">
           <HeartIcon className="w-5 h-5 text-neutral-700" />
           <span className="text-neutral-700 text-sm font-bold">66 人</span>
