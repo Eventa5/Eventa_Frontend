@@ -177,42 +177,42 @@ export default function EventDetailPage() {
                 >
                   心樂山螢火蟲保護園區粉絲專頁
                 </a>
-                {/* 手機版主辦單位資訊 */}
-                <div className="w-full bg-neutral-800 rounded-lg p-8 flex gap-4 items-center md:hidden">
-                  <div className="flex flex-col items-center gap-4">
-                    <div className="flex flex-col items-start">
-                      <span className="font-bold text-lg text-white">心樂山螢火蟲保護園區</span>
-                      <span className="text-sm text-[#E5E5E5]">Xinyue Firefly Reserve</span>
-                    </div>
-                    <div className="flex gap-10 mt-2">
-                      <button
-                        type="button"
-                        className="text-white cursor-pointer"
-                      >
-                        <HeartIcon />
-                      </button>
-                      <button
-                        type="button"
-                        className="text-white cursor-pointer"
-                      >
-                        <Facebook />
-                      </button>
-                      <button
-                        type="button"
-                        className="text-white cursor-pointer"
-                      >
-                        <Mail />
-                      </button>
-                    </div>
+              </div>
+              {/* 手機版主辦單位資訊 */}
+              <div className="w-full bg-neutral-800 rounded-lg p-8 flex gap-4 items-center justify-between md:hidden">
+                <div className="flex flex-col items-center gap-4 ">
+                  <div className="flex flex-col items-start">
+                    <span className="font-bold text-lg text-white">心樂山螢火蟲保護園區</span>
+                    <span className="text-sm text-[#E5E5E5]">Xinyue Firefly Reserve</span>
                   </div>
-                  <Image
-                    src="/images/single_activity_avatar.png"
-                    alt="主辦單位頭貼"
-                    width={90}
-                    height={90}
-                    className="rounded-full w-full"
-                  />
+                  <div className="flex gap-10 mt-2">
+                    <button
+                      type="button"
+                      className="text-white cursor-pointer"
+                    >
+                      <HeartIcon />
+                    </button>
+                    <button
+                      type="button"
+                      className="text-white cursor-pointer"
+                    >
+                      <Facebook />
+                    </button>
+                    <button
+                      type="button"
+                      className="text-white cursor-pointer"
+                    >
+                      <Mail />
+                    </button>
+                  </div>
                 </div>
+                <Image
+                  src="/images/single_activity_avatar.png"
+                  alt="主辦單位頭貼"
+                  width={90}
+                  height={90}
+                  className="rounded-full w-24 sm:w-32 md:w-40"
+                />
               </div>
               <Separator />
               {/* 注意事項 */}
