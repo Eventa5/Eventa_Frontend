@@ -43,7 +43,7 @@ export default function EventDetailPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-primary-50 px-4 pt-4 pb-24 relative -mt-10">
+    <div className="min-h-screen flex flex-col bg-primary-50 px-4 pt-4 pb-24 relative -mt-10 overflow-x-hidden">
       {/* Banner區塊：手機滿版，桌機維持原本寬度 */}
       <div className="relative">
         {/* 手機版滿版 Banner */}
