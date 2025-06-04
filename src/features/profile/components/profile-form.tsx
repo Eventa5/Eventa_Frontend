@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { isAfter, isBefore, subYears } from "date-fns";
 import { User } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -171,6 +171,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
 
   const today = new Date();
   const minBirthDate = subYears(today, 120);
@@ -217,56 +218,6 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
     return !isAfter(date, minBirthDate) || !isBefore(date, maxBirthDate);
   };
 
-  async function onSubmit(data: ProfileFormValues) {
-    try {
-      setIsSubmitting(true);
-
-      // 如果有選擇新的頭貼，先上傳頭貼
-      if (selectedAvatarFile) {
-        const avatarResponse = await postApiV1UsersProfileAvatar({
-          body: {
-            avatar: selectedAvatarFile,
-          },
-        });
-
-        if (!avatarResponse.data?.status) {
-          throw new Error(avatarResponse.error?.message || "上傳頭貼失敗");
-        }
-      }
-
-      // 更新個人資料
-      const response = await putApiV1UsersProfile({
-        body: {
-          ...data,
-          avatar: profile?.avatar || data.avatar,
-          birthday: data.birthday.toLocaleDateString("zh-TW", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-          }),
-        },
-      });
-
-      if (response.data?.status) {
-        await mutate();
-        setSelectedAvatarFile(null);
-        toast.success("個人檔案更新成功");
-      } else {
-        throw new Error(response.error?.message || "更新失敗");
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        toast.error(error.message);
-        console.error("更新失敗詳情:", error);
-      } else {
-        toast.error("更新個人檔案失敗");
-        console.error("未知錯誤:", error);
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
-
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
   };
@@ -287,45 +238,89 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
       return;
     }
 
-    try {
-      setIsUploading(true);
-      const formData = new FormData();
-      formData.append("avatar", file);
+    // 建立預覽 URL
+    const preview = URL.createObjectURL(file);
+    setPreviewUrl(preview);
+    setSelectedAvatarFile(file);
 
-      const response = await postApiV1UsersProfileAvatar({
+    // 清空檔案輸入框，允許重複上傳相同檔案
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  // 在元件移除時清理預覽 URL
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+  async function onSubmit(data: ProfileFormValues) {
+    try {
+      setIsSubmitting(true);
+      let newAvatarUrl = data.avatar;
+
+      // 如果有選擇新的頭貼，先上傳頭貼
+      if (selectedAvatarFile) {
+        const avatarResponse = await postApiV1UsersProfileAvatar({
+          body: {
+            avatar: selectedAvatarFile,
+          },
+        });
+
+        if (!avatarResponse.data?.status) {
+          throw new Error(avatarResponse.error?.message || "上傳頭貼失敗");
+        }
+
+        // 從回應中獲取新的頭貼 URL
+        if (avatarResponse.data?.data) {
+          newAvatarUrl = avatarResponse.data.data;
+        }
+      }
+
+      // 更新個人資料
+      const response = await putApiV1UsersProfile({
         body: {
-          avatar: file,
+          ...data,
+          avatar: newAvatarUrl,
+          birthday: data.birthday.toLocaleDateString("zh-TW", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          }),
         },
       });
 
       if (response.data?.status) {
         await mutate();
-        setSelectedAvatarFile(file);
-        toast.success("大頭貼更新成功");
+        setSelectedAvatarFile(null);
+        setPreviewUrl(""); // 清除預覽 URL
+        toast.success("個人檔案更新成功");
       } else {
-        throw new Error(response.error?.message || "上傳失敗");
+        throw new Error(response.error?.message || "更新失敗");
       }
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
+        console.error("更新失敗詳情:", error);
       } else {
-        toast.error("上傳大頭貼失敗");
+        toast.error("更新個人檔案失敗");
+        console.error("未知錯誤:", error);
       }
     } finally {
-      setIsUploading(false);
-      // 清空檔案輸入框，允許重複上傳相同檔案
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      setIsSubmitting(false);
     }
-  };
+  }
 
   // 顯示錯誤訊息
   if (error) {
     toast.error("載入個人檔案時發生錯誤");
   }
 
-  const photoUrl = profile?.avatar || "";
+  const photoUrl = previewUrl || profile?.avatar || "";
 
   return (
     <>
