@@ -58,7 +58,7 @@ export default function EventDetailPage() {
           />
         </div>
         {/* 桌機版 Banner */}
-        <div className="hidden md:block w-full rounded-2xl overflow-hidden">
+        <div className="hidden md:block w-full max-w-[1680px] mx-auto rounded-2xl overflow-hidden">
           <Image
             src="/images/single_activity_cover.png"
             alt="活動 Banner"
