@@ -103,7 +103,7 @@ export default function EventDetailPage() {
       {/* 主內容與右側資訊欄雙欄排版 */}
       <div className="flex flex-col md:flex-row md:items-start w-full max-w-[1280px] mx-auto px-4 py-0 sm:py-10 mb-16 gap-8">
         {/* 左側主內容（flex-1） */}
-        <div className="flex-1 flex flex-col gap-32">
+        <div className="flex-1 flex flex-col gap-20">
           {/* 內容區塊 */}
           <section className="flex flex-col md:flex-row gap-8">
             {/* 左側主內容 */}
