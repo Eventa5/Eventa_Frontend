@@ -85,13 +85,13 @@ export default function EventDetailPage() {
         <div className="flex gap-4 mb-4">
           <Link
             href="/events"
-            className="bg-secondary-100 text-secondary-500 rounded-lg px-6 py-2 font-bold text-sm md:text-base"
+            className="bg-secondary-100 text-secondary-500 rounded-lg py-2 px-3 sm:px-6 font-bold text-sm md:text-base"
           >
             精選
           </Link>
           <Link
             href="/events"
-            className="bg-secondary-100 text-secondary-500 rounded-lg px-6 py-2 font-bold text-sm md:text-base"
+            className="bg-secondary-100 text-secondary-500 rounded-lg py-2 px-3 sm:px-6 font-bold text-sm md:text-base"
           >
             線下活動
           </Link>
