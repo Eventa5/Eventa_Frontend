@@ -383,7 +383,7 @@ export default function EventDetailPage() {
             <Button
               type="button"
               size="lg"
-              className="w-full bg-[#FFD56B] text-neutral-800 text-base font-bold rounded-lg mt-2
+              className="w-full bg-primary-500 hover:bg-[#FFCA28] transition-colors text-neutral-800 text-base font-bold rounded-lg mt-2 cursor-pointer
                 "
               onClick={handleCheckout}
             >
