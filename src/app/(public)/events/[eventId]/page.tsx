@@ -157,6 +157,7 @@ export default function EventDetailPage() {
                   加入行事曆
                 </button>
               </div>
+              <Separator />
               <div className="flex flex-col sm:flex-row items-start gap-3">
                 <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg sm:text-base">
                   <MapPin className="w-5 h-5" />
@@ -164,6 +165,7 @@ export default function EventDetailPage() {
                 </span>
                 <span className="text-neutral-800">{eventLocation}</span>
               </div>
+              <Separator />
               <div className="flex flex-col sm:flex-row items-start gap-3">
                 <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg sm:text-base">
                   <LinkIcon className="w-5 h-5" />
@@ -214,7 +216,6 @@ export default function EventDetailPage() {
                   className="rounded-full w-24 sm:w-32 md:w-40"
                 />
               </div>
-              <Separator />
               {/* 注意事項 */}
               <div className="bg-[#FFF7E1] rounded-[24px] p-6 flex flex-col gap-4 md:rounded-full md:flex-row md:items-center md:gap-8 md:px-8 md:py-6">
                 <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg md:text-base">
