@@ -365,7 +365,7 @@ export default function EventDetailPage() {
           </section>
         </div>
         {/* 右側主辦單位資訊 */}
-        <aside className="w-full hidden md:flex md:w-[320px] flex-col gap-8">
+        <aside className="w-full hidden md:flex md:w-[320px] flex-col gap-8 mt-0 sm:mt-16">
           <div className="bg-neutral-800 rounded-lg p-6 flex flex-col gap-4 items-center">
             <div className="flex items-center gap-4">
               <Image
