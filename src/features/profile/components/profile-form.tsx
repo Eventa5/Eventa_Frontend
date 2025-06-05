@@ -1,15 +1,5 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { isAfter, isBefore, subYears } from "date-fns";
-import { User } from "lucide-react";
-import Image from "next/image";
-import { useCallback, useState } from "react";
-import type { ChangeEvent } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import useSWR from "swr";
-
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/date-picker";
 import {
@@ -30,8 +20,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { profileFormSchema } from "@/features/profile/schemas";
-import { getApiV1UsersProfile, putApiV1UsersProfile } from "@/services/api/client/sdk.gen";
+import { putApiV1UsersProfile } from "@/services/api/client/sdk.gen";
 import type { UserResponse } from "@/services/api/client/types.gen";
+import { useAuthStore } from "@/store/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { isAfter, isBefore, subYears } from "date-fns";
+import { User } from "lucide-react";
+import Image from "next/image";
+import { useCallback, useEffect, useState } from "react";
+import type { ChangeEvent } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import type { z } from "zod";
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
@@ -144,25 +143,8 @@ function CountryCodeSelect({
   );
 }
 
-// SWR fetcher 函數
-const profileFetcher = async (): Promise<UserResponse> => {
-  const response = await getApiV1UsersProfile();
-  if (response.data?.data) {
-    return response.data.data;
-  }
-  throw new Error(response.error?.message || "無法獲取個人檔案");
-};
-
-export default function ProfileForm({ initialData }: ProfileFormProps) {
-  const {
-    data: profile,
-    error,
-    mutate,
-  } = useSWR<UserResponse>("api/user/profile", profileFetcher, {
-    fallbackData: initialData,
-    revalidateOnFocus: false,
-  });
-
+export default function ProfileForm() {
+  const userProfile = useAuthStore((s) => s.userProfile);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const today = new Date();
@@ -173,38 +155,27 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      name: profile?.name || "",
-      displayName: profile?.displayName || "",
-      email: profile?.email || "",
-      countryCode: profile?.countryCode || "+886",
-      phoneNumber: profile?.phoneNumber || "",
-      birthday: profile?.birthday ? toLocalDateOnly(profile.birthday) : defaultBirthDate,
-      gender: (profile?.gender as "male" | "female" | "nonBinary") || "male",
-      region: profile?.region || "",
-      address: profile?.address || "",
-      identity: (profile?.identity as "general" | "student" | "retiree") || "general",
-      avatar: profile?.avatar || "",
+      name: userProfile?.name || "",
+      displayName: userProfile?.displayName || "",
+      email: userProfile?.email || "",
+      countryCode: userProfile?.countryCode || "+886",
+      phoneNumber: userProfile?.phoneNumber || "",
+      birthday: userProfile?.birthday ? toLocalDateOnly(userProfile.birthday) : defaultBirthDate,
+      gender: (userProfile?.gender as "male" | "female" | "nonBinary") || "male",
+      region: userProfile?.region || "",
+      address: userProfile?.address || "",
+      identity: (userProfile?.identity as "general" | "student" | "retiree") || "general",
+      avatar: userProfile?.avatar || "",
     },
   });
 
-  // 當 profile 數據更新時重設表單
   const resetForm = useCallback(() => {
-    if (profile) {
-      form.reset({
-        name: profile.name || "",
-        displayName: profile.displayName || "",
-        email: profile.email || "",
-        countryCode: profile.countryCode || "+886",
-        phoneNumber: profile.phoneNumber || "",
-        birthday: profile.birthday ? toLocalDateOnly(profile.birthday) : defaultBirthDate,
-        gender: (profile.gender as "male" | "female" | "nonBinary") || "male",
-        region: profile.region || "",
-        address: profile.address || "",
-        identity: (profile.identity as "general" | "student" | "retiree") || "general",
-        avatar: profile.avatar || "",
-      });
-    }
-  }, [profile, form, defaultBirthDate]);
+    form.reset();
+  }, [form]);
+
+  useEffect(() => {
+    resetForm();
+  }, [resetForm]);
 
   const isDateDisabled = (date: Date) => {
     return !isAfter(date, minBirthDate) || !isBefore(date, maxBirthDate);
@@ -226,7 +197,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
       });
 
       if (response.data?.status) {
-        await mutate();
+        await useAuthStore.getState().fetchUserProfile();
         toast.success("個人檔案更新成功");
       } else {
         throw new Error(response.error?.message || "更新失敗");
@@ -244,12 +215,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
     }
   }
 
-  // 顯示錯誤訊息
-  if (error) {
-    toast.error("載入個人檔案時發生錯誤");
-  }
-
-  const photoUrl = profile?.avatar || "";
+  const photoUrl = userProfile?.avatar || "";
 
   return (
     <>
@@ -274,7 +240,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                 </div>
               )}
             </div>
-            <p className="text-xs text-gray-500">{profile?.memberId}</p>
+            <p className="text-xs text-gray-500">{userProfile?.memberId}</p>
           </div>
 
           <div className="space-y-4">
@@ -329,7 +295,8 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                       className="bg-gray-100"
                       disabled
                       readOnly
-                      value={profile?.email || ""}
+                      value={userProfile?.email || ""}
+                      placeholder="請輸入您的電子郵件地址"
                     />
                   </FormControl>
                   <FormMessage className="text-red-500" />

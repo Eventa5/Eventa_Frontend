@@ -32,6 +32,7 @@ export default function Header() {
   const setLoginTab = useDialogStore((s) => s.setLoginTab);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const logout = useAuthStore((s) => s.logout);
+  const userProfile = useAuthStore((s) => s.userProfile);
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -220,12 +221,14 @@ export default function Header() {
                   <div className="bg-neutral-800 p-2 rounded-full">
                     <User className="w-4 h-4 text-white" />
                   </div>
-                  <p className="text-[14px]">使用者</p>
+                  <p className="text-[14px]">{userProfile?.displayName || "使用者"}</p>
                 </button>
                 {menuOpen && (
                   <div className="absolute right-0 mt-2 w-56 bg-white shadow-lg rounded-md z-50 border border-gray-100">
                     <div className="p-4 border-b border-gray-100">
-                      <p className="font-medium text-gray-900">您好，使用者</p>
+                      <p className="font-medium text-gray-900">
+                        您好，{userProfile?.displayName || "使用者"}
+                      </p>
                       <p className="text-xs text-gray-500 mt-1">管理您的活動和個人資料</p>
                     </div>
                     <ul className="py-2">
@@ -362,7 +365,7 @@ export default function Header() {
                     <div className="bg-neutral-800 p-3 rounded-full flex items-center justify-center">
                       <User className="w-4 h-4 text-white" />
                     </div>
-                    <span className="text-sm">使用者#001</span>
+                    <span className="text-sm">{userProfile?.displayName || "使用者"}</span>
                   </div>
                   <button
                     type="button"
