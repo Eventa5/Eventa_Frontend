@@ -108,6 +108,31 @@ const countryOptions = [
   { label: "其他 +0", value: "+0" },
 ];
 
+const cities = [
+  "南投縣",
+  "嘉義市",
+  "嘉義縣",
+  "基隆市",
+  "宜蘭縣",
+  "屏東縣",
+  "彰化縣",
+  "新北市",
+  "新竹市",
+  "新竹縣",
+  "桃園市",
+  "澎湖縣",
+  "臺中市",
+  "臺北市",
+  "臺南市",
+  "臺東縣",
+  "花蓮縣",
+  "苗栗縣",
+  "連江縣",
+  "金門縣",
+  "雲林縣",
+  "高雄市",
+];
+
 function toLocalDateOnly(dateStr: string | Date | null): Date {
   if (!dateStr) {
     return subYears(new Date(), 20); // 預設 20 歲
@@ -226,6 +251,10 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+
     // 檢查檔案類型
     if (!file.type.startsWith("image/")) {
       toast.error("請上傳圖片檔案");
@@ -265,6 +294,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
 
       // 如果有選擇新的頭貼，先上傳頭貼
       if (selectedAvatarFile) {
+        setIsUploading(true);
         const avatarResponse = await postApiV1UsersProfileAvatar({
           body: {
             avatar: selectedAvatarFile,
@@ -272,6 +302,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
         });
 
         if (!avatarResponse.data?.status) {
+          setIsUploading(false);
           throw new Error(avatarResponse.error?.message || "上傳頭貼失敗");
         }
 
@@ -279,6 +310,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
         if (avatarResponse.data?.data) {
           newAvatarUrl = avatarResponse.data.data;
         }
+        setIsUploading(false);
       }
 
       // 更新個人資料
@@ -311,6 +343,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
         console.error("未知錯誤:", error);
       }
     } finally {
+      setIsUploading(false);
       setIsSubmitting(false);
     }
   }
@@ -573,28 +606,14 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent className="border border-neutral-300">
-                            <SelectItem value="南投縣">南投縣</SelectItem>
-                            <SelectItem value="嘉義市">嘉義市</SelectItem>
-                            <SelectItem value="嘉義縣">嘉義縣</SelectItem>
-                            <SelectItem value="基隆市">基隆市</SelectItem>
-                            <SelectItem value="宜蘭縣">宜蘭縣</SelectItem>
-                            <SelectItem value="屏東縣">屏東縣</SelectItem>
-                            <SelectItem value="彰化縣">彰化縣</SelectItem>
-                            <SelectItem value="新北市">新北市</SelectItem>
-                            <SelectItem value="新竹市">新竹市</SelectItem>
-                            <SelectItem value="新竹縣">新竹縣</SelectItem>
-                            <SelectItem value="桃園市">桃園市</SelectItem>
-                            <SelectItem value="澎湖縣">澎湖縣</SelectItem>
-                            <SelectItem value="臺中市">臺中市</SelectItem>
-                            <SelectItem value="臺北市">臺北市</SelectItem>
-                            <SelectItem value="臺南市">臺南市</SelectItem>
-                            <SelectItem value="臺東縣">臺東縣</SelectItem>
-                            <SelectItem value="花蓮縣">花蓮縣</SelectItem>
-                            <SelectItem value="苗栗縣">苗栗縣</SelectItem>
-                            <SelectItem value="連江縣">連江縣</SelectItem>
-                            <SelectItem value="金門縣">金門縣</SelectItem>
-                            <SelectItem value="雲林縣">雲林縣</SelectItem>
-                            <SelectItem value="高雄市">高雄市</SelectItem>
+                            {cities.map((city) => (
+                              <SelectItem
+                                key={city}
+                                value={city}
+                              >
+                                {city}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />
