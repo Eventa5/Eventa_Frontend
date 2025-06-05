@@ -10,11 +10,11 @@ export interface OrderTabsProps {
   value: OrderTabsValue;
   onValueChange: (value: OrderTabsValue) => void;
   counts: {
-    all: number;
-    registered: number;
-    pending: number;
-    cancelled: number;
-    expired: number;
+    all: number | undefined;
+    registered: number | undefined;
+    pending: number | undefined;
+    cancelled: number | undefined;
+    expired: number | undefined;
   };
   className?: string;
 }
@@ -123,15 +123,17 @@ export const OrderTabs: React.FC<OrderTabsProps> = ({
                 <span className={cn("ml-1 text-neutral-400 text-sm md:text-lg", tab.labelClass)}>
                   {tab.label}
                 </span>
-                <span
-                  className={cn(
-                    "ml-1 inline-flex items-center justify-center rounded-full px-2 text-xs font-normal min-w-[20px] border border-neutral-400 text-neutral-400 bg-transparent transition-colors",
-                    tab.badge,
-                    tab.badgeActive
-                  )}
-                >
-                  {counts[tab.value as OrderTabsValue]}
-                </span>
+                {counts[tab.value as OrderTabsValue] !== undefined && (
+                  <span
+                    className={cn(
+                      "ml-1 inline-flex items-center justify-center rounded-full px-2 text-xs font-normal min-w-[20px] border border-neutral-400 text-neutral-400 bg-transparent transition-colors",
+                      tab.badge,
+                      tab.badgeActive
+                    )}
+                  >
+                    {counts[tab.value as OrderTabsValue]}
+                  </span>
+                )}
               </TabsTrigger>
             );
           })}
