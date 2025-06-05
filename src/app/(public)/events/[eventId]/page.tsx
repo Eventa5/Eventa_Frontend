@@ -141,7 +141,7 @@ export default function EventDetailPage() {
               </div>
               <Separator />
               {/* 活動資訊表格 */}
-              <div className="flex flex-col sm:flex-row items-start gap-3">
+              <div className="flex flex-col sm:flex-row items-center gap-3 pl-0 md:pl-8">
                 <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg sm:text-base">
                   <Calendar className="w-5 h-5" />
                   活動時間
@@ -158,7 +158,7 @@ export default function EventDetailPage() {
                 </button>
               </div>
               <Separator />
-              <div className="flex flex-col sm:flex-row items-start gap-3">
+              <div className="flex flex-col sm:flex-row items-center gap-3 pl-0 md:pl-8">
                 <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg sm:text-base">
                   <MapPin className="w-5 h-5" />
                   活動地點
@@ -166,7 +166,7 @@ export default function EventDetailPage() {
                 <span className="text-neutral-800">{eventLocation}</span>
               </div>
               <Separator />
-              <div className="flex flex-col sm:flex-row items-start gap-3">
+              <div className="flex flex-col sm:flex-row items-start gap-3 pl-0 md:pl-8">
                 <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg sm:text-base">
                   <LinkIcon className="w-5 h-5" />
                   相關連結
