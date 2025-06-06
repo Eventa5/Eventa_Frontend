@@ -1,4 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import type { OrderResponse } from "@/services/api/client/types.gen";
 import { CalendarIcon, MapPinIcon } from "lucide-react";
 import Link from "next/link";
 import type React from "react";
@@ -19,11 +20,13 @@ export type Order = {
 };
 
 interface OrderCardProps {
-  order: Order;
+  order: OrderResponse;
 }
 
 // 工具函式：格式化日期
-function formatEventTime(start: string, end: string) {
+function formatEventTime(start: string | undefined, end: string | undefined) {
+  if (!start || !end) return "-";
+
   const weekMap = ["日", "一", "二", "三", "四", "五", "六"];
   const startDate = new Date(start.replace(/-/g, "/"));
   const endDate = new Date(end.replace(/-/g, "/"));
@@ -33,10 +36,13 @@ function formatEventTime(start: string, end: string) {
   const w = weekMap[startDate.getDay()];
   const startHM = startDate.toTimeString().slice(0, 5);
   const endHM = endDate.toTimeString().slice(0, 5);
-  return `${y}.${m}.${d} (${w}) ${startHM} - ${endHM}`;
+
+  return `${y}.${m}.${d}（${w}）${startHM} - ${endHM}`;
 }
 
 export const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
+  if (!order.activity) return null;
+
   let statusClass = "text-gray-600";
   switch (order.status) {
     case "待付款":
@@ -87,7 +93,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
                 </span>
               </div>
               <div className="text-sm text-gray-500 mb-2">訂單編號：{order.id}</div>
-              <div className="text-sm text-gray-500">付款方式：{order.paymentMethod ?? "-"}</div>
+              <div className="text-sm text-gray-500">付款方式：{order.payment?.method ?? "-"}</div>
             </div>
           </div>
         </div>

@@ -8,6 +8,9 @@ import {
 } from "@hey-api/client-next";
 import { client as _heyApiClient } from "./client.gen";
 import type {
+  DeleteApiV1ActivitiesByActivityIdFavoriteData,
+  DeleteApiV1ActivitiesByActivityIdFavoriteError,
+  DeleteApiV1ActivitiesByActivityIdFavoriteResponse,
   DeleteApiV1ActivitiesByActivityIdTicketTypesByTicketTypeIdData,
   DeleteApiV1ActivitiesByActivityIdTicketTypesByTicketTypeIdError,
   DeleteApiV1ActivitiesByActivityIdTicketTypesByTicketTypeIdResponse,
@@ -16,15 +19,31 @@ import type {
   DeleteApiV1OrganizationsResponse,
   GetApiV1ActivitiesByActivityIdData,
   GetApiV1ActivitiesByActivityIdError,
+  GetApiV1ActivitiesByActivityIdParticipantsData,
+  GetApiV1ActivitiesByActivityIdParticipantsError,
+  GetApiV1ActivitiesByActivityIdParticipantsResponse,
   GetApiV1ActivitiesByActivityIdResponse,
   GetApiV1ActivitiesByActivityIdTicketTypesData,
   GetApiV1ActivitiesByActivityIdTicketTypesError,
   GetApiV1ActivitiesByActivityIdTicketTypesResponse,
   GetApiV1ActivitiesData,
   GetApiV1ActivitiesError,
+  GetApiV1ActivitiesPopularData,
+  GetApiV1ActivitiesPopularError,
+  GetApiV1ActivitiesPopularResponse,
   GetApiV1ActivitiesResponse,
+  GetApiV1CategoriesData,
+  GetApiV1CategoriesError,
+  GetApiV1CategoriesResponse,
   GetApiV1CurrenciesData,
+  GetApiV1CurrenciesError,
   GetApiV1CurrenciesResponse,
+  GetApiV1OrdersByOrderIdData,
+  GetApiV1OrdersByOrderIdError,
+  GetApiV1OrdersByOrderIdResponse,
+  GetApiV1OrdersData,
+  GetApiV1OrdersError,
+  GetApiV1OrdersResponse,
   GetApiV1OrganizationsByOrganizationIdData,
   GetApiV1OrganizationsByOrganizationIdError,
   GetApiV1OrganizationsByOrganizationIdResponse,
@@ -51,6 +70,18 @@ import type {
   PatchApiV1ActivitiesByActivityIdPublishData,
   PatchApiV1ActivitiesByActivityIdPublishError,
   PatchApiV1ActivitiesByActivityIdPublishResponse,
+  PatchApiV1ActivitiesByActivityIdTypeData,
+  PatchApiV1ActivitiesByActivityIdTypeError,
+  PatchApiV1ActivitiesByActivityIdTypeResponse,
+  PatchApiV1OrdersByOrderIdCancelData,
+  PatchApiV1OrdersByOrderIdCancelError,
+  PatchApiV1OrdersByOrderIdCancelResponse,
+  PostApiV1ActivitiesByActivityIdCoverData,
+  PostApiV1ActivitiesByActivityIdCoverError,
+  PostApiV1ActivitiesByActivityIdCoverResponse,
+  PostApiV1ActivitiesByActivityIdFavoriteData,
+  PostApiV1ActivitiesByActivityIdFavoriteError,
+  PostApiV1ActivitiesByActivityIdFavoriteResponse,
   PostApiV1ActivitiesByActivityIdTicketTypesData,
   PostApiV1ActivitiesByActivityIdTicketTypesError,
   PostApiV1ActivitiesByActivityIdTicketTypesResponse,
@@ -60,6 +91,12 @@ import type {
   PostApiV1CurrenciesData,
   PostApiV1CurrenciesError,
   PostApiV1CurrenciesResponse,
+  PostApiV1OrdersData,
+  PostApiV1OrdersError,
+  PostApiV1OrdersResponse,
+  PostApiV1OrganizationsByOrganizationIdImagesData,
+  PostApiV1OrganizationsByOrganizationIdImagesError,
+  PostApiV1OrganizationsByOrganizationIdImagesResponse,
   PostApiV1OrganizationsData,
   PostApiV1OrganizationsError,
   PostApiV1OrganizationsResponse,
@@ -107,6 +144,29 @@ export type Options<
    * used to access values that aren't defined as part of the SDK function.
    */
   meta?: Record<string, unknown>;
+};
+
+/**
+ * 獲取熱門活動資料
+ * 獲取熱門活動資料
+ */
+export const getApiV1ActivitiesPopular = <ThrowOnError extends boolean = false>(
+  options?: Options<GetApiV1ActivitiesPopularData, ThrowOnError>
+) => {
+  return (options?.client ?? _heyApiClient).get<
+    GetApiV1ActivitiesPopularResponse,
+    GetApiV1ActivitiesPopularError,
+    ThrowOnError
+  >({
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/v1/activities/popular",
+    ...options,
+  });
 };
 
 /**
@@ -264,6 +324,29 @@ export const putApiV1ActivitiesByActivityIdTicketTypesByTicketTypeId = <
 };
 
 /**
+ * 獲取特定活動的參加者名單
+ * 獲取特定活動的參加者名單
+ */
+export const getApiV1ActivitiesByActivityIdParticipants = <ThrowOnError extends boolean = false>(
+  options: Options<GetApiV1ActivitiesByActivityIdParticipantsData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).get<
+    GetApiV1ActivitiesByActivityIdParticipantsResponse,
+    GetApiV1ActivitiesByActivityIdParticipantsError,
+    ThrowOnError
+  >({
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/v1/activities/{activityId}/participants",
+    ...options,
+  });
+};
+
+/**
  * 獲取特定的活動資料
  * 獲取特定活動資料
  */
@@ -305,6 +388,107 @@ export const putApiV1ActivitiesByActivityId = <ThrowOnError extends boolean = fa
       },
     ],
     url: "/api/v1/activities/{activityId}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+  });
+};
+
+/**
+ * 取消收藏活動
+ * 使用者登入後，可以取消收藏活動
+ */
+export const deleteApiV1ActivitiesByActivityIdFavorite = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteApiV1ActivitiesByActivityIdFavoriteData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).delete<
+    DeleteApiV1ActivitiesByActivityIdFavoriteResponse,
+    DeleteApiV1ActivitiesByActivityIdFavoriteError,
+    ThrowOnError
+  >({
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/v1/activities/{activityId}/favorite",
+    ...options,
+  });
+};
+
+/**
+ * 收藏活動
+ * 使用者登入後，可以收藏活動
+ */
+export const postApiV1ActivitiesByActivityIdFavorite = <ThrowOnError extends boolean = false>(
+  options: Options<PostApiV1ActivitiesByActivityIdFavoriteData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).post<
+    PostApiV1ActivitiesByActivityIdFavoriteResponse,
+    PostApiV1ActivitiesByActivityIdFavoriteError,
+    ThrowOnError
+  >({
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/v1/activities/{activityId}/favorite",
+    ...options,
+  });
+};
+
+/**
+ * 編輯活動主圖
+ * 編輯活動主圖，照片大小限制4MB內
+ */
+export const postApiV1ActivitiesByActivityIdCover = <ThrowOnError extends boolean = false>(
+  options: Options<PostApiV1ActivitiesByActivityIdCoverData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).post<
+    PostApiV1ActivitiesByActivityIdCoverResponse,
+    PostApiV1ActivitiesByActivityIdCoverError,
+    ThrowOnError
+  >({
+    ...formDataBodySerializer,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/v1/activities/{activityId}/cover",
+    ...options,
+    headers: {
+      "Content-Type": null,
+      ...options?.headers,
+    },
+  });
+};
+
+/**
+ * 編輯活動形式
+ * 設定活動形式，線上或線下
+ */
+export const patchApiV1ActivitiesByActivityIdType = <ThrowOnError extends boolean = false>(
+  options: Options<PatchApiV1ActivitiesByActivityIdTypeData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).patch<
+    PatchApiV1ActivitiesByActivityIdTypeResponse,
+    PatchApiV1ActivitiesByActivityIdTypeError,
+    ThrowOnError
+  >({
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/v1/activities/{activityId}/type",
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -441,12 +625,39 @@ export const patchApiV1ActivitiesByActivityIdCancel = <ThrowOnError extends bool
 };
 
 /**
- * Get all currencies
+ * 獲取活動類別資料
+ * 獲取活動類別資料
+ */
+export const getApiV1Categories = <ThrowOnError extends boolean = false>(
+  options?: Options<GetApiV1CategoriesData, ThrowOnError>
+) => {
+  return (options?.client ?? _heyApiClient).get<
+    GetApiV1CategoriesResponse,
+    GetApiV1CategoriesError,
+    ThrowOnError
+  >({
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/v1/categories",
+    ...options,
+  });
+};
+
+/**
+ * 取得所有幣別清單
  */
 export const getApiV1Currencies = <ThrowOnError extends boolean = false>(
   options?: Options<GetApiV1CurrenciesData, ThrowOnError>
 ) => {
-  return (options?.client ?? _heyApiClient).get<GetApiV1CurrenciesResponse, unknown, ThrowOnError>({
+  return (options?.client ?? _heyApiClient).get<
+    GetApiV1CurrenciesResponse,
+    GetApiV1CurrenciesError,
+    ThrowOnError
+  >({
     security: [
       {
         scheme: "bearer",
@@ -459,7 +670,7 @@ export const getApiV1Currencies = <ThrowOnError extends boolean = false>(
 };
 
 /**
- * Create a new currency
+ * 新增幣別
  */
 export const postApiV1Currencies = <ThrowOnError extends boolean = false>(
   options: Options<PostApiV1CurrenciesData, ThrowOnError>
@@ -481,6 +692,102 @@ export const postApiV1Currencies = <ThrowOnError extends boolean = false>(
       "Content-Type": "application/json",
       ...options?.headers,
     },
+  });
+};
+
+/**
+ * 查看所有訂單
+ * 查看單一使用者的訂單
+ */
+export const getApiV1Orders = <ThrowOnError extends boolean = false>(
+  options?: Options<GetApiV1OrdersData, ThrowOnError>
+) => {
+  return (options?.client ?? _heyApiClient).get<
+    GetApiV1OrdersResponse,
+    GetApiV1OrdersError,
+    ThrowOnError
+  >({
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/v1/orders",
+    ...options,
+  });
+};
+
+/**
+ * 創建訂單
+ * 創建新的訂單
+ */
+export const postApiV1Orders = <ThrowOnError extends boolean = false>(
+  options: Options<PostApiV1OrdersData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).post<
+    PostApiV1OrdersResponse,
+    PostApiV1OrdersError,
+    ThrowOnError
+  >({
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/v1/orders",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+  });
+};
+
+/**
+ * 查看單一訂單
+ * 查看單一訂單的詳細資訊
+ */
+export const getApiV1OrdersByOrderId = <ThrowOnError extends boolean = false>(
+  options: Options<GetApiV1OrdersByOrderIdData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).get<
+    GetApiV1OrdersByOrderIdResponse,
+    GetApiV1OrdersByOrderIdError,
+    ThrowOnError
+  >({
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/v1/orders/{orderId}",
+    ...options,
+  });
+};
+
+/**
+ * 取消訂單
+ * 用來手動取消訂單
+ */
+export const patchApiV1OrdersByOrderIdCancel = <ThrowOnError extends boolean = false>(
+  options: Options<PatchApiV1OrdersByOrderIdCancelData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).patch<
+    PatchApiV1OrdersByOrderIdCancelResponse,
+    PatchApiV1OrdersByOrderIdCancelError,
+    ThrowOnError
+  >({
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/v1/orders/{orderId}/cancel",
+    ...options,
   });
 };
 
@@ -608,6 +915,34 @@ export const getApiV1OrganizationsByOrganizationId = <ThrowOnError extends boole
     ],
     url: "/api/v1/organizations/{organizationId}",
     ...options,
+  });
+};
+
+/**
+ * 編輯主辦圖片
+ * 編輯主辦主圖及封面照片，照片大小限制4MB內
+ */
+export const postApiV1OrganizationsByOrganizationIdImages = <ThrowOnError extends boolean = false>(
+  options: Options<PostApiV1OrganizationsByOrganizationIdImagesData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).post<
+    PostApiV1OrganizationsByOrganizationIdImagesResponse,
+    PostApiV1OrganizationsByOrganizationIdImagesError,
+    ThrowOnError
+  >({
+    ...formDataBodySerializer,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/v1/organizations/{organizationId}/images",
+    ...options,
+    headers: {
+      "Content-Type": null,
+      ...options?.headers,
+    },
   });
 };
 
