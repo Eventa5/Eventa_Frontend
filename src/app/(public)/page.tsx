@@ -238,31 +238,7 @@ export default function Home() {
           </div>
 
           <div className="w-full flex justify-center">
-            {/* 使用客戶端組件處理 Swiper */}
-            <CategorySwiper
-              categories={[
-                {
-                  name: "精選",
-                  imageUrl: "/images/category-featured.jpg",
-                },
-                {
-                  name: "學習",
-                  imageUrl: "/images/category-learning.jpg",
-                },
-                {
-                  name: "藝文",
-                  imageUrl: "/images/category-arts.jpg",
-                },
-                {
-                  name: "體驗",
-                  imageUrl: "/images/category-experience.jpg",
-                },
-                {
-                  name: "AI為您推薦",
-                  imageUrl: "/images/category-ai.jpg",
-                },
-              ]}
-            />
+            <CategorySwiper />
           </div>
         </div>
       </section>

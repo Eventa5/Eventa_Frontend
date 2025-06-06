@@ -1,5 +1,6 @@
 "use client";
 
+import { useCategories } from "@/features/activities/categories";
 import Image from "next/image";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -9,11 +10,25 @@ type Category = {
   imageUrl: string;
 };
 
-interface CategorySwiperProps {
-  categories: Category[];
-}
+export default function CategorySwiper() {
+  const { categories, error, isLoading } = useCategories();
 
-export default function CategorySwiper({ categories }: CategorySwiperProps) {
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center w-full h-[219px] md:h-[310px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center w-full h-[219px] md:h-[310px] gap-4">
+        <div className="text-red-500 text-center">{error}</div>
+      </div>
+    );
+  }
+
   return (
     <Swiper
       spaceBetween={24}
@@ -38,7 +53,7 @@ export default function CategorySwiper({ categories }: CategorySwiperProps) {
               height={622}
               className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
             />
-            <div className="absolute left-4 bottom-4 lg:left-6 lg:bottom-6 flex items-center justify-center">
+            <div className="absolute left-4 bottom-4 lg:left-6 lg:bottom-6 flex items-center justify-center bg-black/50">
               <span className="text-white font-bold text-[18px] lg:text-[24px] tracking-widest">
                 {category.name}
               </span>

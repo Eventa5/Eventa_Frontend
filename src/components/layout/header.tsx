@@ -218,9 +218,19 @@ export default function Header() {
                   onClick={() => setMenuOpen(!menuOpen)}
                   className="flex items-center gap-2 cursor-pointer"
                 >
-                  <div className="bg-neutral-800 p-2 rounded-full">
-                    <User className="w-4 h-4 text-white" />
-                  </div>
+                  {userProfile?.avatar ? (
+                    <Image
+                      src={userProfile.avatar}
+                      alt="User Profile"
+                      width={32}
+                      height={32}
+                      className="rounded-full"
+                    />
+                  ) : (
+                    <div className="rounded-full p-2 bg-neutral-800">
+                      <User className="w-4 h-4 text-white" />
+                    </div>
+                  )}
                   <p className="text-[14px]">{userProfile?.displayName || "使用者"}</p>
                 </button>
                 {menuOpen && (
