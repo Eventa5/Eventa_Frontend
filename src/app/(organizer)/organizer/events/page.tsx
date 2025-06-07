@@ -11,6 +11,7 @@ import {
   patchApiV1ActivitiesByActivityIdPublish,
 } from "@/services/api/client/sdk.gen";
 import type { ActivitiesResponse, PaginationResponse } from "@/services/api/client/types.gen";
+import { useOrganizerStore } from "@/store/organizer";
 import { useErrorHandler } from "@/utils/error-handler";
 import {
   Airplay,
@@ -392,6 +393,7 @@ export default function EventsPage() {
   const [events, setEvents] = useState<ActivitiesResponse[]>([]);
   const [pagination, setPagination] = useState<PaginationResponse>({});
   const [loading, setLoading] = useState(false);
+  const { currentOrganizerInfo } = useOrganizerStore();
 
   const [searchKeyword, setSearchKeyword] = useState("");
   const [selectedLocation, setSelectedLocation] = useState<string>("");
@@ -400,7 +402,7 @@ export default function EventsPage() {
     endTime?: string;
   }>({});
 
-  // 實際查詢參數（用於API調用）
+  // 查詢參數
   const [activeFilters, setActiveFilters] = useState({
     keyword: "",
     status: "published" as ActivityTabsValue,
@@ -431,7 +433,10 @@ export default function EventsPage() {
       };
 
       const response = await getApiV1Activities({
-        query: queryParams,
+        query: {
+          ...queryParams,
+          organizationId: currentOrganizerInfo?.id,
+        },
       });
 
       if (response.error) {
@@ -457,6 +462,7 @@ export default function EventsPage() {
     activeFilters.dateRange.startTime,
     activeFilters.dateRange.endTime,
     handleError,
+    currentOrganizerInfo?.id,
   ]);
 
   // 監聽參數變化並重新獲取數據
@@ -492,7 +498,6 @@ export default function EventsPage() {
     setCurrentPage(1);
   };
 
-  // 計算活動狀態統計
   const eventCounts = useMemo(() => {
     const counts: EventStatusCounts = {
       draft: 0,
@@ -501,16 +506,17 @@ export default function EventsPage() {
       canceled: 0,
     };
 
-    for (const event of events) {
-      const status = event.status as ActivityStatus;
-      if (status === ActivityStatus.DRAFT) counts.draft++;
-      else if (status === ActivityStatus.PUBLISHED) counts.published++;
-      else if (status === ActivityStatus.ENDED) counts.ended++;
-      else if (status === ActivityStatus.CANCELED) counts.canceled++;
-    }
+    // 設置當前選中狀態的總數
+    const currentStatusTotal = pagination.totalItems || 0;
+    const currentStatus = activeFilters.status as ActivityStatus;
+
+    if (currentStatus === ActivityStatus.DRAFT) counts.draft = currentStatusTotal;
+    else if (currentStatus === ActivityStatus.PUBLISHED) counts.published = currentStatusTotal;
+    else if (currentStatus === ActivityStatus.ENDED) counts.ended = currentStatusTotal;
+    else if (currentStatus === ActivityStatus.CANCELED) counts.canceled = currentStatusTotal;
 
     return counts;
-  }, [events]);
+  }, [pagination.totalItems, activeFilters.status]);
 
   // 清除篩選
   const handleClearFilters = () => {
@@ -547,7 +553,7 @@ export default function EventsPage() {
           throw new Error(response.error.message || "取消活動失敗");
         }
       }
-      fetchEvents(); // 重新載入列表
+      fetchEvents();
     } catch (error) {
       handleError(error);
     }

@@ -2,42 +2,36 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Camera, Image, Plus, RefreshCw, Upload, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { FormField, FormSection } from "@/components/ui/form-field";
+import { type CreateOrganizerFormData, createOrganizerSchema } from "@/features/organizer/schemas";
 import {
   postApiV1Organizations,
   postApiV1OrganizationsByOrganizationIdImages,
 } from "@/services/api/client/sdk.gen";
+import { useDialogStore } from "@/store/dialog";
 import { useOrganizerStore } from "@/store/organizer";
 import { useErrorHandler } from "@/utils/error-handler";
 import { cn } from "@/utils/transformer";
-import { type CreateOrganizerFormData, createOrganizerSchema } from "../schemas";
 
-interface CreateOrganizerDialogProps {
+interface CreateOrganizerPageProps {
   onSuccess?: (
     data: CreateOrganizerFormData & {
       avatar?: File | null;
       coverImage?: File | null;
     }
   ) => void;
-  children?: React.ReactNode;
 }
 
-export function CreateOrganizerDialog({ onSuccess, children }: CreateOrganizerDialogProps) {
+export default function CreateOrganizerPage({ onSuccess }: CreateOrganizerPageProps) {
+  const router = useRouter();
+  const { showError } = useDialogStore();
   const { handleError } = useErrorHandler();
   const { setCurrentOrganizer } = useOrganizerStore();
 
-  const [open, setOpen] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -157,8 +151,8 @@ export function CreateOrganizerDialog({ onSuccess, children }: CreateOrganizerDi
           coverImage: coverImageFile,
         });
 
-        setOpen(false);
-        resetForm();
+        // 導航回主辦者中心
+        router.push("/organizer");
       }
     } catch (error) {
       handleError(error);
@@ -173,13 +167,6 @@ export function CreateOrganizerDialog({ onSuccess, children }: CreateOrganizerDi
     setCoverImagePreview(null);
     setAvatarFile(null);
     setCoverImageFile(null);
-  };
-
-  const handleOpenChange = (open: boolean) => {
-    if (!open) {
-      resetForm();
-    }
-    setOpen(open);
   };
 
   const handleResetAvatar = () => {
@@ -202,44 +189,25 @@ export function CreateOrganizerDialog({ onSuccess, children }: CreateOrganizerDi
   const countryCodeOptions = [{ value: "台灣 +886", label: "台灣 +886" }];
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={handleOpenChange}
-    >
-      <DialogTrigger asChild>
-        {children || (
-          <button
-            type="button"
-            className="flex items-center gap-3 bg-primary-50 rounded-full px-6 py-4 text-lg font-medium text-primary-700 hover:bg-primary-100 transition cursor-pointer"
-          >
-            <span className="bg-white rounded-full w-10 h-10 flex items-center justify-center border border-primary-200">
-              <Plus size={20} />
-            </span>
-            新增主辦
-          </button>
-        )}
-      </DialogTrigger>
-      <DialogContent className="p-0 w-full h-full max-w-auto sm:max-w-auto lg:h-auto lg:max-w-[900px] xl:max-w-[1024px] border-none rounded-none lg:rounded-lg shadow-lg z-[999]">
-        <DialogHeader className="p-3 border-b bg-white rounded-t-none lg:rounded-t-lg flex flex-row items-start justify-between">
-          <div>
-            <DialogTitle className="text-xl text-left font-medium text-gray-800">
-              建立主辦
-            </DialogTitle>
-            <p className="text-sm text-start text-gray-500 mt-1">
-              開始舉辦活動前先建立個主辦單位，讓參加者更認識你吧！
-            </p>
-          </div>
-        </DialogHeader>
+    <div className="min-h-screen">
+      <div className="py-8 px-4 sm:px-6 lg:px-8">
+        {/* 頁面標題 */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">建立主辦</h1>
+          <p className="text-lg text-gray-600 mt-2">
+            開始舉辦活動前先建立個主辦單位，讓參加者更認識你吧！
+          </p>
+        </div>
 
-        <div className="lg:p-3 h-full lg:max-h-[80vh] overflow-hidden">
+        <div className="bg-white rounded-lg shadow-sm">
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="rounded-b-lg h-full overflow-y-auto"
+            className="space-y-6"
           >
             {/* 封面和頭像上傳 */}
-            <div className="p-3 md:p-5 mb-[35px] lg:mb-[70px]">
+            <div className="p-6 mb-[35px] lg:mb-[70px]">
               {/* 封面圖片 */}
-              <div className="relative bg-primary-100 h-60 rounded-lg">
+              <div className="relative bg-primary-100 h-60 lg:h-[380px] rounded-lg">
                 <div className="w-full h-full flex items-center justify-center">
                   {coverImagePreview ? (
                     <div
@@ -332,7 +300,7 @@ export function CreateOrganizerDialog({ onSuccess, children }: CreateOrganizerDi
             </div>
 
             {/* 基本資訊 */}
-            <div className="px-3 py-2 md:px-6 md:py-5 bg-white rounded-md mb-4">
+            <div className="px-6 py-5 bg-gray-50 rounded-md mx-6">
               <h3 className="text-base font-medium mb-4 text-gray-800">基本資訊</h3>
               <div className="space-y-5">
                 <FormSection
@@ -361,7 +329,7 @@ export function CreateOrganizerDialog({ onSuccess, children }: CreateOrganizerDi
             </div>
 
             {/* 聯絡資訊 */}
-            <div className="px-3 py-2  md:px-6 md:py-5 bg-white rounded-md mb-4">
+            <div className="px-6 py-5 bg-gray-50 rounded-md mx-6">
               <h3 className="text-base font-medium mb-4 text-gray-800">聯絡資訊</h3>
               <div className="space-y-5">
                 <FormSection
@@ -406,7 +374,7 @@ export function CreateOrganizerDialog({ onSuccess, children }: CreateOrganizerDi
             </div>
 
             {/* 語系/幣別 */}
-            <div className="px-3 py-2 md:px-6 md:py-5 mb-5 bg-white rounded-md">
+            <div className="px-6 py-5 bg-gray-50 rounded-md mx-6">
               <h3 className="text-base font-medium mb-4 text-gray-800">語系/幣別</h3>
               <div className="space-y-5">
                 <FormSection
@@ -441,25 +409,34 @@ export function CreateOrganizerDialog({ onSuccess, children }: CreateOrganizerDi
               </div>
             </div>
 
-            <DialogFooter className="p-3 md:p-5 bg-white rounded-b-none lg:rounded-b-lg flex justify-center">
-              <button
-                type="submit"
-                disabled={!isValid}
-                className={cn(
-                  "w-full h-10 bg-primary-500 text-neutral-800 rounded-full font-medium shadow-sm text-sm duration-200",
-                  !isValid
-                    ? "opacity-50 cursor-not-allowed"
-                    : "cursor-pointer hover:saturate-150 transition-colors active:scale-95"
-                )}
-              >
-                建立
-              </button>
-            </DialogFooter>
+            {/* 提交按鈕 */}
+            <div className="px-6 pb-6 flex justify-center">
+              <div className="flex gap-4 w-full max-w-md">
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  disabled={isSubmitting}
+                  className="flex-1 h-12 bg-gray-200 text-gray-700 rounded-full font-medium shadow-sm text-sm duration-200 hover:bg-gray-300 transition-colors active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  重設
+                </button>
+                <button
+                  type="submit"
+                  disabled={!isValid || isSubmitting}
+                  className={cn(
+                    "flex-1 h-12 bg-primary-500 text-neutral-800 rounded-full font-medium shadow-sm text-sm duration-200",
+                    !isValid || isSubmitting
+                      ? "opacity-50 cursor-not-allowed"
+                      : "cursor-pointer hover:saturate-150 transition-colors active:scale-95"
+                  )}
+                >
+                  {isSubmitting ? "建立中..." : "建立"}
+                </button>
+              </div>
+            </div>
           </form>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 }
-
-export default CreateOrganizerDialog;

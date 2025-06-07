@@ -61,7 +61,6 @@ export default function CreateEventLayout({
         className={`${notoSansTC.variable} ${notoSerifTC.variable} antialiased font-sans-tc`}
         suppressHydrationWarning
       >
-        {" "}
         <div className="flex flex-col min-h-screen bg-[#f8fbfd]">
           <CreateEventHeader />
           <div className="flex flex-col justify-stretch min-h-[calc(100vh-112px)] items-center px-5 py-8">

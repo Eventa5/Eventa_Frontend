@@ -11,7 +11,6 @@ import type {
   OrganizationResponse,
 } from "@/services/api/client/types.gen";
 import { getNextIncompleteStep, useCreateEventStore } from "@/store/create-event";
-import { useDialogStore } from "@/store/dialog";
 import { useErrorHandler } from "@/utils/error-handler";
 import { cn } from "@/utils/transformer";
 import { Building } from "lucide-react";
@@ -27,7 +26,6 @@ export default function CreateEventOrganizerPage() {
 
   // 錯誤處理
   const { handleError } = useErrorHandler();
-  const { showError } = useDialogStore();
 
   const {
     currentEventId,

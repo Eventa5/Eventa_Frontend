@@ -3,6 +3,8 @@
 import { Button } from "@/components/ui/button";
 import { FormField, FormSection } from "@/components/ui/form-field";
 import { type BasicInfoFormData, basicInfoSchema } from "@/features/organizer/schemas";
+import { HOUR_OPTIONS, MINUTE_OPTIONS } from "@/features/shared/constants/date";
+import { useStepGuard } from "@/hooks/use-step-guard";
 import {
   patchApiV1ActivitiesByActivityIdBasic,
   postApiV1ActivitiesByActivityIdCover,
@@ -22,20 +24,14 @@ import { useForm, useWatch } from "react-hook-form";
 const TIMEZONE_OPTIONS = [{ value: "(GMT+08:00) 台北", label: "(GMT+08:00) 台北" }];
 const REGION_OPTIONS = [{ value: "台灣", label: "台灣" }];
 
-const HOUR_OPTIONS = Array.from({ length: 24 }, (_, i) => ({
-  value: i.toString(),
-  label: i.toString().padStart(2, "0"),
-}));
-
-const MINUTE_OPTIONS = Array.from({ length: 60 }, (_, i) => ({
-  value: i.toString(),
-  label: i.toString().padStart(2, "0"),
-}));
-
 export default function BasicInfoPage() {
   const router = useRouter();
   const params = useParams();
   const eventId = params.eventId as string;
+
+  // 步驟保護：確保用戶按順序完成步驟
+  useStepGuard("basicinfo", eventId);
+
   // 使用 store 管理狀態
   const {
     currentEventId,
@@ -45,7 +41,6 @@ export default function BasicInfoPage() {
     setPageCompleted,
     loadEventData,
     isLoading,
-    error,
   } = useCreateEventStore();
 
   // 錯誤處理
@@ -165,8 +160,8 @@ export default function BasicInfoPage() {
     },
     [coverImageUrl]
   );
-  // 表單提交
-  const onSubmit = useCallback(
+
+  const handleNext = useCallback(
     async (data: BasicInfoFormData) => {
       const numericEventId = Number.parseInt(eventId);
       if (Number.isNaN(numericEventId)) {
@@ -328,7 +323,7 @@ export default function BasicInfoPage() {
       </div>
 
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(handleNext)}
         className="space-y-6"
       >
         {/* 主辦單位名稱 */}

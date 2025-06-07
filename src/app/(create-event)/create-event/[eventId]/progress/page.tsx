@@ -3,7 +3,12 @@
 import { Button } from "@/components/ui/button";
 import { CircularProgress } from "@/components/ui/circular-progress";
 import { StepTag } from "@/components/ui/step-tag";
-import { getCurrentStep, getNextIncompleteStep, useCreateEventStore } from "@/store/create-event";
+import {
+  canAccessStep,
+  getCurrentStep,
+  getNextIncompleteStep,
+  useCreateEventStore,
+} from "@/store/create-event";
 import { CircleCheck } from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
@@ -83,7 +88,9 @@ export default function ProgressPage() {
 
   // 處理步驟標籤點擊
   const handleStepClick = (path: string) => {
-    router.push(`/create-event/${eventId}/${path}`);
+    if (canAccessStep(path)) {
+      router.push(`/create-event/${eventId}/${path}`);
+    }
   };
 
   const handleContinueEdit = () => {
@@ -135,7 +142,7 @@ export default function ProgressPage() {
               <StepTag
                 key={item.name}
                 completed={item.completed}
-                clickable={true}
+                clickable={canAccessStep(item.path)}
                 onClick={() => handleStepClick(item.path)}
               >
                 {item.name}
@@ -166,7 +173,7 @@ export default function ProgressPage() {
               <StepTag
                 key={item.name}
                 completed={item.completed}
-                clickable={true}
+                clickable={canAccessStep(item.path)}
                 onClick={() => handleStepClick(item.path)}
               >
                 {item.name}

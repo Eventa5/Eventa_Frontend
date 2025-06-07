@@ -1,23 +1,34 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { CATEGORIES } from "@/features/shared/constants/category";
-import { patchApiV1ActivitiesByActivityIdCategories } from "@/services/api/client/sdk.gen";
+import { useStepGuard } from "@/hooks/use-step-guard";
+import {
+  getApiV1Categories,
+  patchApiV1ActivitiesByActivityIdCategories,
+} from "@/services/api/client/sdk.gen";
 import { useCreateEventStore } from "@/store/create-event";
 import { useDialogStore } from "@/store/dialog";
 import { useErrorHandler } from "@/utils/error-handler";
 import { Info } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+
+// 分類介面
+interface Category {
+  id: number;
+  name: string;
+  icon: string;
+  image?: string;
+}
 
 // 主題圖標組件
 const CategoryIcon = ({
-  icon: Icon,
+  icon,
   label,
   selected,
   onClick,
 }: {
-  icon: React.ElementType;
+  icon: string;
   label: string;
   selected: boolean;
   onClick: () => void;
@@ -34,9 +45,8 @@ const CategoryIcon = ({
           selected ? "border-blue-500 bg-blue-50" : "border-gray-200 bg-white"
         }`}
       >
-        <Icon
-          size={28}
-          className={selected ? "text-blue-500" : "text-gray-700"}
+        <div
+          className={`icon-${icon} !text-[22px] ${selected ? "text-blue-500" : "text-gray-700"}`}
         />
       </div>
       <span className="text-xs text-gray-700">{label}</span>
@@ -48,6 +58,10 @@ export default function CategoryPage() {
   const router = useRouter();
   const params = useParams();
   const eventId = params.eventId as string;
+
+  // 步驟保護：確保用戶按順序完成步驟
+  useStepGuard("category", eventId);
+
   // 使用 store 管理狀態
   const { activityData, setPageCompleted, loadEventData, isLoading, error } = useCreateEventStore();
 
@@ -57,12 +71,44 @@ export default function CategoryPage() {
 
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(false);
+
+  // 載入分類資料
+  const loadCategories = useCallback(async () => {
+    setIsCategoriesLoading(true);
+    try {
+      const response = await getApiV1Categories();
+
+      if (response.error?.status === false) {
+        throw new Error(response.error?.message || "獲取分類失敗");
+      }
+
+      if (response.data?.data) {
+        const categoriesData = response.data.data.map((cat) => ({
+          id: cat.id || 0,
+          name: cat.name || "",
+          icon: cat.icon || "",
+          image: cat.image,
+        }));
+        setCategories(categoriesData);
+      }
+    } catch (error) {
+      handleError(error);
+    } finally {
+      setIsCategoriesLoading(false);
+    }
+  }, [handleError]);
 
   useEffect(() => {
     if (!activityData) {
       loadEventData();
     }
   }, [activityData, loadEventData]);
+
+  useEffect(() => {
+    loadCategories();
+  }, [loadCategories]);
 
   useEffect(() => {
     if (activityData?.categories) {
@@ -131,14 +177,14 @@ export default function CategoryPage() {
 
   // 返回上一步
   const handleBack = () => {
-    router.back();
+    router.push(`/create-event/${eventId}/eventplacetype`);
   };
 
-  // 如果正在載入活動資料，顯示載入中
-  if (isLoading && !activityData) {
+  // 如果正在載入活動資料或分類資料，顯示載入中
+  if ((isLoading && !activityData) || isCategoriesLoading) {
     return (
       <div className="flex flex-col h-full items-center justify-center">
-        <div className="text-lg text-gray-600">載入活動資料中...</div>
+        <div className="text-lg text-gray-600">載入資料中...</div>
       </div>
     );
   }
@@ -162,11 +208,11 @@ export default function CategoryPage() {
       </div>
 
       <div className="grid grid-cols-[repeat(3,68px)] md:grid-cols-[repeat(6,68px)] gap-5 w-fit">
-        {CATEGORIES.map((category) => (
+        {categories.map((category) => (
           <CategoryIcon
             key={category.id}
             icon={category.icon}
-            label={category.label}
+            label={category.name}
             selected={selectedCategories.includes(category.id)}
             onClick={() => toggleCategory(category.id)}
           />

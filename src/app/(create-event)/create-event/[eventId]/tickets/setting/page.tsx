@@ -5,6 +5,7 @@ import { FormField, FormSection } from "@/components/ui/form-field";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { type TicketSettingFormData, ticketSettingSchema } from "@/features/organizer/schemas";
 import { HOUR_OPTIONS, MINUTE_OPTIONS } from "@/features/shared/constants/date";
+import { useStepGuard } from "@/hooks/use-step-guard";
 import {
   deleteApiV1ActivitiesByActivityIdTicketTypesByTicketTypeId,
   getApiV1ActivitiesByActivityIdTicketTypes,
@@ -503,6 +504,9 @@ export default function TicketSettingPage() {
   const params = useParams();
   const eventId = params.eventId as string;
 
+  // 步驟保護：確保用戶按順序完成步驟
+  useStepGuard("tickets/setting", eventId);
+
   const {
     activityData,
     organizationInfo,
@@ -510,7 +514,6 @@ export default function TicketSettingPage() {
     completeEventCreation,
     loadEventData,
     isLoading,
-    error,
   } = useCreateEventStore();
 
   // 錯誤處理
@@ -755,7 +758,7 @@ export default function TicketSettingPage() {
     setIsAddingTicket(false);
   }, [append, isAddingTicket, tomorrowData]);
 
-  const onSubmit = useCallback(
+  const handleComplete = useCallback(
     async (data: TicketSettingFormData) => {
       const numericEventId = Number.parseInt(eventId);
       if (Number.isNaN(numericEventId) || !activityData || !organizationInfo) {
@@ -972,7 +975,7 @@ export default function TicketSettingPage() {
       <h1 className="text-2xl font-bold mb-6">設定活動票券！</h1>
 
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(handleComplete)}
         className="space-y-6"
       >
         {/* 活動時間設定 */}

@@ -5,6 +5,7 @@
 @import "swiper/css/pagination";
 @import "swiper/css/effect-coverflow";
 @import "quill/dist/quill.core.css";
+@import "lucide-static/font/lucide.css";
 
 @import "./customs/quill.css";
 @import "./customs/swiper.css";

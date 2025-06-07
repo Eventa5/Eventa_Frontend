@@ -326,7 +326,7 @@ export const SidebarNav = () => {
       <>
         <MobileMenuButton />
         <MobileMenu />
-        <div className="hidden lg:flex w-[220px] shrink-0 p-6 h-full bg-[#FDFBF5] flex-col gap-14">
+        <div className="hidden lg:flex w-[220px] shrink-0 p-6 bg-[#FDFBF5] flex-col gap-14">
           <div className="flex justify-center">
             <Link href="/organizer">
               <Image
@@ -363,7 +363,7 @@ export const SidebarNav = () => {
     <>
       <MobileMenuButton />
       <MobileMenu />
-      <div className="hidden md:flex w-[220px] p-6 h-full bg-[#FDFBF5] flex-col gap-14">
+      <div className="hidden md:flex w-[220px] p-6 bg-[#FDFBF5] flex-col gap-14">
         <div className="flex justify-center">
           <Link href="/organizer">
             <Image

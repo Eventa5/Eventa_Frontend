@@ -236,8 +236,7 @@ export default function OrdersPage() {
                   {searchDate?.from ? (
                     searchDate.to ? (
                       <>
-                        {searchDate.from.toLocaleDateString()} -{" "}
-                        {searchDate.to.toLocaleDateString()}
+                        {searchDate.from.toLocaleDateString()} -{searchDate.to.toLocaleDateString()}
                       </>
                     ) : (
                       searchDate.from.toLocaleDateString()

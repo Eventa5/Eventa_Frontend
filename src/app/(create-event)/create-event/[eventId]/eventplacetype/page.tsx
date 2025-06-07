@@ -8,8 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { patchApiV1ActivitiesByActivityIdType } from "@/services/api/client/sdk.gen";
 import { useCreateEventStore } from "@/store/create-event";
-import { useDialogStore } from "@/store/dialog";
 import { useErrorHandler } from "@/utils/error-handler";
 import { Camera, ExternalLink, UserCheck } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -20,20 +20,26 @@ export default function EventPlaceTypePage() {
   const params = useParams();
   const eventId = params.eventId as string;
 
-  // 使用 store 管理狀態
-  const { organizationInfo, createNewEvent, setCurrentEventId, setPageCompleted, error } =
-    useCreateEventStore();
+  const {
+    organizationInfo,
+    createNewEvent,
+    setCurrentEventId,
+    setPageCompleted,
+    activityData,
+    loadEventData,
+    isLoading,
+  } = useCreateEventStore();
 
   // 錯誤處理
   const { handleError } = useErrorHandler();
-  const { showError } = useDialogStore();
 
   // 本地狀態
   const [eventType, setEventType] = useState<string>("online");
   const [streamLink, setStreamLink] = useState<string>("");
   const [isCreating, setIsCreating] = useState(false);
+  const [hasLoadedData, setHasLoadedData] = useState(false);
 
-  // 檢查是否有主辦單位資訊
+  // 檢查是否有主辦單位資訊並載入活動資料
   useEffect(() => {
     if (!organizationInfo) {
       // 如果沒有主辦單位資訊，導航回主辦單位選擇頁面
@@ -41,14 +47,33 @@ export default function EventPlaceTypePage() {
       return;
     }
 
-    // 如果是編輯現有活動（eventId 不是 "new"），設置當前活動ID
+    // 如果是編輯現有活動（eventId 不是 "new"），設置當前活動ID並載入資料
     if (eventId !== "new") {
       const numericEventId = Number.parseInt(eventId);
       if (!Number.isNaN(numericEventId)) {
         setCurrentEventId(numericEventId);
+        // 載入活動資料
+        if (!hasLoadedData) {
+          loadEventData();
+          setHasLoadedData(true);
+        }
       }
     }
-  }, [organizationInfo, eventId, router, setCurrentEventId]);
+  }, [organizationInfo, eventId, router, setCurrentEventId, loadEventData, hasLoadedData]);
+
+  // 當活動資料載入完成時，同步 isOnline 狀態到本地狀態
+  useEffect(() => {
+    if (activityData && eventId !== "new") {
+      // 同步活動形式
+      const activityEventType = activityData.isOnline ? "online" : "physical";
+      setEventType(activityEventType);
+
+      // 如果是線上活動，同步直播連結
+      if (activityData.isOnline && activityData.livestreamUrl) {
+        setStreamLink(activityData.livestreamUrl);
+      }
+    }
+  }, [activityData, eventId]);
 
   // 活動形式選項
   const eventTypes = [
@@ -65,7 +90,7 @@ export default function EventPlaceTypePage() {
     }
   };
 
-  // 處理表單提交，建立活動並跳轉到下一步
+  // 處理表單提交，建立或更新活動並跳轉到下一步
   const handleNext = async () => {
     if (!organizationInfo) {
       router.push("/create-event/organizer");
@@ -78,17 +103,45 @@ export default function EventPlaceTypePage() {
       const isOnline = eventType === "online";
       const livestreamUrl = isOnline ? streamLink : undefined;
 
-      // 建立新活動
-      const newEventId = await createNewEvent(isOnline, livestreamUrl);
+      if (eventId === "new") {
+        // 建立新活動
+        const newEventId = await createNewEvent(isOnline, livestreamUrl);
 
-      // 標記此步驟為完成
-      setPageCompleted("eventplacetype", true);
+        // 標記此步驟為完成
+        setPageCompleted("eventplacetype", true);
 
-      // 跳轉到下一步
-      router.push(`/create-event/${newEventId}/category`);
+        // 跳轉到下一步
+        router.push(`/create-event/${newEventId}/category`);
+      } else {
+        // 更新現有活動
+        const numericEventId = Number.parseInt(eventId);
+        if (!Number.isNaN(numericEventId) && activityData) {
+          const response = await patchApiV1ActivitiesByActivityIdType({
+            path: { activityId: numericEventId },
+            body: {
+              isOnline,
+              livestreamUrl,
+            },
+          });
+
+          if (response.error?.status === false) {
+            throw new Error(response.error.message || "更新活動失敗，請稍後再試");
+          }
+
+          // 標記此步驟為完成
+          setPageCompleted("eventplacetype", true);
+
+          // 重新載入活動資料
+          await loadEventData();
+
+          // 跳轉到下一步
+          router.push(`/create-event/${eventId}/category`);
+        }
+      }
     } catch (error) {
       handleError(error, {
-        customErrorMessage: "建立活動失敗，請稍後再試",
+        customErrorMessage:
+          eventId === "new" ? "建立活動失敗，請稍後再試" : "更新活動失敗，請稍後再試",
       });
     } finally {
       setIsCreating(false);
@@ -101,13 +154,26 @@ export default function EventPlaceTypePage() {
   };
 
   // 檢查是否可以進行下一步
-  const canProceed = eventType && (eventType !== "online" || streamLink.trim());
+  const canProceed =
+    eventType &&
+    (eventType !== "online" || streamLink.trim()) &&
+    // 如果是編輯現有活動，必須等活動資料載入完成
+    (eventId === "new" || (eventId !== "new" && activityData && !isLoading));
 
   // 如果沒有主辦單位資訊，顯示載入中
   if (!organizationInfo) {
     return (
       <div className="flex flex-col h-full items-center justify-center">
         <div className="text-lg text-gray-600">載入中...</div>
+      </div>
+    );
+  }
+
+  // 如果是編輯現有活動但活動資料還在載入中，顯示載入中
+  if (eventId !== "new" && isLoading) {
+    return (
+      <div className="flex flex-col h-full items-center justify-center">
+        <div className="text-lg text-gray-600">載入活動資料中...</div>
       </div>
     );
   }

@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { FormField, FormSection } from "@/components/ui/form-field";
 import { type IntroFormData, introSchema } from "@/features/organizer/schemas";
+import { useStepGuard } from "@/hooks/use-step-guard";
 import { patchApiV1ActivitiesByActivityIdContent } from "@/services/api/client/sdk.gen";
 import { useCreateEventStore } from "@/store/create-event";
 import { useDialogStore } from "@/store/dialog";
@@ -28,6 +29,10 @@ export default function IntroPage() {
   const params = useParams();
   const eventId = params.eventId as string;
   const [isMounted, setIsMounted] = useState(false);
+
+  // 步驟保護：確保用戶按順序完成步驟
+  useStepGuard("intro", eventId);
+
   // 使用 store 管理狀態
   const {
     currentEventId,
@@ -99,7 +104,7 @@ export default function IntroPage() {
   const maxNoticeLength = 500;
 
   // 處理表單提交
-  const onSubmit = useCallback(
+  const handleNext = useCallback(
     async (data: IntroFormData) => {
       const numericEventId = Number.parseInt(eventId);
       if (Number.isNaN(numericEventId)) {
@@ -166,7 +171,7 @@ export default function IntroPage() {
 
       <form
         className="space-y-6"
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(handleNext)}
       >
         {/* 活動摘要 */}
         <FormSection
@@ -179,7 +184,7 @@ export default function IntroPage() {
               control={control}
               name="summary"
               type="textarea"
-              placeholder="請簡述您「活動背包」、「參與者可獲得的經驗」等您認為人之處。"
+              placeholder="建議提及「活動特色」、「參加者可獲得的體驗」等吸引人之處。"
               maxLength={maxSummaryLength}
               className="min-h-[120px]"
             />

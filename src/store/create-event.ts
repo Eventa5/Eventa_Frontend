@@ -238,6 +238,48 @@ export const useCreateEventStore = create<CreateEventState>()(
   )
 );
 
+// 輔助函數：檢查是否可以訪問指定步驟
+// 邏輯：
+// 1. 如果步驟已完成，可以訪問（用戶可以回到已完成的步驟）
+// 2. 如果步驟未完成，但是下一個應該完成的步驟，可以訪問
+// 3. 其他情況不可訪問（不能跳過未完成的步驟）
+export const canAccessStep = (stepPath: string): boolean => {
+  const store = useCreateEventStore.getState();
+  const { completionStatus } = store;
+
+  // 定義步驟順序和對應的完成狀態鍵
+  const stepOrder = [
+    { path: "eventplacetype", key: "eventplacetype" },
+    { path: "category", key: "category" },
+    { path: "basicinfo", key: "basicinfo" },
+    { path: "intro", key: "intro" },
+    { path: "tickets/setting", key: "ticketsSetting" },
+  ];
+
+  // 找到當前步驟的索引
+  const currentStepIndex = stepOrder.findIndex(
+    (step) => step.path === stepPath || stepPath.startsWith(step.path.split("/")[0])
+  );
+
+  if (currentStepIndex === -1) return true; // 未知步驟允許訪問
+
+  const currentStepKey = stepOrder[currentStepIndex].key as keyof PageCompletionStatus;
+
+  // 如果當前步驟已完成，允許訪問
+  if (completionStatus[currentStepKey]) {
+    return true;
+  }
+
+  // 如果當前步驟未完成，檢查是否為下一個應該完成的步驟
+  // 找到第一個未完成的步驟
+  const firstIncompleteStepIndex = stepOrder.findIndex(
+    (step) => !completionStatus[step.key as keyof PageCompletionStatus]
+  );
+
+  // 如果當前步驟是第一個未完成的步驟，允許訪問
+  return currentStepIndex === firstIncompleteStepIndex;
+};
+
 // 輔助函數：獲取下一個未完成的步驟路徑
 export const getNextIncompleteStep = (eventId: number): string => {
   const store = useCreateEventStore.getState();
