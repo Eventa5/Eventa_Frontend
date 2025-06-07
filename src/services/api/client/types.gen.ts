@@ -502,6 +502,7 @@ export type UploadAvatarRequest = {
 export type UploadAvatarResponse = {
   status?: boolean;
   message?: string;
+  data?: string;
 };
 
 export type GetApiV1ActivitiesData = {
