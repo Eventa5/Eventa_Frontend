@@ -1,21 +1,17 @@
 "use client";
 
 import { useAuthStore } from "@/store/auth";
-import { Home, LogOut, SwitchCamera, UserRound } from "lucide-react";
+import { Home, LogOut, SquarePen, SwitchCamera, UserRound } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useRef, useState, useEffect } from "react";
-import { Button } from "../ui/button";
 
 export const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const logout = useAuthStore((s) => s.logout);
-
-  const createEvent = () => {
-    router.push(`/create-event/${Math.random().toString(36).slice(2)}/basicinfo`);
-  };
 
   // 點擊外部關閉選單
   useEffect(() => {
@@ -31,8 +27,22 @@ export const Navbar = () => {
   }, []);
 
   return (
-    <div className="w-full bg-[#FDFBF5] py-4 flex justify-end items-center px-6">
-      <div className="flex items-center gap-8">
+    <div className="w-full bg-primary-50 md:bg-white py-4 flex justify-end items-center px-6">
+      <div className="w-full flex items-center justify-between lg:justify-end gap-8">
+        <div className="w-9" />
+
+        <Link
+          href="/organizer"
+          className="lg:hidden"
+        >
+          <Image
+            src="/eventa-logo-horizontal.svg"
+            alt="Eventa Logo Balloon and Ticket"
+            width={120}
+            height={37}
+          />
+        </Link>
+
         <div
           className="relative"
           ref={menuRef}
@@ -45,7 +55,7 @@ export const Navbar = () => {
             <div className="bg-[#262626] p-2 rounded-full">
               <UserRound className="w-5 h-5 text-white" />
             </div>
-            <span className="text-sm font-normal text-[#262626]">使用者#001</span>
+            <span className="text-sm font-normal text-[#262626] hidden lg:block">使用者#001</span>
           </button>
 
           {menuOpen && (
@@ -94,13 +104,12 @@ export const Navbar = () => {
           )}
         </div>
 
-        <Button
-          type="button"
-          onClick={createEvent}
-          className="bg-[#FFD56B] text-[#262626] rounded-xl px-8 py-2 text-base font-normal hover:bg-[#FFCA28] transition-colors cursor-pointer"
+        <Link
+          href="/create-event/organizer"
+          className="px-8 py-2 font-bold bg-primary-500 hover:saturate-150 duration-200 active:scale-95 cursor-pointer rounded-md mr-8 items-center hidden lg:flex"
         >
           建立活動
-        </Button>
+        </Link>
       </div>
     </div>
   );

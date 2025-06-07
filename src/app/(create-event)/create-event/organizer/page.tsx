@@ -1,0 +1,243 @@
+"use client";
+
+import CreateOrganizerDialog from "@/features/organizer/components/create-organizer-dialog";
+import {
+  getApiV1Organizations,
+  postApiV1Organizations,
+  postApiV1OrganizationsByOrganizationIdImages,
+} from "@/services/api/client/sdk.gen";
+import type {
+  CreateOrganizationRequest,
+  OrganizationResponse,
+} from "@/services/api/client/types.gen";
+import { getNextIncompleteStep, useCreateEventStore } from "@/store/create-event";
+import { useDialogStore } from "@/store/dialog";
+import { useErrorHandler } from "@/utils/error-handler";
+import { cn } from "@/utils/transformer";
+import { Building } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+
+export default function CreateEventOrganizerPage() {
+  const [selected, setSelected] = useState<number | null>(null);
+  const [selectedOrgName, setSelectedOrgName] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [organizations, setOrganizations] = useState<OrganizationResponse[]>([]);
+  const router = useRouter();
+
+  // 錯誤處理
+  const { handleError } = useErrorHandler();
+  const { showError } = useDialogStore();
+
+  const {
+    currentEventId,
+    organizationInfo,
+    hasUnfinishedEvent,
+    setOrganizationInfo,
+    loadEventData,
+  } = useCreateEventStore();
+
+  // 載入主辦單位列表
+  const loadOrganizations = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const response = await getApiV1Organizations();
+      if (response.data?.data) {
+        setOrganizations(response.data.data);
+      }
+    } catch (error) {
+      handleError(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [handleError]);
+
+  // 初始化時檢查是否有未完成的活動和載入主辦單位列表
+  useEffect(() => {
+    const checkUnfinishedEvent = async () => {
+      if (hasUnfinishedEvent() && currentEventId) {
+        // 載入活動資料
+        await loadEventData();
+
+        // 導航到下一個未完成的步驟
+        const nextStep = getNextIncompleteStep(currentEventId);
+        router.push(nextStep);
+        return;
+      }
+    };
+
+    // 載入主辦單位列表
+    loadOrganizations();
+
+    // 檢查未完成的活動
+    checkUnfinishedEvent();
+  }, [hasUnfinishedEvent, currentEventId, loadEventData, loadOrganizations, router]);
+
+  // 從 store 載入已選擇的主辦單位
+  useEffect(() => {
+    if (organizationInfo) {
+      setSelected(organizationInfo.organizationId);
+      setSelectedOrgName(organizationInfo.organizationName);
+    }
+  }, [organizationInfo]);
+
+  // 選擇主辦單位
+  const handleSelectOrganizer = (id: number, name: string) => {
+    setSelected(id);
+    setSelectedOrgName(name);
+  };
+
+  // 處理新增主辦單位成功
+  const handleOrganizerCreated = async (data: {
+    organizerName: string;
+    phoneNumber: string;
+    email: string;
+    language: string;
+    currency: string;
+    description?: string;
+    avatar?: File | null;
+    coverImage?: File | null;
+  }) => {
+    try {
+      // 轉換資料格式以符合 API 要求
+      const organizationData: CreateOrganizationRequest = {
+        name: data.organizerName, // 轉換 organizerName 為 name
+        introduction: data.description,
+        email: data.email,
+        avatar: "",
+        cover: "",
+        phoneNumber: data.phoneNumber,
+        countryCode: data.language,
+      };
+
+      const response = await postApiV1Organizations({
+        body: organizationData,
+      });
+
+      if (response.error?.status === false) {
+        throw new Error(response.error.message || "創建主辦單位失敗");
+      }
+
+      if (response.data?.data) {
+        // 獲取創建的主辦單位 ID
+        const organizationId = response.data.data;
+
+        // 如果有上傳頭像或封面圖片，則進行圖片上傳
+        if (data.avatar || data.coverImage) {
+          try {
+            const response = await postApiV1OrganizationsByOrganizationIdImages({
+              path: {
+                organizationId,
+              },
+              body: {
+                avatar: data.avatar || undefined,
+                cover: data.coverImage || undefined,
+              },
+            });
+
+            if (response.error?.status === false) {
+              throw new Error(response.error.message || "上傳主辦單位圖片失敗，請稍後再試");
+            }
+          } catch (imageError: unknown) {
+            handleError(imageError);
+          }
+        }
+
+        // 重新載入主辦單位列表
+        await loadOrganizations();
+        // 自動選擇新創建的主辦單位
+        setSelected(organizationId);
+        setSelectedOrgName(data.organizerName);
+      }
+    } catch (error) {
+      handleError(error);
+    }
+  };
+
+  // 處理選擇按鈕點擊 - 只儲存主辦單位資訊，不建立活動
+  const handleSelect = () => {
+    if (selected && selectedOrgName) {
+      // 儲存主辦單位資訊到 store
+      setOrganizationInfo({
+        organizationId: selected,
+        organizationName: selectedOrgName,
+      });
+
+      // 導航到活動形式選擇頁面
+      router.push("/create-event/new/eventplacetype");
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="w-full flex flex-col min-h-[calc(100vh-64px)] items-center justify-center">
+        <div className="text-lg text-gray-600">載入中...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full flex flex-col min-h-[calc(100vh-64px)]">
+      <div className="flex-1 mb-6 w-full">
+        <div className="flex flex-col gap-4">
+          <CreateOrganizerDialog onSuccess={handleOrganizerCreated} />
+
+          {organizations.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              還沒有主辦單位，請先創建一個主辦單位
+            </div>
+          ) : (
+            organizations.map((org) => (
+              <button
+                key={org.id}
+                type="button"
+                className={`flex items-center gap-4 bg-white rounded-full px-5 py-3 shadow-sm border transition text-left ${
+                  selected === org.id
+                    ? "border-primary-500 ring-2 ring-primary-500"
+                    : "border-transparent"
+                }`}
+                onClick={() => org.name && org.id && handleSelectOrganizer(org.id, org.name)}
+              >
+                <span className="bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center">
+                  {org.avatar ? (
+                    <img
+                      src={org.avatar}
+                      alt={org.name}
+                      className="w-full h-full rounded-full object-cover"
+                    />
+                  ) : (
+                    <Building className="w-4 h-4 text-gray-400" />
+                  )}
+                </span>
+                <div className="flex flex-col flex-1">
+                  <span className="font-bold text-lg text-gray-800">{org.name}</span>
+                  <div className="flex items-center gap-2 mt-1">
+                    {org.currency && (
+                      <span className="text-gray-400 text-sm font-medium">{org.currency}</span>
+                    )}
+                  </div>
+                </div>
+              </button>
+            ))
+          )}
+        </div>
+      </div>
+
+      <div className="w-full flex justify-center">
+        <button
+          type="button"
+          className={cn(
+            "w-full max-w-xl bg-primary-500 text-neutral-800 text-lg font-bold rounded-full py-3 transition hover:saturate-150 active:scale-95",
+            !selected || organizations.length === 0
+              ? "opacity-50 cursor-not-allowed"
+              : "cursor-pointer"
+          )}
+          disabled={!selected || organizations.length === 0}
+          onClick={handleSelect}
+        >
+          選擇
+        </button>
+      </div>
+    </div>
+  );
+}

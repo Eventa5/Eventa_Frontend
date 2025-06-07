@@ -10,6 +10,9 @@
       "a11y": {
         "useKeyWithClickEvents": "off",
         "noAutofocus": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "off"
       }
     }
   },

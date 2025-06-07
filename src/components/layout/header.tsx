@@ -201,7 +201,7 @@ export default function Header() {
           {isAuthenticated ? (
             <div className="flex items-center gap-2">
               <Link
-                href="#"
+                href="/create-event/organizer"
                 className="px-8 py-2 font-serif-tc font-bold bg-primary-500 hover:saturate-150 duration-200 active:scale-95 cursor-pointer rounded-md mr-8 flex items-center"
               >
                 <SquarePen className="w-4 h-4 mr-2" />
@@ -247,13 +247,36 @@ export default function Header() {
                           會員中心
                         </Link>
                       </li>
-                      <li>
+                      <li className="border-t border-gray-100 mt-1">
                         <Link
-                          href="#"
+                          href="/organizer"
                           className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                         >
-                          <Settings className="w-4 h-4 mr-3 text-gray-500" />
-                          帳號管理
+                          <svg
+                            className="text-gray-500 w-4 h-4 mr-3"
+                            width="80"
+                            height="80"
+                            viewBox="0 0 80 80"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <title>主辦中心</title>
+                            <path
+                              d="M69.7246 11H62.8261C62.8261 14.075 60.3913 16.5137 57.4493 16.5137C54.6087 16.5137 52.1739 14.075 52.1739 11H45.2754C45.2754 12.1664 44.971 13.2267 44.3623 14.075C48.0145 18.2102 50.1449 23.724 50.1449 29.7678C50.1449 37.9324 46.1884 45.2486 40 49.4899V63.3803C42.942 63.3803 45.2754 65.925 45.2754 69H52.1739C52.1739 65.925 54.6087 63.3803 57.4493 63.3803C60.3913 63.3803 62.8261 65.925 62.8261 69H69.7246C69.7246 65.925 72.058 63.3803 75 63.3803V16.5137C72.058 16.5137 69.7246 14.075 69.7246 11Z"
+                              stroke="currentColor"
+                              stroke-width="6"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                            <path
+                              d="M40.5 29.7C40.5 19.9 32.5 12 22.7 12C12.9 12 5 19.9 5 29.7C5 38.4 11.3 45.7 19.6 47.2L18.7 48.6C18.4 49.3 18.8 50.1 19.6 50.1H21.2V65.1C21.2 66 21.9 66.7 22.7 66.7C23.6 66.7 24.3 66 24.3 65.1V50.1H25.9C26.6 50.1 27.1 49.3 26.7 48.6L25.9 47.2C34.2 45.7 40.5 38.4 40.5 29.7Z"
+                              stroke="currentColor"
+                              stroke-width="6"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                          </svg>
+                          主辦中心
                         </Link>
                       </li>
                       <li className="border-t border-gray-100 mt-1">
@@ -334,7 +357,7 @@ export default function Header() {
               </Link>
               {isAuthenticated ? (
                 <Link
-                  href="/events/create"
+                  href="/create-event/organizer"
                   className="flex items-center gap-4 py-2 px-4 font-serif-tc font-black text-base tracking-widest"
                   onClick={() => setMobileMenuOpen(false)}
                 >
