@@ -103,7 +103,11 @@ const ActionDropdown = ({
   const [isOpen, setIsOpen] = useState(false);
 
   const handleViewEvent = () => {
-    if (event.id) {
+    if (event.status === ActivityStatus.DRAFT) {
+      // 如果是草稿狀態，則跳轉到編輯頁面
+      window.location.href = `/create-event/${event.id}/progress`;
+    } else {
+      // 如果是已發布或其他狀態，則跳轉到查看頁面
       window.location.href = `/organizer/events/${event.id}`;
     }
   };
@@ -283,7 +287,7 @@ const EventCard = ({
         </div>
 
         {/* 手機版：垂直排列 */}
-        <div className="lg:hidden">
+        <div className="md:hidden">
           {/* 封面圖片 */}
           <div className="w-full h-40 bg-gray-50 overflow-hidden rounded-lg border border-gray-100 mb-4">
             {event.cover ? (
@@ -467,8 +471,10 @@ export default function EventsPage() {
 
   // 監聽參數變化並重新獲取數據
   useEffect(() => {
-    fetchEvents();
-  }, [fetchEvents]);
+    if (currentOrganizerInfo?.id) {
+      fetchEvents();
+    }
+  }, [fetchEvents, currentOrganizerInfo]);
 
   // 處理搜尋輸入變化
   const handleSearchChange = (value: string) => {
@@ -516,7 +522,7 @@ export default function EventsPage() {
     else if (currentStatus === ActivityStatus.CANCELED) counts.canceled = currentStatusTotal;
 
     return counts;
-  }, [pagination.totalItems, activeFilters.status]);
+  }, [pagination.totalItems]);
 
   // 清除篩選
   const handleClearFilters = () => {

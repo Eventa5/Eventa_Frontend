@@ -7,6 +7,7 @@ import {
   canAccessStep,
   getCurrentStep,
   getNextIncompleteStep,
+  isStepCompletedByPath,
   useCreateEventStore,
 } from "@/store/create-event";
 import { CircleCheck } from "lucide-react";
@@ -29,27 +30,36 @@ export default function ProgressPage() {
   const router = useRouter();
   const eventId = params.eventId as string;
   const isHydrated = useHydration();
-
   const {
-    completionStatus,
+    currentEventId,
     getOverallProgress,
     getStepOneProgress,
     getStepTwoProgress,
     setCurrentEventId,
+    loadEventData,
   } = useCreateEventStore();
 
+  // 檢查當前步驟，如果在 eventplacetype 步驟則重定向
   useEffect(() => {
-    if (getCurrentStep() === "eventplacetype") {
+    const currentStep = getCurrentStep();
+    if (currentStep === "eventplacetype") {
       router.push("/create-event/organizer");
     }
   }, [router]);
-
-  // 設置當前編輯的活動ID
+  // 設置當前編輯的活動ID並載入活動資料
   useEffect(() => {
     if (eventId) {
-      setCurrentEventId(Number.parseInt(eventId));
+      const numericEventId = Number.parseInt(eventId);
+      if (!Number.isNaN(numericEventId)) {
+        setCurrentEventId(numericEventId);
+
+        // 如果當前活動ID不同，需要重新載入資料
+        if (currentEventId !== numericEventId) {
+          loadEventData();
+        }
+      }
     }
-  }, [eventId, setCurrentEventId]);
+  }, [eventId, currentEventId, setCurrentEventId, loadEventData]);
 
   const overallProgress = isHydrated ? getOverallProgress() : 0;
   const stepOneCompleted = isHydrated ? getStepOneProgress() : false;
@@ -57,22 +67,22 @@ export default function ProgressPage() {
   const stepOneItems = [
     {
       name: "活動形式",
-      completed: isHydrated ? completionStatus.eventplacetype : false,
+      completed: isHydrated ? isStepCompletedByPath("eventplacetype") : false,
       path: "eventplacetype",
     },
     {
       name: "活動主題",
-      completed: isHydrated ? completionStatus.category : false,
+      completed: isHydrated ? isStepCompletedByPath("category") : false,
       path: "category",
     },
     {
       name: "活動基本資訊",
-      completed: isHydrated ? completionStatus.basicinfo : false,
+      completed: isHydrated ? isStepCompletedByPath("basicinfo") : false,
       path: "basicinfo",
     },
     {
       name: "活動內容",
-      completed: isHydrated ? completionStatus.intro : false,
+      completed: isHydrated ? isStepCompletedByPath("intro") : false,
       path: "intro",
     },
   ];
@@ -80,7 +90,7 @@ export default function ProgressPage() {
   const stepTwoItems = [
     {
       name: "票券設定",
-      completed: isHydrated ? completionStatus.ticketsSetting : false,
+      completed: isHydrated ? isStepCompletedByPath("tickets/setting") : false,
       path: "tickets/setting",
     },
   ];

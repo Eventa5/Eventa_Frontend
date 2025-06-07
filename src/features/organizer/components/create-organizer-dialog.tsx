@@ -338,7 +338,10 @@ export function CreateOrganizerDialog({ onSuccess, children }: CreateOrganizerDi
                   />
                 </FormSection>
 
-                <FormSection title="主辦單位簡介">
+                <FormSection
+                  title="主辦單位簡介"
+                  required
+                >
                   <FormField
                     control={control}
                     name="description"

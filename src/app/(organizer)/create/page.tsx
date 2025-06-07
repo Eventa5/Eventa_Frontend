@@ -316,7 +316,10 @@ export default function CreateOrganizerPage({ onSuccess }: CreateOrganizerPagePr
                   />
                 </FormSection>
 
-                <FormSection title="主辦單位簡介">
+                <FormSection
+                  title="主辦單位簡介"
+                  required
+                >
                   <FormField
                     control={control}
                     name="description"

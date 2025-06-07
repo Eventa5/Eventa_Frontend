@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useStepGuard } from "@/hooks/use-step-guard";
 import {
   getApiV1Categories,
   patchApiV1ActivitiesByActivityIdCategories,
@@ -59,11 +58,15 @@ export default function CategoryPage() {
   const params = useParams();
   const eventId = params.eventId as string;
 
-  // 步驟保護：確保用戶按順序完成步驟
-  useStepGuard("category", eventId);
-
   // 使用 store 管理狀態
-  const { activityData, setPageCompleted, loadEventData, isLoading, error } = useCreateEventStore();
+  const {
+    currentEventId,
+    activityData,
+    setCurrentEventId,
+    loadEventData,
+    checkStepAccess,
+    isLoading,
+  } = useCreateEventStore();
 
   // 錯誤處理
   const { handleError } = useErrorHandler();
@@ -76,6 +79,8 @@ export default function CategoryPage() {
 
   // 載入分類資料
   const loadCategories = useCallback(async () => {
+    if (isCategoriesLoading) return;
+
     setIsCategoriesLoading(true);
     try {
       const response = await getApiV1Categories();
@@ -100,17 +105,40 @@ export default function CategoryPage() {
     }
   }, [handleError]);
 
+  // 設置當前活動ID並載入活動資料
   useEffect(() => {
-    if (!activityData) {
+    const numericEventId = Number.parseInt(eventId);
+    if (!Number.isNaN(numericEventId)) {
+      setCurrentEventId(numericEventId);
+
+      // 如果當前活動ID不同，需要重新載入資料
+      if (currentEventId !== numericEventId) {
+        loadEventData();
+      }
+    }
+  }, [eventId, currentEventId]);
+
+  // 確保活動資料已載入
+  useEffect(() => {
+    if (!activityData && currentEventId) {
       loadEventData();
     }
-  }, [activityData, loadEventData]);
+  }, [activityData, currentEventId]);
 
   useEffect(() => {
-    loadCategories();
-  }, [loadCategories]);
+    if (!categories.length) {
+      loadCategories();
+    }
+  }, [categories]);
 
   useEffect(() => {
+    if (activityData) {
+      const result = checkStepAccess("category");
+      if (!result.canAccess) {
+        router.push(result.redirectTo);
+      }
+    }
+
     if (activityData?.categories) {
       const categoryIds = activityData.categories
         .map((cat) => cat.id)
@@ -155,13 +183,9 @@ export default function CategoryPage() {
         path: { activityId: numericEventId },
         body: { categoryIds: selectedCategories },
       });
-
       if (response.error?.status === false) {
         throw new Error(response.error?.message || "更新活動主題失敗");
       }
-
-      // 標記此步驟為完成
-      setPageCompleted("category", true);
 
       // 重新載入活動資料以獲取最新資訊
       await loadEventData();

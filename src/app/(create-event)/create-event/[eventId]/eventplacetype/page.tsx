@@ -22,9 +22,9 @@ export default function EventPlaceTypePage() {
 
   const {
     organizationInfo,
+    currentEventId,
     createNewEvent,
     setCurrentEventId,
-    setPageCompleted,
     activityData,
     loadEventData,
     isLoading,
@@ -37,29 +37,22 @@ export default function EventPlaceTypePage() {
   const [eventType, setEventType] = useState<string>("online");
   const [streamLink, setStreamLink] = useState<string>("");
   const [isCreating, setIsCreating] = useState(false);
-  const [hasLoadedData, setHasLoadedData] = useState(false);
-
-  // 檢查是否有主辦單位資訊並載入活動資料
+  const [hasLoadedData, setHasLoadedData] = useState(false); // 檢查是否有主辦單位資訊並載入活動資料
   useEffect(() => {
-    if (!organizationInfo) {
-      // 如果沒有主辦單位資訊，導航回主辦單位選擇頁面
-      router.push("/create-event/organizer");
-      return;
-    }
-
     // 如果是編輯現有活動（eventId 不是 "new"），設置當前活動ID並載入資料
     if (eventId !== "new") {
       const numericEventId = Number.parseInt(eventId);
       if (!Number.isNaN(numericEventId)) {
         setCurrentEventId(numericEventId);
-        // 載入活動資料
-        if (!hasLoadedData) {
+
+        // 如果當前活動ID不同且尚未載入資料，需要重新載入資料
+        if (currentEventId !== numericEventId && !hasLoadedData) {
           loadEventData();
           setHasLoadedData(true);
         }
       }
     }
-  }, [organizationInfo, eventId, router, setCurrentEventId, loadEventData, hasLoadedData]);
+  }, [eventId, currentEventId, setCurrentEventId, loadEventData, hasLoadedData]);
 
   // 當活動資料載入完成時，同步 isOnline 狀態到本地狀態
   useEffect(() => {
@@ -107,8 +100,9 @@ export default function EventPlaceTypePage() {
         // 建立新活動
         const newEventId = await createNewEvent(isOnline, livestreamUrl);
 
-        // 標記此步驟為完成
-        setPageCompleted("eventplacetype", true);
+        // 重新載入活動資料
+        setCurrentEventId(newEventId);
+        await loadEventData();
 
         // 跳轉到下一步
         router.push(`/create-event/${newEventId}/category`);
@@ -123,13 +117,9 @@ export default function EventPlaceTypePage() {
               livestreamUrl,
             },
           });
-
           if (response.error?.status === false) {
             throw new Error(response.error.message || "更新活動失敗，請稍後再試");
           }
-
-          // 標記此步驟為完成
-          setPageCompleted("eventplacetype", true);
 
           // 重新載入活動資料
           await loadEventData();

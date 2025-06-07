@@ -1,15 +1,18 @@
-import { getApiV1ActivitiesByActivityId, postApiV1Activities } from "@/services/api/client/sdk.gen";
+import {
+  getApiV1ActivitiesByActivityId,
+  getApiV1OrganizationsByOrganizationId,
+  postApiV1Activities,
+} from "@/services/api/client/sdk.gen";
 import type { ActivityResponse } from "@/services/api/client/types.gen";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-// 頁面完成狀態類型
-export interface PageCompletionStatus {
-  eventplacetype: boolean;
-  category: boolean;
-  basicinfo: boolean;
-  intro: boolean;
-  ticketsSetting: boolean;
+enum ActivityStep {
+  activityType = "activityType", // 活動形式
+  categories = "categories", // 分類
+  basic = "basic", // 基本資訊
+  content = "content", // 內容介紹
+  ticketTypes = "ticketTypes", // 票券設定
 }
 
 // 主辦單位資訊類型
@@ -26,9 +29,6 @@ interface CreateEventState {
   // 主辦單位資訊
   organizationInfo: OrganizationInfo | null;
 
-  // 各頁面完成狀態
-  completionStatus: PageCompletionStatus;
-
   // 從 API 獲取的活動資料
   activityData: ActivityResponse | null;
 
@@ -42,36 +42,31 @@ interface CreateEventState {
   createNewEvent: (isOnline: boolean, livestreamUrl?: string) => Promise<number>; // 建立新活動並返回 ID
   hasUnfinishedEvent: () => boolean; // 檢查是否有未完成的活動
   loadEventData: () => Promise<void>; // 載入活動資料到 store
-  setPageCompleted: (page: keyof PageCompletionStatus, completed: boolean) => void;
 
   // 工具方法
   getOverallProgress: () => number;
   getStepOneProgress: () => boolean;
   getStepTwoProgress: () => boolean;
-  isPageCompleted: (page: keyof PageCompletionStatus) => boolean;
 
-  // 重置和清空方法
-  resetEventData: (eventId: number) => void;
+  // 重置狀態
   clearAllData: () => void;
 
   // 完成活動創建（在票券設定頁面調用）
   completeEventCreation: () => void;
-
   // 錯誤處理
   setError: (error: string | null) => void;
   clearError: () => void;
+
+  // 步驟檢測功能
+  checkStepAccess: (currentStepPath: string) => {
+    canAccess: boolean;
+    redirectTo: string;
+  };
 }
 
 const initialState = {
   currentEventId: null,
   organizationInfo: null,
-  completionStatus: {
-    eventplacetype: false,
-    category: false,
-    basicinfo: false,
-    intro: false,
-    ticketsSetting: false,
-  },
   activityData: null,
   isLoading: false,
   error: null,
@@ -107,20 +102,12 @@ export const useCreateEventStore = create<CreateEventState>()(
               livestreamUrl,
             },
           });
-
           if (response.data?.data?.id) {
             const eventId = response.data.data.id;
 
-            // 設定活動 ID 並初始化狀態
+            // 設定活動 ID
             set({
               currentEventId: eventId,
-              completionStatus: {
-                eventplacetype: true, // 創建活動時已完成活動形式選擇
-                category: false,
-                basicinfo: false,
-                intro: false,
-                ticketsSetting: false,
-              },
               activityData: null,
               isLoading: false,
               error: null,
@@ -139,9 +126,8 @@ export const useCreateEventStore = create<CreateEventState>()(
       hasUnfinishedEvent: (): boolean => {
         return Boolean(get().currentEventId);
       },
-
       loadEventData: async (): Promise<void> => {
-        const { currentEventId } = get();
+        const { currentEventId, organizationInfo } = get();
 
         if (!currentEventId) {
           return;
@@ -154,59 +140,121 @@ export const useCreateEventStore = create<CreateEventState>()(
             path: { activityId: currentEventId },
           });
 
-          if (response.data) {
-            set({
-              activityData: response.data.data,
-              isLoading: false,
-              error: null,
-            });
+          if (response.data?.data) {
+            const activityData = response.data.data;
+
+            // 檢查是否需要更新組織資訊
+            const needUpdateOrganization =
+              !organizationInfo ||
+              (activityData?.organizationId &&
+                organizationInfo.organizationId !== activityData.organizationId);
+
+            if (needUpdateOrganization && activityData?.organizationId) {
+              try {
+                // 獲取組織詳細資料
+                const orgResponse = await getApiV1OrganizationsByOrganizationId({
+                  path: { organizationId: activityData.organizationId },
+                });
+
+                if (orgResponse.data?.data) {
+                  const organizationData = orgResponse.data.data;
+                  if (organizationData?.id && organizationData?.name) {
+                    set({
+                      activityData,
+                      organizationInfo: {
+                        organizationId: organizationData.id,
+                        organizationName: organizationData.name,
+                      },
+                      isLoading: false,
+                      error: null,
+                    });
+                  } else {
+                    throw new Error("組織資料格式錯誤");
+                  }
+                } else {
+                  throw new Error("無法獲取組織資料");
+                }
+              } catch (orgError) {
+                // 即使組織資料獲取失敗，仍然設定活動資料
+                console.warn("獲取組織資料失敗:", orgError);
+                set({
+                  activityData,
+                  isLoading: false,
+                  error: null,
+                });
+              }
+            } else {
+              // 組織資訊一致或不需要更新
+              set({
+                activityData,
+                isLoading: false,
+                error: null,
+              });
+            }
           } else {
             throw new Error("無法獲取活動資料");
           }
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : "載入活動資料失敗";
-          set({ error: errorMessage, isLoading: false });
-
-          // 如果載入失敗，清除無效的 ID
+          set({ error: errorMessage, isLoading: false }); // 如果載入失敗，清除無效的 ID
           get().clearAllData();
         }
       },
 
-      setPageCompleted: (page: keyof PageCompletionStatus, completed: boolean) => {
-        set((state) => ({
-          completionStatus: {
-            ...state.completionStatus,
-            [page]: completed,
-          },
-        }));
-      },
-
       getOverallProgress: () => {
-        const status = get().completionStatus;
-        const completedPages = Object.values(status).filter(Boolean).length;
-        const totalPages = Object.keys(status).length;
-        return Math.round((completedPages / totalPages) * 100);
-      },
+        const { activityData } = get();
 
+        if (!activityData?.currentStep) {
+          return 0;
+        }
+
+        // 定義步驟順序
+        const steps = [
+          ActivityStep.activityType,
+          ActivityStep.categories,
+          ActivityStep.basic,
+          ActivityStep.content,
+          ActivityStep.ticketTypes,
+        ];
+
+        const currentStepIndex = steps.indexOf(activityData.currentStep as ActivityStep);
+
+        if (currentStepIndex === -1) {
+          return 0;
+        }
+
+        // 計算進度：(當前步驟索引 + 1) / 總步驟數 * 100
+        return Math.round(((currentStepIndex + 1) / steps.length) * 100);
+      },
       getStepOneProgress: () => {
-        const { eventplacetype, category, basicinfo, intro } = get().completionStatus;
-        return eventplacetype && category && basicinfo && intro;
+        const { activityData } = get();
+
+        if (!activityData?.currentStep) {
+          return false;
+        }
+
+        // 步驟一包含：activityType, categories, basic, content
+        const stepOneSteps = [
+          ActivityStep.activityType,
+          ActivityStep.categories,
+          ActivityStep.basic,
+          ActivityStep.content,
+        ];
+
+        const currentStepIndex = stepOneSteps.indexOf(activityData.currentStep as ActivityStep);
+
+        // 如果當前步驟是步驟一的最後一步(content)或已經超過步驟一，則步驟一完成
+        return (
+          currentStepIndex === stepOneSteps.length - 1 ||
+          activityData.currentStep === ActivityStep.ticketTypes
+        );
       },
 
       getStepTwoProgress: () => {
-        const { ticketsSetting } = get().completionStatus;
-        return ticketsSetting;
-      },
+        const { activityData } = get();
 
-      isPageCompleted: (page: keyof PageCompletionStatus) => {
-        return get().completionStatus[page];
-      },
-
-      resetEventData: (eventId: number) => {
-        const state = get();
-        if (state.currentEventId === eventId) {
-          set({ ...initialState });
-        }
+        // 步驟二只有票券設定，當到達 ticketTypes 步驟時即為完成
+        return activityData?.currentStep === ActivityStep.ticketTypes;
       },
 
       clearAllData: () => {
@@ -221,105 +269,197 @@ export const useCreateEventStore = create<CreateEventState>()(
       setError: (error: string | null) => {
         set({ error });
       },
-
       clearError: () => {
         set({ error: null });
+      },
+
+      checkStepAccess: (currentStepPath: string) => {
+        const { activityData } = get();
+        const eventId = get().currentEventId;
+        // 檢查 eventId 是否有效
+        if (!eventId) {
+          return { canAccess: false, redirectTo: "/create-event/organizer" };
+        }
+
+        // 如果沒有活動資料，只允許訪問第一步
+        if (!activityData?.currentStep) {
+          if (currentStepPath === "eventplacetype") {
+            return { canAccess: true, redirectTo: "/create-event/organizer" };
+          }
+          return {
+            canAccess: false,
+            redirectTo: `/create-event/${eventId}/eventplacetype`,
+          };
+        }
+
+        const stepOrder = [
+          { path: "eventplacetype", activityStep: ActivityStep.activityType },
+          { path: "category", activityStep: ActivityStep.categories },
+          { path: "basicinfo", activityStep: ActivityStep.basic },
+          { path: "intro", activityStep: ActivityStep.content },
+          { path: "tickets/setting", activityStep: ActivityStep.ticketTypes },
+        ];
+
+        const currentActivityStepIndex = stepOrder.findIndex(
+          (step) => step.activityStep === activityData.currentStep
+        );
+        const targetStepIndex = stepOrder.findIndex((step) => step.path === currentStepPath);
+
+        // 如果找不到對應的步驟，則允許訪問（可能是其他頁面）
+        if (targetStepIndex === -1) {
+          return { canAccess: true, redirectTo: "/create-event/organizer" };
+        }
+
+        const canAccess = targetStepIndex <= currentActivityStepIndex + 1;
+
+        if (!canAccess) {
+          // 獲取下一個未完成的步驟路徑
+          const nextStep = getNextIncompleteStep(eventId);
+          return { canAccess: false, redirectTo: nextStep };
+        }
+
+        return { canAccess: true, redirectTo: "/create-event/organizer" };
       },
     }),
     {
       name: "create-event-storage",
-      // 只保存必要的狀態到 localStorage
       partialize: (state) => ({
         currentEventId: state.currentEventId,
         organizationInfo: state.organizationInfo,
-        completionStatus: state.completionStatus,
       }),
     }
   )
 );
 
 // 輔助函數：檢查是否可以訪問指定步驟
-// 邏輯：
-// 1. 如果步驟已完成，可以訪問（用戶可以回到已完成的步驟）
-// 2. 如果步驟未完成，但是下一個應該完成的步驟，可以訪問
-// 3. 其他情況不可訪問（不能跳過未完成的步驟）
 export const canAccessStep = (stepPath: string): boolean => {
   const store = useCreateEventStore.getState();
-  const { completionStatus } = store;
+  const { activityData } = store;
 
-  // 定義步驟順序和對應的完成狀態鍵
-  const stepOrder = [
-    { path: "eventplacetype", key: "eventplacetype" },
-    { path: "category", key: "category" },
-    { path: "basicinfo", key: "basicinfo" },
-    { path: "intro", key: "intro" },
-    { path: "tickets/setting", key: "ticketsSetting" },
-  ];
-
-  // 找到當前步驟的索引
-  const currentStepIndex = stepOrder.findIndex(
-    (step) => step.path === stepPath || stepPath.startsWith(step.path.split("/")[0])
-  );
-
-  if (currentStepIndex === -1) return true; // 未知步驟允許訪問
-
-  const currentStepKey = stepOrder[currentStepIndex].key as keyof PageCompletionStatus;
-
-  // 如果當前步驟已完成，允許訪問
-  if (completionStatus[currentStepKey]) {
-    return true;
+  // 如果沒有活動資料，只允許訪問第一步
+  if (!activityData?.currentStep) {
+    return stepPath === "eventplacetype";
   }
 
-  // 如果當前步驟未完成，檢查是否為下一個應該完成的步驟
-  // 找到第一個未完成的步驟
-  const firstIncompleteStepIndex = stepOrder.findIndex(
-    (step) => !completionStatus[step.key as keyof PageCompletionStatus]
+  const stepOrder = [
+    { path: "eventplacetype", activityStep: ActivityStep.activityType },
+    { path: "category", activityStep: ActivityStep.categories },
+    { path: "basicinfo", activityStep: ActivityStep.basic },
+    { path: "intro", activityStep: ActivityStep.content },
+    { path: "tickets/setting", activityStep: ActivityStep.ticketTypes },
+  ];
+  const currentActivityStepIndex = stepOrder.findIndex(
+    (step) => step.activityStep === activityData.currentStep
   );
+  const targetStepIndex = stepOrder.findIndex((step) => step.path === stepPath);
 
-  // 如果當前步驟是第一個未完成的步驟，允許訪問
-  return currentStepIndex === firstIncompleteStepIndex;
+  // 如果找不到對應的步驟，則允許訪問（可能是其他頁面）
+  if (targetStepIndex === -1) return true;
+
+  const canAccess = targetStepIndex <= currentActivityStepIndex + 1;
+
+  return canAccess;
 };
 
 // 輔助函數：獲取下一個未完成的步驟路徑
 export const getNextIncompleteStep = (eventId: number): string => {
   const store = useCreateEventStore.getState();
-  const { completionStatus } = store;
+  const { activityData } = store;
 
-  const steps = [
-    { key: "eventplacetype", path: "eventplacetype" },
-    { key: "category", path: "category" },
-    { key: "basicinfo", path: "basicinfo" },
-    { key: "intro", path: "intro" },
-    { key: "ticketsSetting", path: "tickets/setting" },
-  ];
-
-  for (const step of steps) {
-    if (!completionStatus[step.key as keyof PageCompletionStatus]) {
-      return `/create-event/${eventId}/${step.path}`;
-    }
+  // 如果沒有活動資料，回到第一步
+  if (!activityData?.currentStep) {
+    return `/create-event/${eventId}/eventplacetype`;
   }
 
-  return `/organizer/events/${eventId}`;
+  // 定義步驟順序對應表
+  const stepOrder = [
+    { activityStep: ActivityStep.activityType, path: "eventplacetype" },
+    { activityStep: ActivityStep.categories, path: "category" },
+    { activityStep: ActivityStep.basic, path: "basicinfo" },
+    { activityStep: ActivityStep.content, path: "intro" },
+    { activityStep: ActivityStep.ticketTypes, path: "tickets/setting" },
+  ];
+
+  // 找到當前步驟的索引
+  const currentStepIndex = stepOrder.findIndex(
+    (step) => step.activityStep === activityData.currentStep
+  );
+
+  // 如果找不到當前步驟或已經是最後一步，跳轉到活動管理頁面
+  if (currentStepIndex === -1 || currentStepIndex === stepOrder.length - 1) {
+    return `/organizer/events/${eventId}`;
+  }
+
+  // 返回下一個步驟
+  const nextStep = stepOrder[currentStepIndex + 1];
+  return `/create-event/${eventId}/${nextStep.path}`;
 };
 
 // 輔助函數：檢查活動是否可以發布
 export const canPublishEvent = (): boolean => {
   const store = useCreateEventStore.getState();
-  const { completionStatus } = store;
+  const { activityData } = store;
 
-  return Object.values(completionStatus).every(Boolean);
+  return activityData?.currentStep === ActivityStep.ticketTypes;
 };
 
 // 輔助函數：獲取活動當前步驟
 export const getCurrentStep = (): string => {
   const store = useCreateEventStore.getState();
-  const { completionStatus } = store;
+  const { activityData } = store;
 
-  if (!completionStatus.eventplacetype) return "eventplacetype";
-  if (!completionStatus.category) return "category";
-  if (!completionStatus.basicinfo) return "basicinfo";
-  if (!completionStatus.intro) return "intro";
-  if (!completionStatus.ticketsSetting) return "ticketsSetting";
+  if (!activityData?.currentStep) {
+    return ActivityStep.activityType;
+  }
 
-  return "completed";
+  return activityData.currentStep;
+};
+
+// 輔助函數：檢查特定步驟是否完成
+export const isStepCompleted = (step: ActivityStep): boolean => {
+  const store = useCreateEventStore.getState();
+  const { activityData } = store;
+
+  if (!activityData?.currentStep) {
+    return false;
+  }
+
+  // 定義步驟順序
+  const stepOrder = [
+    ActivityStep.activityType,
+    ActivityStep.categories,
+    ActivityStep.basic,
+    ActivityStep.content,
+    ActivityStep.ticketTypes,
+  ];
+
+  const currentStepIndex = stepOrder.indexOf(activityData.currentStep as ActivityStep);
+  const targetStepIndex = stepOrder.indexOf(step);
+
+  // currentStep 表示已經完成到哪個步驟，所以當前完成步驟 >= 目標步驟時，目標步驟就算完成
+  return currentStepIndex >= targetStepIndex;
+};
+
+// 輔助函數：檢查特定路徑對應的步驟是否完成
+export const isStepCompletedByPath = (stepPath: string): boolean => {
+  const stepMapping = {
+    eventplacetype: ActivityStep.activityType,
+    category: ActivityStep.categories,
+    basicinfo: ActivityStep.basic,
+    intro: ActivityStep.content,
+    "tickets/setting": ActivityStep.ticketTypes,
+  };
+
+  const step = stepMapping[stepPath as keyof typeof stepMapping];
+  return step ? isStepCompleted(step) : false;
+};
+
+// Hook：步驟保護功能
+export const useStepGuard = (currentStepPath: string, eventId: string) => {
+  const checkStepAccess = useCreateEventStore((state) => state.checkStepAccess);
+
+  return (): { canAccess: boolean; redirectTo: string | null } => {
+    const numericEventId = Number.parseInt(eventId);
+    return checkStepAccess(currentStepPath, numericEventId);
+  };
 };

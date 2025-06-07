@@ -211,7 +211,10 @@ export const createOrganizerSchema = z.object({
     .string()
     .min(1, { message: "主辦單位名稱不能為空" })
     .max(60, { message: "主辦單位名稱不能超過60個字元" }),
-  description: z.string().max(255, { message: "簡介不能超過255個字元" }).optional(),
+  description: z
+    .string()
+    .min(1, { message: "主辦單位簡介不能為空" })
+    .max(255, { message: "簡介不能超過255個字元" }),
   phoneNumber: z
     .string()
     .min(1, { message: "電話號碼不能為空" })

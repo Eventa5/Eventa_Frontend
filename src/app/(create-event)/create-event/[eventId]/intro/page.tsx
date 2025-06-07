@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { FormField, FormSection } from "@/components/ui/form-field";
 import { type IntroFormData, introSchema } from "@/features/organizer/schemas";
-import { useStepGuard } from "@/hooks/use-step-guard";
 import { patchApiV1ActivitiesByActivityIdContent } from "@/services/api/client/sdk.gen";
 import { useCreateEventStore } from "@/store/create-event";
 import { useDialogStore } from "@/store/dialog";
@@ -30,18 +29,14 @@ export default function IntroPage() {
   const eventId = params.eventId as string;
   const [isMounted, setIsMounted] = useState(false);
 
-  // 步驟保護：確保用戶按順序完成步驟
-  useStepGuard("intro", eventId);
-
   // 使用 store 管理狀態
   const {
     currentEventId,
     activityData,
     setCurrentEventId,
-    setPageCompleted,
     loadEventData,
+    checkStepAccess,
     isLoading,
-    error,
   } = useCreateEventStore();
 
   // 錯誤處理
@@ -85,6 +80,11 @@ export default function IntroPage() {
   // 當活動資料載入完成時，重置表單預設值
   useEffect(() => {
     if (activityData) {
+      const result = checkStepAccess("intro");
+      if (!result.canAccess) {
+        router.push(result.redirectTo);
+      }
+
       const formData = {
         summary: activityData.summary || "",
         description: activityData.descriptionMd || "",
@@ -132,9 +132,6 @@ export default function IntroPage() {
           throw new Error(response.error.message || "更新活動內容失敗");
         }
 
-        // 標記此步驟為完成
-        setPageCompleted("intro", true);
-
         // 重新載入活動資料以獲取最新資訊
         await loadEventData();
 
@@ -146,7 +143,7 @@ export default function IntroPage() {
         setIsUpdating(false);
       }
     },
-    [eventId, setPageCompleted, loadEventData, router, showError, handleError]
+    [eventId, loadEventData, router, showError, handleError]
   );
 
   // 返回上一步

@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { FormField, FormSection } from "@/components/ui/form-field";
 import { type BasicInfoFormData, basicInfoSchema } from "@/features/organizer/schemas";
 import { HOUR_OPTIONS, MINUTE_OPTIONS } from "@/features/shared/constants/date";
-import { useStepGuard } from "@/hooks/use-step-guard";
 import {
   patchApiV1ActivitiesByActivityIdBasic,
   postApiV1ActivitiesByActivityIdCover,
@@ -29,17 +28,14 @@ export default function BasicInfoPage() {
   const params = useParams();
   const eventId = params.eventId as string;
 
-  // 步驟保護：確保用戶按順序完成步驟
-  useStepGuard("basicinfo", eventId);
-
   // 使用 store 管理狀態
   const {
     currentEventId,
     organizationInfo,
     activityData,
     setCurrentEventId,
-    setPageCompleted,
     loadEventData,
+    checkStepAccess,
     isLoading,
   } = useCreateEventStore();
 
@@ -61,7 +57,7 @@ export default function BasicInfoPage() {
         loadEventData();
       }
     }
-  }, [eventId, currentEventId, setCurrentEventId, loadEventData]);
+  }, [eventId, currentEventId]);
 
   // 解析活動時間
   const startTimeData = useMemo(() => {
@@ -105,6 +101,11 @@ export default function BasicInfoPage() {
   // 當活動資料載入完成時，重置表單預設值
   useEffect(() => {
     if (activityData && organizationInfo) {
+      const result = checkStepAccess("basicinfo");
+      if (!result.canAccess) {
+        router.push(result.redirectTo);
+      }
+
       setValue("organizerName", organizationInfo.organizationName);
       setValue("eventName", activityData.title || "");
       setValue("startDate", startTimeData?.date || tomorrowDate, {
@@ -120,7 +121,7 @@ export default function BasicInfoPage() {
       setValue("eventTags", activityData.tags || []);
       setValue("eventLocation", activityData.location || "");
     }
-  }, [activityData, organizationInfo, startTimeData, endTimeData, tomorrowDate, setValue]);
+  }, [activityData, organizationInfo, startTimeData, endTimeData, tomorrowDate]);
 
   // 監看地址變化
   const eventLocation = useWatch({
@@ -209,9 +210,6 @@ export default function BasicInfoPage() {
           }
         }
 
-        // 標記此步驟為完成
-        setPageCompleted("basicinfo", true);
-
         // 重新載入活動資料以獲取最新資訊
         await loadEventData();
 
@@ -223,16 +221,7 @@ export default function BasicInfoPage() {
         setIsUpdating(false);
       }
     },
-    [
-      eventId,
-      currentEventId,
-      coverImage,
-      setPageCompleted,
-      loadEventData,
-      router,
-      handleError,
-      showError,
-    ]
+    [eventId, currentEventId, coverImage, loadEventData, router, handleError, showError]
   );
 
   const handleBack = useCallback(() => {

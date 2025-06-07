@@ -5,7 +5,6 @@ import { FormField, FormSection } from "@/components/ui/form-field";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { type TicketSettingFormData, ticketSettingSchema } from "@/features/organizer/schemas";
 import { HOUR_OPTIONS, MINUTE_OPTIONS } from "@/features/shared/constants/date";
-import { useStepGuard } from "@/hooks/use-step-guard";
 import {
   deleteApiV1ActivitiesByActivityIdTicketTypesByTicketTypeId,
   getApiV1ActivitiesByActivityIdTicketTypes,
@@ -505,14 +504,14 @@ export default function TicketSettingPage() {
   const eventId = params.eventId as string;
 
   // 步驟保護：確保用戶按順序完成步驟
-  useStepGuard("tickets/setting", eventId);
-
   const {
+    currentEventId,
     activityData,
     organizationInfo,
-    setPageCompleted,
+    setCurrentEventId,
     completeEventCreation,
     loadEventData,
+    checkStepAccess,
     isLoading,
   } = useCreateEventStore();
 
@@ -547,7 +546,6 @@ export default function TicketSettingPage() {
     getValues,
     setValue,
     trigger,
-    reset,
     formState: { errors, isValid },
   } = useForm<TicketSettingFormData>({
     resolver: zodResolver(ticketSettingSchema),
@@ -561,12 +559,27 @@ export default function TicketSettingPage() {
       tickets: [],
     },
     mode: "all",
-  });
-
+  }); // 設置當前活動ID並載入活動資料
   useEffect(() => {
-    if (!activityData) {
-      loadEventData();
-    } else {
+    const numericEventId = Number.parseInt(eventId);
+    if (!Number.isNaN(numericEventId)) {
+      setCurrentEventId(numericEventId);
+
+      // 如果當前活動ID不同，需要重新載入資料
+      if (currentEventId !== numericEventId) {
+        loadEventData();
+      }
+    }
+  }, [eventId, currentEventId]);
+
+  // 當活動資料載入完成時，設置表單預設值
+  useEffect(() => {
+    if (activityData && startTimeData && endTimeData) {
+      const result = checkStepAccess("intro");
+      if (!result.canAccess) {
+        router.push(result.redirectTo);
+      }
+
       setValue("eventStartDate", startTimeData?.date || tomorrowData?.date || "", {
         shouldTouch: true,
       });
@@ -578,7 +591,7 @@ export default function TicketSettingPage() {
       setValue("eventEndHour", endTimeData?.hour || "");
       setValue("eventEndMinute", endTimeData?.minute || "");
     }
-  }, [activityData, loadEventData, setValue, startTimeData, endTimeData, tomorrowData]);
+  }, [activityData, startTimeData, endTimeData, tomorrowData]);
 
   // 載入票券資料
   const loadTickets = useCallback(async () => {
@@ -855,12 +868,7 @@ export default function TicketSettingPage() {
               throw new Error(ticketResponse.error.message || "更新票券失敗，請稍後再試");
             }
           }
-        }
-
-        // 4. 標記票券設定頁面完成
-        setPageCompleted("ticketsSetting", true);
-
-        // 5. 發布活動
+        } // 4. 發布活動
         const publishResponse = await patchApiV1ActivitiesByActivityIdPublish({
           path: { activityId: numericEventId },
         });
@@ -879,16 +887,7 @@ export default function TicketSettingPage() {
         setIsSubmitting(false);
       }
     },
-    [
-      eventId,
-      activityData,
-      organizationInfo,
-      completeEventCreation,
-      router,
-      setPageCompleted,
-      handleError,
-      showError,
-    ]
+    [eventId, activityData, organizationInfo, completeEventCreation, router, handleError, showError]
   );
 
   const handleBack = useCallback(() => {

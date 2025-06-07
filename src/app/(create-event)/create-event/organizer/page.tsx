@@ -1,16 +1,9 @@
 "use client";
 
 import CreateOrganizerDialog from "@/features/organizer/components/create-organizer-dialog";
-import {
-  getApiV1Organizations,
-  postApiV1Organizations,
-  postApiV1OrganizationsByOrganizationIdImages,
-} from "@/services/api/client/sdk.gen";
-import type {
-  CreateOrganizationRequest,
-  OrganizationResponse,
-} from "@/services/api/client/types.gen";
-import { getNextIncompleteStep, useCreateEventStore } from "@/store/create-event";
+import { getApiV1Organizations } from "@/services/api/client/sdk.gen";
+import type { OrganizationResponse } from "@/services/api/client/types.gen";
+import { useCreateEventStore } from "@/store/create-event";
 import { useErrorHandler } from "@/utils/error-handler";
 import { cn } from "@/utils/transformer";
 import { Building } from "lucide-react";
@@ -27,13 +20,8 @@ export default function CreateEventOrganizerPage() {
   // 錯誤處理
   const { handleError } = useErrorHandler();
 
-  const {
-    currentEventId,
-    organizationInfo,
-    hasUnfinishedEvent,
-    setOrganizationInfo,
-    loadEventData,
-  } = useCreateEventStore();
+  const { organizationInfo, hasUnfinishedEvent, setOrganizationInfo, clearAllData } =
+    useCreateEventStore();
 
   // 載入主辦單位列表
   const loadOrganizations = useCallback(async () => {
@@ -50,26 +38,16 @@ export default function CreateEventOrganizerPage() {
     }
   }, [handleError]);
 
-  // 初始化時檢查是否有未完成的活動和載入主辦單位列表
+  // 初始化時如果有未完成的活動，則清除所有資料並載入主辦單位列表
   useEffect(() => {
-    const checkUnfinishedEvent = async () => {
-      if (hasUnfinishedEvent() && currentEventId) {
-        // 載入活動資料
-        await loadEventData();
-
-        // 導航到下一個未完成的步驟
-        const nextStep = getNextIncompleteStep(currentEventId);
-        router.push(nextStep);
-        return;
-      }
-    };
+    if (hasUnfinishedEvent()) {
+      // 重置狀態
+      clearAllData();
+    }
 
     // 載入主辦單位列表
     loadOrganizations();
-
-    // 檢查未完成的活動
-    checkUnfinishedEvent();
-  }, [hasUnfinishedEvent, currentEventId, loadEventData, loadOrganizations, router]);
+  }, []);
 
   // 從 store 載入已選擇的主辦單位
   useEffect(() => {
