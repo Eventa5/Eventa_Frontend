@@ -152,7 +152,7 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full bg-white md:bg-[#FFFCF5] px-4 sm:px-8 py-6 flex flex-col items-center z-50 relative mb-10">
+    <header className="w-full bg-[#FFFCF5] px-4 sm:px-8 py-6 flex flex-col items-center z-50 relative mb-10">
       <div className="w-full max-w-6xl flex items-center justify-between">
         {/* 左側選單 */}
         <div className="hidden md:flex flex-1 items-center">
@@ -181,7 +181,7 @@ export default function Header() {
             className="flex flex-col items-center"
           >
             <span
-              className="block rounded-full bg-white md:bg-[#FFFCF5] -mb-2 z-10 p-10"
+              className="block rounded-full bg-[#FFFCF5] -mb-2 z-10 p-10"
               title="Eventa Logo"
             >
               <Image
@@ -315,9 +315,9 @@ export default function Header() {
           className="fixed flex flex-col inset-0 bg-white z-50 md:hidden"
           ref={mobileMenuRef}
         >
-          <div className="w-full px-4 py-2 flex justify-between items-center">
+          <div className="w-full px-4 py-2 flex justify-between items-center bg-primary-50 relative">
             <div className="invisible w-10">{/* 空間平衡佔位元素 */}</div>
-            <div className="rounded-full bg-white p-6">
+            <div className="rounded-full bg-primary-50 p-6 absolute top-0 left-1/2 -translate-x-1/2">
               <Image
                 src="/eventa-logo.svg"
                 alt="Eventa Logo"

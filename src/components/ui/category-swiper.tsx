@@ -1,17 +1,12 @@
 "use client";
 
-import { useCategories } from "@/features/activities/categories";
+import { useCategoriesStore } from "@/store/categories";
 import Image from "next/image";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 
-type Category = {
-  name: string;
-  imageUrl: string;
-};
-
 export default function CategorySwiper() {
-  const { categories, error, isLoading } = useCategories();
+  const { categories, error, isLoading } = useCategoriesStore();
 
   if (isLoading) {
     return (
@@ -53,10 +48,12 @@ export default function CategorySwiper() {
               height={622}
               className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
             />
-            <div className="absolute left-4 bottom-4 lg:left-6 lg:bottom-6 flex items-center justify-center bg-black/50">
-              <span className="text-white font-bold text-[18px] lg:text-[24px] tracking-widest">
-                {category.name}
-              </span>
+            <div className="absolute left-4 bottom-4 lg:left-6 lg:bottom-6 flex items-center justify-center">
+              <div className="px-4 py-2 rounded-lg backdrop-blur-xs bg-neutral-500/20">
+                <span className="text-white font-bold text-[18px] lg:text-[24px] tracking-widest">
+                  {category.name}
+                </span>
+              </div>
             </div>
           </Link>
         </SwiperSlide>

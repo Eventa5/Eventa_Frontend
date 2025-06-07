@@ -1,3 +1,5 @@
+"use client";
+
 import CategorySwiper from "@/components/ui/category-swiper";
 import { EventCard, EventCarousel, ServiceCard } from "@/components/ui/event-cards";
 import HotEventsSection from "@/components/ui/hot-events-section";
@@ -5,7 +7,9 @@ import Link from "next/link";
 import "@/styles/pages/home.css";
 import ChatButton from "@/features/chatbot/components/chat-button";
 import SearchContainer from "@/features/search/components/search-container";
+import { useCategoriesStore } from "@/store/categories";
 import Image from "next/image";
+import { useEffect } from "react";
 
 // 首頁的模擬資料
 const hotEvents = [
@@ -151,6 +155,12 @@ const otherEvents = [
 ];
 
 export default function Home() {
+  const { fetchCategories } = useCategoriesStore();
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
   return (
     <main className="flex flex-col w-full min-h-screen bg-[#FDFBF5] pt-10 -mt-10">
       {/* 首頁橫幅 */}
