@@ -1,3 +1,5 @@
+"use client";
+
 export default function OrganizerHomePage() {
   return (
     <div className="p-6">

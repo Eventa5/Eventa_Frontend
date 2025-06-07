@@ -1,0 +1,10 @@
+@reference url('../index.css');
+
+.ql-toolbar {
+  @apply rounded-t-md !border-t-0 !border-l-0 !border-r-0 border-b border-gray-300;
+}
+
+.ql-container {
+  height: calc(100% - 68.5px) !important;
+  @apply rounded-b-md !border-0;
+}

@@ -50,7 +50,7 @@ interface DropdownProps {
     label: string;
     disabled?: boolean;
   }>;
-  value?: string | number;
+  value?: string | number | readonly string[];
   onChange?: (event: ChangeEvent<HTMLSelectElement>) => void;
 }
 

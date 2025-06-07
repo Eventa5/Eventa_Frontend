@@ -23,6 +23,7 @@ interface DatePickerProps {
   components?: Partial<CustomComponents>;
   classNames?: ClassNames;
   popoverContentClassName?: string;
+  footerText?: string;
 }
 
 export function DatePicker({
@@ -40,6 +41,7 @@ export function DatePicker({
   components,
   classNames,
   popoverContentClassName,
+  footerText,
 }: DatePickerProps) {
   return (
     <Popover>
@@ -81,9 +83,11 @@ export function DatePicker({
             ...classNames,
           }}
           footer={
-            <div className="px-4 pt-0 pb-4">
-              <p className="text-xs text-muted-foreground">請選擇您的生日日期。</p>
-            </div>
+            footerText && (
+              <div className="px-4 pt-0 pb-4">
+                <p className="text-xs text-muted-foreground">{footerText}</p>
+              </div>
+            )
           }
         />
       </PopoverContent>

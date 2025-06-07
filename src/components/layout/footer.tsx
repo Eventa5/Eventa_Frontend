@@ -156,7 +156,7 @@ export default function Footer() {
               <div className="flex items-center gap-4">
                 <span className="text-white">Email</span>
                 <span className="text-white">projecteventa@gmail.com</span>
-              </div>{" "}
+              </div>
               <p className="text-white">週一至週五 10:00 - 18:30</p>
             </div>
             <HelpButton />

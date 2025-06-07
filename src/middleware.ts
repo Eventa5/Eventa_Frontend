@@ -9,6 +9,7 @@ const PROTECTED_PATH_REGEX = [
   /^\/events\/[^/]+\/checkout$/,
   /^\/create-event(\/|$)/,
   /^\/organizer(\/|$)/,
+  /^\/create(\/|$)/,
 ];
 
 export async function middleware(request: NextRequest) {
@@ -41,5 +42,6 @@ export const config = {
     "/events/:path*/checkout",
     "/create-event/:path*",
     "/organizer/:path*",
+    "/create",
   ],
 };
