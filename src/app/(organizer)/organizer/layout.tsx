@@ -7,6 +7,8 @@ import { getApiV1Organizations } from "@/services/api/client/sdk.gen";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
+export const dynamic = "force-dynamic";
+
 const notoSansTC = localFont({
   src: [
     {

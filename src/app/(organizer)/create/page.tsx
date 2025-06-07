@@ -17,16 +17,7 @@ import { useOrganizerStore } from "@/store/organizer";
 import { useErrorHandler } from "@/utils/error-handler";
 import { cn } from "@/utils/transformer";
 
-interface CreateOrganizerPageProps {
-  onSuccess?: (
-    data: CreateOrganizerFormData & {
-      avatar?: File | null;
-      coverImage?: File | null;
-    }
-  ) => void;
-}
-
-export default function CreateOrganizerPage({ onSuccess }: CreateOrganizerPageProps) {
+export default function CreateOrganizerPage() {
   const router = useRouter();
   const { showError } = useDialogStore();
   const { handleError } = useErrorHandler();
@@ -143,13 +134,6 @@ export default function CreateOrganizerPage({ onSuccess }: CreateOrganizerPagePr
 
         // 設定為當前主辦單位
         setCurrentOrganizer(organizationId, data.organizerName);
-
-        // 呼叫 onSuccess 回調（如果有提供）
-        onSuccess?.({
-          ...data,
-          avatar: avatarFile,
-          coverImage: coverImageFile,
-        });
 
         // 導航回主辦者中心
         router.push("/organizer");

@@ -453,13 +453,3 @@ export const isStepCompletedByPath = (stepPath: string): boolean => {
   const step = stepMapping[stepPath as keyof typeof stepMapping];
   return step ? isStepCompleted(step) : false;
 };
-
-// Hook：步驟保護功能
-export const useStepGuard = (currentStepPath: string, eventId: string) => {
-  const checkStepAccess = useCreateEventStore((state) => state.checkStepAccess);
-
-  return (): { canAccess: boolean; redirectTo: string | null } => {
-    const numericEventId = Number.parseInt(eventId);
-    return checkStepAccess(currentStepPath, numericEventId);
-  };
-};
