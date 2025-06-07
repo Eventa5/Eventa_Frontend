@@ -85,73 +85,6 @@ export default function CreateEventOrganizerPage() {
     setSelectedOrgName(name);
   };
 
-  // 處理新增主辦單位成功
-  const handleOrganizerCreated = async (data: {
-    organizerName: string;
-    phoneNumber: string;
-    email: string;
-    language: string;
-    currency: string;
-    description?: string;
-    avatar?: File | null;
-    coverImage?: File | null;
-  }) => {
-    try {
-      // 轉換資料格式以符合 API 要求
-      const organizationData: CreateOrganizationRequest = {
-        name: data.organizerName, // 轉換 organizerName 為 name
-        introduction: data.description,
-        email: data.email,
-        avatar: "",
-        cover: "",
-        phoneNumber: data.phoneNumber,
-        countryCode: data.language,
-      };
-
-      const response = await postApiV1Organizations({
-        body: organizationData,
-      });
-
-      if (response.error?.status === false) {
-        throw new Error(response.error.message || "創建主辦單位失敗");
-      }
-
-      if (response.data?.data) {
-        // 獲取創建的主辦單位 ID
-        const organizationId = response.data.data;
-
-        // 如果有上傳頭像或封面圖片，則進行圖片上傳
-        if (data.avatar || data.coverImage) {
-          try {
-            const response = await postApiV1OrganizationsByOrganizationIdImages({
-              path: {
-                organizationId,
-              },
-              body: {
-                avatar: data.avatar || undefined,
-                cover: data.coverImage || undefined,
-              },
-            });
-
-            if (response.error?.status === false) {
-              throw new Error(response.error.message || "上傳主辦單位圖片失敗，請稍後再試");
-            }
-          } catch (imageError: unknown) {
-            handleError(imageError);
-          }
-        }
-
-        // 重新載入主辦單位列表
-        await loadOrganizations();
-        // 自動選擇新創建的主辦單位
-        setSelected(organizationId);
-        setSelectedOrgName(data.organizerName);
-      }
-    } catch (error) {
-      handleError(error);
-    }
-  };
-
   // 處理選擇按鈕點擊 - 只儲存主辦單位資訊，不建立活動
   const handleSelect = () => {
     if (selected && selectedOrgName) {
@@ -178,7 +111,7 @@ export default function CreateEventOrganizerPage() {
     <div className="w-full flex flex-col min-h-[calc(100vh-64px)]">
       <div className="flex-1 mb-6 w-full">
         <div className="flex flex-col gap-4">
-          <CreateOrganizerDialog onSuccess={handleOrganizerCreated} />
+          <CreateOrganizerDialog onSuccess={loadOrganizations} />
 
           {organizations.length === 0 ? (
             <div className="text-center py-8 text-gray-500">

@@ -54,7 +54,6 @@ export default function ProgressPage() {
   const overallProgress = isHydrated ? getOverallProgress() : 0;
   const stepOneCompleted = isHydrated ? getStepOneProgress() : false;
   const stepTwoCompleted = isHydrated ? getStepTwoProgress() : false;
-
   const stepOneItems = [
     {
       name: "活動形式",
@@ -85,17 +84,18 @@ export default function ProgressPage() {
       path: "tickets/setting",
     },
   ];
-
   // 處理步驟標籤點擊
   const handleStepClick = (path: string) => {
-    if (canAccessStep(path)) {
+    if (isHydrated && canAccessStep(path)) {
       router.push(`/create-event/${eventId}/${path}`);
     }
   };
 
   const handleContinueEdit = () => {
-    const nextStep = getNextIncompleteStep(Number.parseInt(eventId));
-    router.push(nextStep);
+    if (isHydrated) {
+      const nextStep = getNextIncompleteStep(Number.parseInt(eventId));
+      router.push(nextStep);
+    }
   };
 
   return (
@@ -134,27 +134,24 @@ export default function ProgressPage() {
                 </span>
               )}
             </h3>
-          </div>
-
+          </div>{" "}
           {/* 活動資訊標籤 */}
           <div className="flex items-center flex-wrap gap-y-3">
             {stepOneItems.map((item, index) => (
               <StepTag
                 key={item.name}
                 completed={item.completed}
-                clickable={canAccessStep(item.path)}
+                clickable={isHydrated ? canAccessStep(item.path) : false}
                 onClick={() => handleStepClick(item.path)}
               >
                 {item.name}
               </StepTag>
             ))}
           </div>
-
           <CircularProgress
             className="absolute right-0 top-5"
             percentage={overallProgress}
             size={90}
-            strokeWidth={6}
           />
         </div>
 
@@ -167,13 +164,13 @@ export default function ProgressPage() {
                 <CircleCheck className="w-6 h-6" />
               </span>
             )}
-          </h3>
+          </h3>{" "}
           <div className="flex items-center -space-x-2">
             {stepTwoItems.map((item, index) => (
               <StepTag
                 key={item.name}
                 completed={item.completed}
-                clickable={canAccessStep(item.path)}
+                clickable={isHydrated ? canAccessStep(item.path) : false}
                 onClick={() => handleStepClick(item.path)}
               >
                 {item.name}

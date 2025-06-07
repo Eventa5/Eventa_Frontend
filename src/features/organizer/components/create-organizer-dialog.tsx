@@ -24,12 +24,7 @@ import { cn } from "@/utils/transformer";
 import { type CreateOrganizerFormData, createOrganizerSchema } from "../schemas";
 
 interface CreateOrganizerDialogProps {
-  onSuccess?: (
-    data: CreateOrganizerFormData & {
-      avatar?: File | null;
-      coverImage?: File | null;
-    }
-  ) => void;
+  onSuccess?: () => void;
   children?: React.ReactNode;
 }
 
@@ -150,12 +145,7 @@ export function CreateOrganizerDialog({ onSuccess, children }: CreateOrganizerDi
         // 設定為當前主辦單位
         setCurrentOrganizer(organizationId, data.organizerName);
 
-        // 呼叫 onSuccess 回調（如果有提供）
-        onSuccess?.({
-          ...data,
-          avatar: avatarFile,
-          coverImage: coverImageFile,
-        });
+        onSuccess?.();
 
         setOpen(false);
         resetForm();

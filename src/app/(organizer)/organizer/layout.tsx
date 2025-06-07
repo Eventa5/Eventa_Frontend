@@ -71,7 +71,7 @@ export default async function OrganizerLayout({
 }) {
   const response = await getApiV1Organizations();
   if (!response.data?.data?.length) {
-    redirect("/organizer/create");
+    redirect("/create");
   }
   const defaultOrg = response.data?.data[0];
 
