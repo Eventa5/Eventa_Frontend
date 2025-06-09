@@ -19,7 +19,7 @@ import SignUpForm from "@/features/auth/components/sign-up-form";
 import { useIsMobile } from "@/hooks/useMediaQuery";
 import { useAuthStore } from "@/store/auth";
 import { useDialogStore } from "@/store/dialog";
-import { Calendar, ChevronLeft, Menu, Settings, SquarePen, Ticket, User, X } from "lucide-react";
+import { ChevronLeft, Menu, SquarePen, Ticket, User, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -201,7 +201,7 @@ export default function Header() {
           {isAuthenticated ? (
             <div className="flex items-center gap-2">
               <Link
-                href="#"
+                href="/create-event/organizer"
                 className="px-8 py-2 font-serif-tc font-bold bg-primary-500 hover:saturate-150 duration-200 active:scale-95 cursor-pointer rounded-md mr-8 flex items-center"
               >
                 <SquarePen className="w-4 h-4 mr-2" />
@@ -247,13 +247,19 @@ export default function Header() {
                           會員中心
                         </Link>
                       </li>
-                      <li>
+                      <li className="border-t border-gray-100 mt-1">
                         <Link
-                          href="#"
+                          href="/organizer"
                           className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                         >
-                          <Settings className="w-4 h-4 mr-3 text-gray-500" />
-                          帳號管理
+                          <Image
+                            src="/icons/logo-outline.svg"
+                            alt="Eventa Logo"
+                            width={16}
+                            height={16}
+                            className="w-4 h-4 mr-3"
+                          />
+                          主辦中心
                         </Link>
                       </li>
                       <li className="border-t border-gray-100 mt-1">
@@ -334,7 +340,7 @@ export default function Header() {
               </Link>
               {isAuthenticated ? (
                 <Link
-                  href="/events/create"
+                  href="/create-event/organizer"
                   className="flex items-center gap-4 py-2 px-4 font-serif-tc font-black text-base tracking-widest"
                   onClick={() => setMobileMenuOpen(false)}
                 >
