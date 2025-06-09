@@ -63,7 +63,6 @@ export default function EventDetailPage() {
           getApiV1OrganizationsByOrganizationId({
             path: { organizationId: Number(orgId) },
           }).then((orgRes) => {
-            console.log(orgRes.data?.data);
             setOrganization(orgRes.data?.data ?? null);
           });
         }
