@@ -20,6 +20,7 @@ import {
   Mail,
   MapPin,
   PlusIcon,
+  VideoIcon,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -272,16 +273,35 @@ export default function EventDetailPage() {
                 />
               </div>
               {/* 注意事項 */}
-              <div className="bg-[#FFF7E1] rounded-[24px] p-6 flex flex-col gap-4 md:rounded-full md:flex-row md:items-center md:gap-8 md:px-8 md:py-6">
+              <div
+                className={`rounded-[24px] p-6 flex flex-col gap-4 md:rounded-full md:flex-row md:items-center md:gap-8 md:px-8 md:py-6 ${
+                  eventData?.isOnline ? "bg-[#FCE3DA]" : "bg-[#FFF0CA]"
+                }`}
+              >
                 <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg md:text-base">
-                  <Cone className="w-5 h-5" />
-                  線下活動
+                  {eventData?.isOnline ? (
+                    <>
+                      <VideoIcon className="w-5 h-5" />
+                      線上活動
+                    </>
+                  ) : (
+                    <>
+                      <Cone className="w-5 h-5" />
+                      線下活動
+                    </>
+                  )}
                 </span>
                 <div className="flex flex-col gap-2">
                   <span className="text-neutral-800">
-                    報名完成後，活動當天抵達現場出示 Eventa 電子票券即可快速入場
+                    {eventData?.isOnline
+                      ? "此為線上活動，不受地點限制，輕鬆享受活動樂趣！"
+                      : "報名完成後，活動當天抵達現場出示 Eventa 電子票券即可快速入場"}
                   </span>
-                  <span className="text-neutral-500 text-sm">實際入場相關規定以活動主辦方為主</span>
+                  <span className="text-neutral-500 text-sm">
+                    {eventData?.isOnline
+                      ? "本課程使用Zoom進行，報名後會於課前收到課程的Zoom連結，請留意您的Email信箱"
+                      : "實際入場相關規定以活動主辦方為主"}
+                  </span>
                 </div>
                 <button
                   type="button"
