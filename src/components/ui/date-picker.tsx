@@ -21,6 +21,8 @@ interface DatePickerProps {
   endMonth?: Date;
   defaultMonth?: Date;
   components?: Partial<CustomComponents>;
+  classNames?: ClassNames;
+  popoverContentClassName?: string;
 }
 
 export function DatePicker({
@@ -36,6 +38,8 @@ export function DatePicker({
   endMonth,
   defaultMonth,
   components,
+  classNames,
+  popoverContentClassName,
 }: DatePickerProps) {
   return (
     <Popover>
@@ -57,7 +61,7 @@ export function DatePicker({
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-auto p-0"
+        className={`w-auto p-0 ${popoverContentClassName}`}
         align="start"
       >
         <Calendar
@@ -74,6 +78,7 @@ export function DatePicker({
             month_caption: "flex items-center gap-2",
             caption_label: "text-sm font-medium",
             dropdowns: "flex gap-2",
+            ...classNames,
           }}
           footer={
             <div className="px-4 pt-0 pb-4">
