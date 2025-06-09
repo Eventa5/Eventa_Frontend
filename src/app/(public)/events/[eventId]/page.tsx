@@ -8,6 +8,7 @@ import { useAuthStore } from "@/store/auth";
 import { useDialogStore } from "@/store/dialog";
 import { format, parseISO } from "date-fns";
 import { zhTW } from "date-fns/locale";
+import DOMPurify from "dompurify";
 import { Loader } from "lucide-react";
 import {
   Calendar,
@@ -393,7 +394,13 @@ export default function EventDetailPage() {
               </span>
             </div>
             <div className="flex flex-col gap-2 mt-0 sm:mt-16">
-              <p className="text-base text-[#525252]">{eventData?.descriptionMd ?? ""}</p>
+              <div
+                className="text-base text-[#525252]"
+                // biome-ignore lint/security/noDangerouslySetInnerHtml: 已用 DOMPurify 處理
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(eventData?.descriptionMd ?? ""),
+                }}
+              />
             </div>
           </section>
         </div>
