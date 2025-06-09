@@ -100,6 +100,15 @@ export default function EventDetailPage() {
     return `${startStr} - ${endStr} (GMT+8)`;
   }
 
+  function formatGoogleDate(dateStr?: string) {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    return d
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .replace(/\.\d+Z$/, "Z");
+  }
+
   return loading ? (
     // 載入中
     <div className="min-h-screen flex items-center justify-center bg-primary-50 -mt-10">
@@ -219,13 +228,21 @@ export default function EventDetailPage() {
                     ? formatEventDate(eventData.startTime, eventData.endTime)
                     : "--"}
                 </span>
-                <button
-                  type="button"
+                <a
+                  href={`https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
+                    eventData?.title ?? ""
+                  )}&dates=${formatGoogleDate(eventData?.startTime)}/${formatGoogleDate(
+                    eventData?.endTime
+                  )}&details=${encodeURIComponent(
+                    eventData?.summary ?? ""
+                  )}&location=${encodeURIComponent(eventData?.location ?? "")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center gap-1 text-sm text-primary-700 font-bold cursor-pointer"
                 >
                   <PlusIcon className="w-4 h-4" />
                   加入行事曆
-                </button>
+                </a>
               </div>
               <Separator />
               <div className="flex flex-col sm:flex-row items-start gap-3 pl-0 md:pl-8">
