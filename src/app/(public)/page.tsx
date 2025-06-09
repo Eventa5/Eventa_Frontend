@@ -1,16 +1,13 @@
-"use client";
-
 import CategorySwiper from "@/components/ui/category-swiper";
 import { EventCard, EventCarousel, ServiceCard } from "@/components/ui/event-cards";
 import HotEventsSection from "@/components/ui/hot-events-section";
 import Link from "next/link";
 import "@/styles/pages/home.css";
+import CategoriesProvider from "@/features/activities/categories-provider";
+import OtherEventsSection from "@/features/activities/components/other-events-section";
 import ChatButton from "@/features/chatbot/components/chat-button";
 import SearchContainer from "@/features/search/components/search-container";
-import { useCategoriesStore } from "@/store/categories";
 import Image from "next/image";
-import { useEffect } from "react";
-
 // 首頁的模擬資料
 const hotEvents = [
   {
@@ -155,103 +152,99 @@ const otherEvents = [
 ];
 
 export default function Home() {
-  const { fetchCategories } = useCategoriesStore();
-
-  useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
-
   return (
     <main className="flex flex-col w-full min-h-screen bg-[#FDFBF5] pt-10 -mt-10">
-      {/* 首頁橫幅 */}
-      <section className="relative w-full px-4 md:px-8  flex items-center justify-center overflow-x-clip">
-        <div className="max-w-[1680px] w-full h-[638px] lg:h-[840px]  flex items-center justify-center z-10 bg-banner rounded-[40px]">
-          <div className="w-full px-8 md:w-[400px] md:px-0 lg:w-[532px] flex flex-col items-center justify-center  gap-4">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif-tc font-bold tracking-wide text-center text-[#262626] leading-tight">
-              AI 精準推薦
-              <br />
-              活動票券一手掌握
-            </h1>
-            <p className="text-lg text-center text-[#525252] max-w-2xl">
-              無論何時何地，輕鬆找到最佳選擇，讓每場活動都值得期待
-            </p>
-            <ChatButton />
-            {/* 搜尋容器 */}
-            <div className="w-full">
-              <SearchContainer />
+      <CategoriesProvider>
+        {/* 首頁橫幅 */}
+        <section className="relative w-full px-4 md:px-8  flex items-center justify-center overflow-x-clip">
+          <div className="max-w-[1680px] w-full h-[638px] lg:h-[840px]  flex items-center justify-center z-10 bg-banner rounded-[40px]">
+            <div className="w-full px-8 md:w-[400px] md:px-0 lg:w-[532px] flex flex-col items-center justify-center  gap-4">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif-tc font-bold tracking-wide text-center text-[#262626] leading-tight">
+                AI 精準推薦
+                <br />
+                活動票券一手掌握
+              </h1>
+              <p className="text-lg text-center text-[#525252] max-w-2xl">
+                無論何時何地，輕鬆找到最佳選擇，讓每場活動都值得期待
+              </p>
+              <ChatButton />
+              {/* 搜尋容器 */}
+              <div className="w-full">
+                <SearchContainer />
+              </div>
             </div>
           </div>
-        </div>
-      </section>
-      {/* 最新強檔 */}
-      <section className="py-20 md:py-32 px-4 md:px-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col items-center mb-3 md:mb-8">
-            <div className="flex items-center gap-6 mb-6 font-serif-tc">
-              <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">最新強檔</h2>
-              <Image
-                src="/images/balloon.png"
-                width={50}
-                height={100}
-                className="w-6 h-12 md:w-10 md:h-20"
-                alt="氣球"
-              />
-              <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">話題不斷</h2>
+        </section>
+        {/* 最新強檔 */}
+        <section className="py-20 md:py-32 px-4 md:px-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex flex-col items-center mb-3 md:mb-8">
+              <div className="flex items-center gap-6 mb-6 font-serif-tc">
+                <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">最新強檔</h2>
+                <Image
+                  src="/images/balloon.png"
+                  width={50}
+                  height={100}
+                  className="w-6 h-12 md:w-10 md:h-20"
+                  alt="氣球"
+                />
+                <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">話題不斷</h2>
+              </div>
+              <p className="text-[14px] md:text-[18px] text-[#525252] text-center max-w-3xl">
+                不只是活動，更是讓生活亮起來的機會，錯過這波話題活動，就真的只能看別人打卡了！
+              </p>
             </div>
-            <p className="text-[14px] md:text-[18px] text-[#525252] text-center max-w-3xl">
-              不只是活動，更是讓生活亮起來的機會，錯過這波話題活動，就真的只能看別人打卡了！
-            </p>
-          </div>
 
-          <EventCarousel events={newEvents} />
-        </div>
-      </section>
-      {/* 熱門活動 */}
-      <section className="pt-[116px] pb-[116px] md:pt-[200px] md:pb-[173px] px-4 md:px-8 bg-hot-activity">
-        <div className="flex flex-col items-center">
-          <div className="flex flex-col items-center mb-8 md:mb-[64px]">
-            <div className="flex items-center gap-6 mb-6 font-serif-tc">
-              <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">熱門</h2>
-              <Image
-                src="/images/balloon-red.png"
-                width={50}
-                height={100}
-                className="w-6 h-12 md:w-10 md:h-20"
-                alt="氣球"
-              />
-              <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">活動</h2>
-            </div>
-            <p className="text-[14px] md:text-[18px] text-[#525252] text-center max-w-3xl">
-              大家最近都在參加<span className="hidden md:inline-block">、</span>
-              <br className="md:hidden" />
-              討論度最高的熱門活動都在這裡！
-            </p>
+            <EventCarousel events={newEvents} />
           </div>
-          <HotEventsSection events={hotEvents} />
-        </div>
-      </section>
-      {/* 活動分類 */}
-      <section className="py-20 md:py-32 px-4 md:px-8">
-        <div className="flex flex-col items-center">
-          <div className="flex flex-col items-center mb-8 md:mb-[64px]">
-            <div className="flex items-end gap-6 font-serif-tc">
-              <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">活動</h2>
-              <Image
-                src="/images/balloon.png"
-                width={50}
-                height={100}
-                className="w-6 h-12 md:w-10 md:h-20"
-                alt="氣球"
-              />
-              <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">分類</h2>
+        </section>
+        {/* 熱門活動 */}
+        <section className="pt-[116px] pb-[116px] md:pt-[200px] md:pb-[173px] px-4 md:px-8 bg-hot-activity">
+          <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center mb-8 md:mb-[64px]">
+              <div className="flex items-center gap-6 mb-6 font-serif-tc">
+                <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">熱門</h2>
+                <Image
+                  src="/images/balloon-red.png"
+                  width={50}
+                  height={100}
+                  className="w-6 h-12 md:w-10 md:h-20"
+                  alt="氣球"
+                />
+                <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">活動</h2>
+              </div>
+              <p className="text-[14px] md:text-[18px] text-[#525252] text-center max-w-3xl">
+                大家最近都在參加<span className="hidden md:inline-block">、</span>
+                <br className="md:hidden" />
+                討論度最高的熱門活動都在這裡！
+              </p>
             </div>
+            <HotEventsSection />
           </div>
+        </section>
+        {/* 活動分類 */}
+        <section className="py-20 md:py-32 px-4 md:px-8">
+          <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center mb-8 md:mb-[64px]">
+              <div className="flex items-end gap-6 font-serif-tc">
+                <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">活動</h2>
+                <Image
+                  src="/images/balloon.png"
+                  width={50}
+                  height={100}
+                  className="w-6 h-12 md:w-10 md:h-20"
+                  alt="氣球"
+                />
+                <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">分類</h2>
+              </div>
+            </div>
 
-          <div className="w-full flex justify-center">
-            <CategorySwiper />
+            <div className="w-full flex justify-center">
+              <CategorySwiper />
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </CategoriesProvider>
       {/* 服務介紹 */}
       <section className="py-20 md:py-32 px-4 md:px-8 bg-service">
         <div className="flex flex-col  items-center md:flex-row md:justify-center gap-6">
@@ -293,41 +286,7 @@ export default function Home() {
           />
         </div>
       </section>
-      {/* 其他活動 */}
-      <section className="py-20 md:py-32 px-4 md:px-8">
-        <div className="flex flex-col items-center">
-          <div className="flex flex-col items-center mb-12">
-            <div className="flex items-end gap-6 mb-6 font-serif-tc">
-              <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">其他</h2>
-              <Image
-                src="/images/balloon-red.png"
-                width={50}
-                height={100}
-                className="w-6 h-12 md:w-10 md:h-20"
-                alt="氣球"
-              />
-              <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">活動</h2>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-[repeat(2,_302px)] lg:grid-cols-[repeat(3,_302px)] 2xl:grid-cols-[repeat(4,_302px)] gap-6 justify-items-center">
-            {otherEvents.map((event) => (
-              <EventCard
-                key={event.id}
-                {...event}
-                size="sm"
-              />
-            ))}
-          </div>
-          <div className="mt-12 flex justify-center">
-            <Link
-              href="/events"
-              className="px-8 py-3 border border-[#525252] rounded-xl text-[#525252] hover:bg-[#F5F5F5] transition-colors"
-            >
-              查看更多
-            </Link>
-          </div>
-        </div>
-      </section>
+      <OtherEventsSection />
     </main>
   );
 }

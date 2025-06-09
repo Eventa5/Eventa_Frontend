@@ -61,17 +61,19 @@ export const EventCard = ({
       className={cardClassName}
     >
       <div className={imageClassName}>
-        <Image
-          src={imageUrl}
-          alt={title}
-          fill
-          sizes={
-            size === "sm"
-              ? "(max-width: 768px) 164px, (max-width: 1280px) 50vw, 33vw"
-              : "(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-          }
-          className="object-cover group-hover:scale-105 transition-transform duration-300 shrink-0"
-        />
+        {imageUrl && (
+          <Image
+            src={imageUrl}
+            alt={title}
+            fill
+            sizes={
+              size === "sm"
+                ? "(max-width: 768px) 164px, (max-width: 1280px) 50vw, 33vw"
+                : "(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+            }
+            className="object-cover group-hover:scale-105 transition-transform duration-300 shrink-0"
+          />
+        )}
         <div className="hidden md:block bg-[#FFFFFF33] w-full h-full absolute left-0 top-0 group-hover:bg-transparent duration-200" />
       </div>
 

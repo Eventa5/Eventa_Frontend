@@ -1,6 +1,9 @@
 "use client";
 
+import { getApiV1ActivitiesPopular } from "@/services/api/client/sdk.gen";
+import type { ActivitiesResponse } from "@/services/api/client/types.gen";
 import { Swiper, SwiperSlide } from "swiper/react";
+import useSWR from "swr";
 import { EventCard } from "./event-cards";
 
 interface Event {
@@ -11,11 +14,28 @@ interface Event {
   imageUrl: string;
 }
 
-interface HotEventsSectionProps {
-  events: Event[];
-}
+export default function HotEventsSection() {
+  const { data, error, isLoading } = useSWR("popular-activities", async () => {
+    const response = await getApiV1ActivitiesPopular();
+    return response.data?.data || [];
+  });
 
-export default function HotEventsSection({ events }: HotEventsSectionProps) {
+  if (isLoading) {
+    return <div className="w-full h-[400px] flex items-center justify-center">載入中...</div>;
+  }
+
+  if (error) {
+    return <div className="w-full h-[400px] flex items-center justify-center">載入失敗</div>;
+  }
+
+  const events: Event[] = (data || []).map((activity: ActivitiesResponse) => ({
+    id: String(activity.id || 0),
+    title: activity.title || "",
+    location: activity.location || "",
+    date: activity.startTime || "",
+    imageUrl: activity.cover || "",
+  }));
+
   return (
     <>
       {/* 手機版使用 Swiper */}
