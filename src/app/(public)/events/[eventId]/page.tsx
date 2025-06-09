@@ -9,6 +9,7 @@ import {
 import type { ActivityResponse, OrganizationResponse } from "@/services/api/client/types.gen";
 import { useAuthStore } from "@/store/auth";
 import { useDialogStore } from "@/store/dialog";
+import { useSearchStore } from "@/store/search";
 import { format, parseISO } from "date-fns";
 import { zhTW } from "date-fns/locale";
 import DOMPurify from "dompurify";
@@ -43,6 +44,7 @@ export default function EventDetailPage() {
   const [organization, setOrganization] = useState<OrganizationResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const setSearchValue = useSearchStore((s) => s.setSearchValue);
 
   useEffect(() => {
     if (!eventId) return;
@@ -208,12 +210,17 @@ export default function EventDetailPage() {
               <div className="flex flex-wrap gap-2">
                 {eventData?.tags?.length &&
                   eventData.tags.map((tag) => (
-                    <span
+                    <button
                       key={tag}
-                      className="border border-neutral-500 rounded-full px-4 py-1 text-neutral-500 text-base sm:text-sm"
+                      type="button"
+                      onClick={() => {
+                        router.push(`/events?search=${tag}`);
+                        setSearchValue(tag);
+                      }}
+                      className="border border-neutral-500 rounded-full px-4 py-1 text-neutral-500 text-base sm:text-sm cursor-pointer"
                     >
                       #{tag}
-                    </span>
+                    </button>
                   ))}
               </div>
               <Separator />
