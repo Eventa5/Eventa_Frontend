@@ -216,7 +216,7 @@ export default function Header() {
               >
                 <button
                   type="button"
-                  onClick={() => setMobileUserMenuOpen(!mobileUserMenuOpen)}
+                  onClick={() => setMenuOpen(!menuOpen)}
                   className="flex items-center gap-2 cursor-pointer"
                 >
                   {userProfile?.avatar ? (
@@ -381,7 +381,7 @@ export default function Header() {
                           onClick={(e) => {
                             e.preventDefault();
                             setMobileMenuOpen(false);
-                            setMenuOpen(false);
+                            setMobileUserMenuOpen(false);
                             setTimeout(() => {
                               router.push("/attendee/orders");
                             }, 0);
@@ -398,7 +398,7 @@ export default function Header() {
                           onClick={(e) => {
                             e.preventDefault();
                             setMobileMenuOpen(false);
-                            setMenuOpen(false);
+                            setMobileUserMenuOpen(false);
                             setTimeout(() => {
                               router.push("/attendee/profile");
                             }, 0);
@@ -415,7 +415,7 @@ export default function Header() {
                           onClick={(e) => {
                             e.preventDefault();
                             setMobileMenuOpen(false);
-                            setMenuOpen(false);
+                            setMobileUserMenuOpen(false);
                           }}
                         >
                           <Settings className="w-4 h-4 mr-3 text-gray-500" />
@@ -443,7 +443,7 @@ export default function Header() {
                     onClick={() => {
                       logout();
                       setMobileMenuOpen(false);
-                      setMenuOpen(false);
+                      setMobileUserMenuOpen(false);
                       router.push("/");
                     }}
                   >

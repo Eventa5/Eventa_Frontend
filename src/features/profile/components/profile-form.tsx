@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/select";
 import { profileFormSchema } from "@/features/profile/schemas";
 import { postApiV1UsersProfileAvatar, putApiV1UsersProfile } from "@/services/api/client/sdk.gen";
-import type { UserResponse } from "@/services/api/client/types.gen";
 import { useAuthStore } from "@/store/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isAfter, isBefore, subYears } from "date-fns";
@@ -34,10 +33,6 @@ import { toast } from "sonner";
 import type { z } from "zod";
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
-
-interface ProfileFormProps {
-  initialData: UserResponse;
-}
 
 interface DropdownProps {
   options?: Array<{
@@ -169,12 +164,12 @@ function CountryCodeSelect({
 }
 
 export default function ProfileForm() {
-  const userProfile = useAuthStore((s) => s.userProfile);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
+  const userProfile = useAuthStore((state) => state.userProfile);
 
   const today = new Date();
   const minBirthDate = subYears(today, 120);
@@ -191,7 +186,7 @@ export default function ProfileForm() {
       phoneNumber: userProfile?.phoneNumber || "",
       birthday: userProfile?.birthday ? toLocalDateOnly(userProfile.birthday) : defaultBirthDate,
       gender: (userProfile?.gender as "male" | "female" | "nonBinary") || "male",
-      region: userProfile?.region || "",
+      region: userProfile?.region || "新北市",
       address: userProfile?.address || "",
       identity: (userProfile?.identity as "general" | "student" | "retiree") || "general",
       avatar: userProfile?.avatar || "",
