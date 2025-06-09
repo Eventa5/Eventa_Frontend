@@ -47,7 +47,12 @@ export default function OtherEventsSection() {
 
   useEffect(() => {
     if (events) {
-      setAllEvents((prev) => [...prev, ...events]);
+      setAllEvents((prev) => {
+        const newEvents = events.filter(
+          (event) => !prev.some((prevEvent) => prevEvent.id === event.id)
+        );
+        return [...prev, ...newEvents];
+      });
     }
   }, [events]);
 
@@ -89,7 +94,7 @@ export default function OtherEventsSection() {
         <div className="grid grid-cols-1 md:grid-cols-[repeat(2,_302px)] lg:grid-cols-[repeat(3,_302px)] 2xl:grid-cols-[repeat(4,_302px)] gap-6 justify-items-center">
           {allEvents.map((event) => (
             <EventCard
-              key={event.id}
+              key={`event-${event.id}-${event.startTime}`}
               id={String(event.id)}
               title={event.title || ""}
               location={event.location || ""}

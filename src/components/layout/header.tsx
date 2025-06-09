@@ -37,6 +37,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileAuthOpen, setMobileAuthOpen] = useState(false);
+  const [mobileUserMenuOpen, setMobileUserMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const mobileAuthRef = useRef<HTMLDivElement>(null);
@@ -215,7 +216,7 @@ export default function Header() {
               >
                 <button
                   type="button"
-                  onClick={() => setMenuOpen(!menuOpen)}
+                  onClick={() => setMobileUserMenuOpen(!mobileUserMenuOpen)}
                   className="flex items-center gap-2 cursor-pointer"
                 >
                   {userProfile?.avatar ? (
@@ -370,19 +371,79 @@ export default function Header() {
               <div className="">
                 <div className="border-t border-gray-200 my-8" />
 
+                {mobileUserMenuOpen && (
+                  <div className="mb-4 border-b border-gray-200">
+                    <ul className="py-2">
+                      <li>
+                        <Link
+                          href="/attendee/orders"
+                          className="flex items-center cursor-pointer px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setMobileMenuOpen(false);
+                            setMenuOpen(false);
+                            setTimeout(() => {
+                              router.push("/attendee/orders");
+                            }, 0);
+                          }}
+                        >
+                          <Ticket className="w-4 h-4 mr-3 text-gray-500" />
+                          訂單管理
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          href="/attendee/profile"
+                          className="flex items-center cursor-pointer px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setMobileMenuOpen(false);
+                            setMenuOpen(false);
+                            setTimeout(() => {
+                              router.push("/attendee/profile");
+                            }, 0);
+                          }}
+                        >
+                          <User className="w-4 h-4 mr-3 text-gray-500" />
+                          會員中心
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          href="#"
+                          className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setMobileMenuOpen(false);
+                            setMenuOpen(false);
+                          }}
+                        >
+                          <Settings className="w-4 h-4 mr-3 text-gray-500" />
+                          帳號管理
+                        </Link>
+                      </li>
+                    </ul>
+                  </div>
+                )}
+
                 <div className="flex items-end justify-between px-4">
-                  <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    className="flex items-center gap-2 cursor-pointer"
+                    onClick={() => setMobileUserMenuOpen(!mobileUserMenuOpen)}
+                  >
                     <div className="bg-neutral-800 p-3 rounded-full flex items-center justify-center">
                       <User className="w-4 h-4 text-white" />
                     </div>
                     <span className="text-sm">{userProfile?.displayName || "使用者"}</span>
-                  </div>
+                  </button>
                   <button
                     type="button"
                     className="border border-neutral-400 rounded-lg px-4 py-3 text-xs text-neutral-600 cursor-pointer"
                     onClick={() => {
                       logout();
                       setMobileMenuOpen(false);
+                      setMenuOpen(false);
                       router.push("/");
                     }}
                   >
