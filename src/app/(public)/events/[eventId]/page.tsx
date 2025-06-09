@@ -2,8 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { getApiV1ActivitiesByActivityId } from "@/services/api/client/sdk.gen";
-import type { ActivityResponse } from "@/services/api/client/types.gen";
+import {
+  getApiV1ActivitiesByActivityId,
+  getApiV1OrganizationsByOrganizationId,
+} from "@/services/api/client/sdk.gen";
+import type { ActivityResponse, OrganizationResponse } from "@/services/api/client/types.gen";
 import { useAuthStore } from "@/store/auth";
 import { useDialogStore } from "@/store/dialog";
 import { format, parseISO } from "date-fns";
@@ -37,6 +40,7 @@ export default function EventDetailPage() {
   const setLoginTab = useDialogStore((s) => s.setLoginTab);
   const router = useRouter();
   const [eventData, setEventData] = useState<ActivityResponse | null>(null);
+  const [organization, setOrganization] = useState<OrganizationResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -50,6 +54,15 @@ export default function EventDetailPage() {
       .then((res) => {
         setEventData(res.data?.data ?? null);
         if (!res.data?.data) setError("查無此活動");
+        const orgId = res.data?.data?.organizationId;
+        if (orgId) {
+          getApiV1OrganizationsByOrganizationId({
+            path: { organizationId: Number(orgId) },
+          }).then((orgRes) => {
+            console.log(orgRes.data?.data);
+            setOrganization(orgRes.data?.data ?? null);
+          });
+        }
       })
       .catch(() => setError("載入活動資料失敗"))
       .finally(() => setLoading(false));
@@ -229,19 +242,23 @@ export default function EventDetailPage() {
                   相關連結
                 </span>
                 <a
-                  href="https://www.facebook.com"
+                  href={organization?.officialSiteUrl ? organization.officialSiteUrl : "#"}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-neutral-800 underline"
+                  className={`text-neutral-800 underline ${
+                    organization?.officialSiteUrl ? "" : "opacity-50 pointer-events-none"
+                  }`}
+                  aria-label="主辦單位官方網站"
+                  aria-disabled={!organization?.officialSiteUrl}
                 >
-                  心樂山螢火蟲保護園區粉絲專頁
+                  {organization?.name}
                 </a>
               </div>
               {/* 手機版主辦單位資訊 */}
               <div className="w-full bg-neutral-800 rounded-lg p-8 flex gap-4 items-center justify-between md:hidden">
                 <div className="flex flex-col items-center gap-4 ">
                   <div className="flex flex-col items-start">
-                    <span className="font-bold text-lg text-white">心樂山螢火蟲保護園區</span>
+                    <span className="font-bold text-lg text-white">{organization?.name}</span>
                     <span className="text-sm text-[#E5E5E5]">Xinyue Firefly Reserve</span>
                   </div>
                   <div className="flex gap-10 mt-2">
@@ -251,22 +268,34 @@ export default function EventDetailPage() {
                     >
                       <HeartIcon />
                     </button>
-                    <button
-                      type="button"
-                      className="text-white cursor-pointer"
+                    <a
+                      href={organization?.officialSiteUrl ? organization.officialSiteUrl : "#"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`text-white cursor-pointer ${
+                        organization?.officialSiteUrl ? "" : "opacity-50 pointer-events-none"
+                      }`}
+                      aria-label="主辦單位官方網站"
+                      aria-disabled={!organization?.officialSiteUrl}
                     >
                       <Facebook />
-                    </button>
-                    <button
-                      type="button"
-                      className="text-white cursor-pointer"
+                    </a>
+                    <a
+                      href={organization?.email ? `mailto:${organization.email}` : "#"}
+                      className={`text-white cursor-pointer ${
+                        organization?.email ? "" : "opacity-50 pointer-events-none"
+                      }`}
                     >
                       <Mail />
-                    </button>
+                    </a>
                   </div>
                 </div>
                 <Image
-                  src="/images/single_activity_avatar.png"
+                  src={
+                    organization?.avatar
+                      ? organization.avatar
+                      : "/images/single_activity_avatar.png"
+                  }
                   alt="主辦單位頭貼"
                   width={90}
                   height={90}
@@ -409,14 +438,16 @@ export default function EventDetailPage() {
           <div className="bg-neutral-800 rounded-lg p-6 flex flex-col gap-4 items-center">
             <div className="flex items-center gap-4">
               <Image
-                src="/images/single_activity_avatar.png"
+                src={
+                  organization?.avatar ? organization.avatar : "/images/single_activity_avatar.png"
+                }
                 alt="主辦單位頭貼"
                 width={48}
                 height={48}
                 className="rounded-full"
               />
               <div className="flex flex-col items-start">
-                <span className="font-bold text-lg text-white">心樂山螢火蟲保護園區</span>
+                <span className="font-bold text-lg text-white">{organization?.name}</span>
                 <span className="text-sm text-[#E5E5E5]">Xinyue Firefly Reserve</span>
               </div>
             </div>
@@ -437,18 +468,28 @@ export default function EventDetailPage() {
               >
                 <HeartIcon />
               </button>
-              <button
-                type="button"
-                className="text-white cursor-pointer"
+              <a
+                href={organization?.officialSiteUrl ? organization.officialSiteUrl : "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`text-white cursor-pointer ${
+                  organization?.officialSiteUrl ? "" : "opacity-50 pointer-events-none"
+                }`}
+                aria-label="主辦單位官方網站"
+                aria-disabled={!organization?.officialSiteUrl}
               >
                 <Facebook />
-              </button>
-              <button
-                type="button"
-                className="text-white cursor-pointer"
+              </a>
+              <a
+                href={organization?.email ? `mailto:${organization.email}` : "#"}
+                className={`text-white cursor-pointer ${
+                  organization?.email ? "" : "opacity-50 pointer-events-none"
+                }`}
+                aria-label="寄信給主辦單位"
+                aria-disabled={!organization?.email}
               >
                 <Mail />
-              </button>
+              </a>
             </div>
           </div>
           {/* 活動熱度 */}
