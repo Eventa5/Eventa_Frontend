@@ -253,7 +253,7 @@ export default function EventsPage() {
               討論度最高的熱門活動都在這裡！
             </p>
           </div>
-          <HotEventsSection events={hotEvents} />
+          <HotEventsSection />
         </div>
       </section>
       {/* 其他活動（搜尋時以外才顯示） */}
