@@ -6,6 +6,8 @@ import { getApiV1ActivitiesByActivityId } from "@/services/api/client/sdk.gen";
 import type { ActivityResponse } from "@/services/api/client/types.gen";
 import { useAuthStore } from "@/store/auth";
 import { useDialogStore } from "@/store/dialog";
+import { format, parseISO } from "date-fns";
+import { zhTW } from "date-fns/locale";
 import { Loader } from "lucide-react";
 import {
   Calendar,
@@ -63,6 +65,25 @@ export default function EventDetailPage() {
       toast.error("請先登入才能購票");
     }
   };
+
+  function formatEventDate(start?: string, end?: string) {
+    if (!start || !end) return "--";
+    const startDate = parseISO(start);
+    const endDate = parseISO(end);
+    const startStr = `${format(startDate, "yyyy.MM.dd", {
+      locale: zhTW,
+    })}（${format(startDate, "EEEE", { locale: zhTW }).replace(
+      "星期",
+      ""
+    )}）${format(startDate, "HH:mm")}`;
+    const endStr = `${format(endDate, "yyyy.MM.dd", {
+      locale: zhTW,
+    })}（${format(endDate, "EEEE", { locale: zhTW }).replace(
+      "星期",
+      ""
+    )}）${format(endDate, "HH:mm")}`;
+    return `${startStr} - ${endStr} (GMT+8)`;
+  }
 
   return loading ? (
     // 載入中
@@ -180,7 +201,7 @@ export default function EventDetailPage() {
                 </span>
                 <span className="text-neutral-800">
                   {eventData?.startTime && eventData?.endTime
-                    ? `${eventData.startTime} - ${eventData.endTime}`
+                    ? formatEventDate(eventData.startTime, eventData.endTime)
                     : "--"}
                 </span>
                 <button
