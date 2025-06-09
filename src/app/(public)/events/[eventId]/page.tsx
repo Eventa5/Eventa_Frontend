@@ -6,6 +6,7 @@ import { getApiV1ActivitiesByActivityId } from "@/services/api/client/sdk.gen";
 import type { ActivityResponse } from "@/services/api/client/types.gen";
 import { useAuthStore } from "@/store/auth";
 import { useDialogStore } from "@/store/dialog";
+import { Loader } from "lucide-react";
 import {
   Calendar,
   Cone,
@@ -63,7 +64,23 @@ export default function EventDetailPage() {
     }
   };
 
-  return (
+  return loading ? (
+    // 載入中
+    <div className="min-h-screen flex items-center justify-center bg-primary-50 -mt-10">
+      <Loader className="animate-spin w-10 h-10 text-primary-500" />
+    </div>
+  ) : error ? (
+    // 錯誤頁面顯示
+    <div className="min-h-screen flex flex-col items-center justify-center text-2xl font-bold text-neutral-500 bg-primary-50 -mt-10">
+      {error}
+      <Image
+        src="/images/error.png"
+        alt="error"
+        width={400}
+        height={400}
+      />
+    </div>
+  ) : (
     <div className="min-h-screen flex flex-col bg-primary-50 px-4 pt-4 pb-24 relative -mt-10 overflow-x-hidden">
       {/* Banner區塊：手機滿版，桌機維持原本寬度 */}
       <div className="relative">
@@ -115,7 +132,7 @@ export default function EventDetailPage() {
           ))}
         </div>
         <h1 className="font-black text-3xl font-serif-tc md:text-5xl text-[#000] leading-tight">
-          {loading ? "載入中..." : error ? error : (eventData?.title ?? "無標題")}
+          {eventData?.title ?? "無標題"}
         </h1>
       </div>
       {/* 主內容與右側資訊欄雙欄排版 */}
