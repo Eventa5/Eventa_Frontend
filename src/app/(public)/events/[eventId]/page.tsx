@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import TicketGuideDialog from "@/features/activities/components/ticket-guide-dialog";
 import {
   getApiV1ActivitiesByActivityId,
   getApiV1OrganizationsByOrganizationId,
@@ -45,6 +46,7 @@ export default function EventDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const setSearchValue = useSearchStore((s) => s.setSearchValue);
+  const [showTicketGuide, setShowTicketGuide] = useState(false);
 
   useEffect(() => {
     if (!eventId) return;
@@ -357,13 +359,25 @@ export default function EventDetailPage() {
                       : "實際入場相關規定以活動主辦方為主"}
                   </span>
                 </div>
-                <button
-                  type="button"
-                  className="flex items-center gap-1 text-base text-primary-700 font-bold cursor-pointer mt-2 md:mt-0"
-                >
-                  <InfoIcon className="w-5 h-5" />
-                  如何取票
-                </button>
+                {/* 線下活動才顯示如何取票 */}
+                {!eventData?.isOnline && (
+                  <button
+                    type="button"
+                    className="flex items-center gap-1 text-sm text-primary-700 font-bold cursor-pointer mt-2 md:mt-0"
+                    onClick={() => {
+                      setShowTicketGuide(true);
+                    }}
+                  >
+                    <InfoIcon className="w-5 h-5" />
+                    如何取票
+                  </button>
+                )}
+                <TicketGuideDialog
+                  open={showTicketGuide}
+                  onClose={() => {
+                    setShowTicketGuide(false);
+                  }}
+                />
               </div>
             </div>
           </section>
