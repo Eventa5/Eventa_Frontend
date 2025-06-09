@@ -2,6 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { getApiV1ActivitiesByActivityId } from "@/services/api/client/sdk.gen";
+import type { ActivityResponse } from "@/services/api/client/types.gen";
 import { useAuthStore } from "@/store/auth";
 import { useDialogStore } from "@/store/dialog";
 import {
@@ -19,6 +21,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function EventDetailPage() {
@@ -28,9 +31,27 @@ export default function EventDetailPage() {
   const setLoginDialogOpen = useDialogStore((s) => s.setLoginDialogOpen);
   const setLoginTab = useDialogStore((s) => s.setLoginTab);
   const router = useRouter();
+  const [eventData, setEventData] = useState<ActivityResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!eventId) return;
+    setLoading(true);
+    setError(null);
+    getApiV1ActivitiesByActivityId({
+      path: { activityId: Number(eventId) },
+    })
+      .then((res) => {
+        setEventData(res.data?.data ?? null);
+        if (!res.data?.data) setError("查無此活動");
+      })
+      .catch(() => setError("載入活動資料失敗"))
+      .finally(() => setLoading(false));
+  }, [eventId]);
 
   // 活動地點變數
-  const eventLocation = "苗栗縣大埔鄉興正路 121 巷 8 弄 20 號";
+  const eventLocation = eventData?.location || "";
 
   const handleCheckout = () => {
     if (isAuthenticated) {
@@ -72,32 +93,29 @@ export default function EventDetailPage() {
       <div className="flex justify-center items-center bg-[#FFD56B] md:hidden w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] relative">
         <div className="flex items-center gap-1 justify-center w-1/2">
           <EyeIcon className="w-5 h-5 text-neutral-700" />
-          <span className="text-neutral-700 text-sm font-bold">1,473 人</span>
+          <span className="text-neutral-700 text-sm font-bold">{eventData?.viewCount ?? 0} 人</span>
         </div>
         <div className="h-8 w-px bg-neutral-700 mx-2" />
         <div className="flex items-center gap-1 justify-center w-1/2">
           <HeartIcon className="w-5 h-5 text-neutral-700" />
-          <span className="text-neutral-700 text-sm font-bold">66 人</span>
+          <span className="text-neutral-700 text-sm font-bold">{eventData?.likeCount ?? 0} 人</span>
         </div>
       </div>
       {/* 標題與標籤區塊 */}
       <div className="w-full max-w-[1280px] mx-auto px-4 pt-10 sm:pt-10 sm:pb-6">
         <div className="flex gap-4 mb-4">
-          <Link
-            href="/events"
-            className="bg-secondary-100 text-secondary-500 rounded-lg py-2 px-3 sm:px-6 font-bold text-sm md:text-base"
-          >
-            精選
-          </Link>
-          <Link
-            href="/events"
-            className="bg-secondary-100 text-secondary-500 rounded-lg py-2 px-3 sm:px-6 font-bold text-sm md:text-base"
-          >
-            線下活動
-          </Link>
+          {eventData?.categories?.map((category) => (
+            <Link
+              key={category.id}
+              href="/events"
+              className="bg-secondary-100 text-secondary-500 rounded-lg py-2 px-3 sm:px-6 font-bold text-sm md:text-base"
+            >
+              {category.name}
+            </Link>
+          ))}
         </div>
         <h1 className="font-black text-3xl font-serif-tc md:text-5xl text-[#000] leading-tight">
-          2025 心樂山林星光夜祭 · 初夏閃耀夢樂園
+          {loading ? "載入中..." : error ? error : (eventData?.title ?? "無標題")}
         </h1>
       </div>
       {/* 主內容與右側資訊欄雙欄排版 */}
@@ -123,21 +141,18 @@ export default function EventDetailPage() {
             <div className="flex-1 flex flex-col gap-10">
               {/* 關於活動 */}
               <p className="text-neutral-800 leading-relaxed mt-0 sm:mt-16">
-                非集團同仁也可報名本年度心樂山林螢火蟲季初夏螢光遊樂園，開放喜愛大自然的您入園夜觀賞如同星空閃耀的流螢！還有美味餐食及滿滿親子活動：繪本故事屋、兒童手作、蟲舞燈光秀，一起和孩子度過難忘的螢火蟲時光吧✨
+                {eventData?.summary ?? ""}
               </p>
               <div className="flex flex-wrap gap-2">
-                <span className="border border-neutral-500 rounded-full px-4 py-1 text-neutral-500 text-base sm:text-sm">
-                  #螢火蟲
-                </span>
-                <span className="border border-neutral-500 rounded-full px-4 py-1 text-neutral-500 text-base sm:text-sm">
-                  #生態導覽
-                </span>
-                <span className="border border-neutral-500 rounded-full px-4 py-1 text-neutral-500 text-base sm:text-sm">
-                  #賞螢
-                </span>
-                <span className="border border-neutral-500 rounded-full px-4 py-1 text-neutral-500 text-base sm:text-sm">
-                  #親子活動
-                </span>
+                {eventData?.tags?.length &&
+                  eventData.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="border border-neutral-500 rounded-full px-4 py-1 text-neutral-500 text-base sm:text-sm"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
               </div>
               <Separator />
               {/* 活動資訊表格 */}
@@ -147,7 +162,9 @@ export default function EventDetailPage() {
                   活動時間
                 </span>
                 <span className="text-neutral-800">
-                  2025.04.19 (六) 14:30 - 05.10 (六)20:30 (GMT+8)
+                  {eventData?.startTime && eventData?.endTime
+                    ? `${eventData.startTime} - ${eventData.endTime}`
+                    : "--"}
                 </span>
                 <button
                   type="button"
@@ -318,49 +335,7 @@ export default function EventDetailPage() {
               </span>
             </div>
             <div className="flex flex-col gap-2 mt-0 sm:mt-16">
-              <h2 className="font-bold text-lg text-neutral-800">
-                2025 心樂山林親子螢火蟲季 ✧ 初夏星夜夢樂園
-              </h2>
-              <p className="text-base text-[#525252]">
-                ❚ ❚ ❚ ❚ ❚ 單日賞螢門票開賣中 .ᐟ.ᐟ
-                在星光閃爍的夏夜裡，和寶貝牽著手，一起走進被山林擁抱的心樂園歡迎喜愛大自然的您，一同漫步於山林間與萬點閃爍螢光共舞✨
-                螢火蟲悄悄飛舞，點亮孩子的笑容，也照亮你的童年記憶我們準備了溫馨的親子繪本共讀、自然探索體驗，還有最夢幻的蟲舞燈✨
-              </p>
-              <h3 className="font-bold text-base text-neutral-800 mt-2">
-                ✸ 初夏星夜夢樂園 — 主題活動日 ✸
-              </h3>
-              <ul className="list-none pl-6 text-base text-[#525252]">
-                <li>
-                  ⊛ 自然教育—繪本故事屋
-                  渺小的亮亮，最後是否能像大大的月亮，讓其他動物注意到牠的與眾不同呢？一起來聽精彩的故事《亮亮想要當月亮》。
-                </li>
-                <li>⊛ 兒童手作—閃閃螢光翼 陪著寶貝一起動手做，把夏夜記憶變成閃閃發亮的火金姑！</li>
-                <li>
-                  ⊛ 活力搖擺—蟲舞燈光秀
-                  閃亮亮集合囉！牽著小手，在星空下奔跑、發光，一起點亮屬於家的螢光派對🌙
-                </li>
-                <li>
-                  ⊛ 達人帶路—夜觀賞流螢
-                  當夜空輕輕蓋上山林，螢火蟲便點亮他們的魔法燈籠，引領大小朋友踏上奇幻旅程。跟著森林導師，一起解開螢光的奧祕咒語。途中還有機會遇見神出鬼沒的穿山甲、唱情歌的樹蛙與樹頂守夜的貓頭鷹，一場夏夜森林的奇幻派對，就等你加入！
-                </li>
-              </ul>
-              <Image
-                src="/images/single_activity_img.png"
-                alt="Ballon Yellow"
-                width={845}
-                height={400}
-                className="rounded-[16px] my-10"
-              />
-              <p className="text-base text-[#525252]">⌒⌒⌒⍋⍋⌒⌒⌒⍋⍋⌒⌒⌒⍋⍋⌒⌒⌒⍋⍋⌒⌒⌒​</p>
-              <h3 className="font-bold text-base text-neutral-800 mt-2">
-                ✸ 初夏螢光遊樂園 — 主題活動日 ✸
-              </h3>
-              <ul className="list-none pl-6 text-base text-[#525252]">
-                <li>⊛ 地點：心樂山螢火蟲保護園區（苗栗縣大埔鄉興正路121巷8弄20號）</li>
-                <li>⊛ 主題活動梯次&時程表：04/19 ㊅、04/26 ㊅、05/03 ㊅、05/10 ㊅</li>
-                <li>⊛ 活動時間：下午 15:00 至晚間 20:20</li>
-                <li>⊛ 入園時間：下午 14:30 後，不開放提前入園。</li>
-              </ul>
+              <p className="text-base text-[#525252]">{eventData?.descriptionMd ?? ""}</p>
             </div>
           </section>
         </div>
@@ -416,7 +391,7 @@ export default function EventDetailPage() {
             <div className="flex flex-col items-center gap-2">
               <div className="flex items-center gap-2">
                 <EyeIcon className="w-5 h-5 text-neutral-500" />
-                <span className="text-neutral-500 font-bold">1,473 人</span>
+                <span className="text-neutral-500 font-bold">{eventData?.viewCount ?? 0} 人</span>
               </div>
               <span className="text-neutral-500">正在關注活動</span>
             </div>
@@ -425,7 +400,7 @@ export default function EventDetailPage() {
             <div className="flex flex-col items-center gap-2">
               <div className="flex items-center gap-2">
                 <HeartIcon className="w-5 h-5 text-neutral-500" />
-                <span className="text-neutral-500 font-bold">66 人</span>
+                <span className="text-neutral-500 font-bold"> {eventData?.likeCount ?? 0} 人</span>
               </div>
               <span className="text-neutral-500">喜歡這場活動</span>
             </div>
