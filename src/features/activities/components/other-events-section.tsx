@@ -1,5 +1,6 @@
 "use client";
 import { EventCard } from "@/components/ui/event-cards";
+import { formatEventDate } from "@/features/activities/formatEventDate";
 import { getApiV1Activities } from "@/services/api/client/sdk.gen";
 import type { ActivitiesResponse } from "@/services/api/client/types.gen";
 import Image from "next/image";
@@ -68,7 +69,7 @@ export default function OtherEventsSection() {
   };
 
   if (isLoading && page === 1) {
-    return <div>載入中...</div>;
+    return <div className="text-center text-2xl font-bold py-2">載入中...</div>;
   }
 
   if (error) {
@@ -98,7 +99,7 @@ export default function OtherEventsSection() {
               id={String(event.id)}
               title={event.title || ""}
               location={event.location || ""}
-              date={`${event.startTime || ""} - ${event.endTime || ""}`}
+              date={formatEventDate(event.startTime || "", event.endTime || "")}
               imageUrl={event.cover || ""}
               size="sm"
             />

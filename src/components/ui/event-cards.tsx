@@ -28,8 +28,8 @@ export const EventCard = ({
   // 預設樣式與依據尺寸的樣式組合
   const styles = {
     card: {
-      base: "rounded-t-[30px] w-[253px] md:w-[324px] 2xl:w-[411px]",
-      sm: "flex-row md:flex-col rounded-tl-[20px] rounded-bl-[20px] md:rounded-bl-none md:rounded-t-[30px] md:w-full",
+      base: "rounded-t-[30px] w-[253px] md:w-[324px] 2xl:w-[411px] h-full",
+      sm: "flex-row md:flex-col rounded-tl-[20px] rounded-bl-[20px] md:rounded-bl-none md:rounded-t-[30px] md:w-full h-full",
     },
     image: {
       base: "h-[148px] md:h-[200px] 2xl:h-[274px] w-full",
@@ -44,16 +44,16 @@ export const EventCard = ({
       sm: "!text-[14px] !leading-5",
     },
     titleContainer: {
-      base: "px-2 h-[54px]",
-      sm: "px-2 md:h-[54px]",
+      base: "px-2 h-[54px] grow",
+      sm: "px-2 md:grow md:h-[54px]",
     },
   };
 
   const cardClassName = `flex flex-col relative overflow-hidden flex-shrink-0 group ${styles.card[size]}`;
 
-  const imageClassName = `relative overflow-hidden ${styles.image[size]}`;
+  const imageClassName = `relative overflow-hidden ${styles.image[size]} shrink-0`;
 
-  const contentClassName = `flex flex-col gap-2 p-4 md:p-6 bg-white ${styles.content[size]}`;
+  const contentClassName = `flex flex-col gap-2 p-4 md:p-6 bg-white grow ${styles.content[size]}`;
 
   return (
     <Link
@@ -61,7 +61,7 @@ export const EventCard = ({
       className={cardClassName}
     >
       <div className={imageClassName}>
-        {imageUrl && (
+        {imageUrl ? (
           <Image
             src={imageUrl}
             alt={title}
@@ -73,14 +73,21 @@ export const EventCard = ({
             }
             className="object-cover group-hover:scale-105 transition-transform duration-300 shrink-0"
           />
+        ) : (
+          <div className="bg-neutral-600 group-hover:bg-neutral-600/50 w-full h-full absolute left-0 top-0  duration-200" />
         )}
-        <div className="hidden md:block bg-[#FFFFFF33] w-full h-full absolute left-0 top-0 group-hover:bg-transparent duration-200" />
       </div>
 
       <div className={contentClassName}>
         {/* 地點標籤 */}
-        <div className="inline-flex bg-[#FDF1ED] rounded-lg py-1 px-2 w-fit">
-          <span className="text-[#F07348] text-sm tracking-wider">{location}</span>
+        <div
+          className={`inline-flex rounded-lg py-1 px-2 w-fit ${location ? "bg-[#FDF1ED]" : "bg-primary-300"}`}
+        >
+          <span
+            className={`${location ? "text-[#F07348]" : "text-center text-primary-900"} text-sm tracking-wider`}
+          >
+            {location ? location : "線上活動"}
+          </span>
         </div>
 
         {/* 標題 */}
@@ -90,14 +97,12 @@ export const EventCard = ({
           </h3>
         </div>
 
-        {/* 分隔線 - 只在 base 尺寸顯示 */}
         {size !== "sm" && <div className="border-t border-[#E5E5E5] my-1" />}
 
-        {/* 日期區塊 - 只在 base 尺寸顯示 */}
         {size !== "sm" && (
           <div className="flex items-center gap-2 px-2 text-[#A3A3A3]">
             <Calendar className="w-4 h-4 shrink-0 stroke-[#A3A3A3]" />
-            <span className="text-sm h-[40px]">{date}</span>
+            <span className="text-sm">{date}</span>
           </div>
         )}
       </div>

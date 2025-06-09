@@ -1,5 +1,6 @@
 "use client";
 
+import { formatEventDate } from "@/features/activities/formatEventDate";
 import { getApiV1ActivitiesPopular } from "@/services/api/client/sdk.gen";
 import type { ActivitiesResponse } from "@/services/api/client/types.gen";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -32,7 +33,7 @@ export default function HotEventsSection() {
     id: String(activity.id || 0),
     title: activity.title || "",
     location: activity.location || "",
-    date: activity.startTime || "",
+    date: formatEventDate(activity.startTime || "", activity.endTime || ""),
     imageUrl: activity.cover || "",
   }));
 
@@ -49,7 +50,7 @@ export default function HotEventsSection() {
           {events.map((event) => (
             <SwiperSlide
               key={event.id}
-              className="!w-[253px] shrink-0"
+              className="!w-[253px] !h-[340px] shrink-0"
             >
               <EventCard {...event} />
             </SwiperSlide>

@@ -1,7 +1,6 @@
 import { getApiV1Categories } from "@/services/api/client/sdk.gen";
 import type { CategoriesResponse } from "@/services/api/client/types.gen";
 import useSWR from "swr";
-console.log("typeof useSWR:", typeof useSWR); // 應該是 "function"
 
 // 類別資料的類型定義
 export type FormattedCategory = {
