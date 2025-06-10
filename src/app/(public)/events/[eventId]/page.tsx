@@ -135,7 +135,7 @@ export default function EventDetailPage() {
         {/* 手機版滿版 Banner */}
         <div className="block md:hidden relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
           <Image
-            src="/images/single_activity_cover.png"
+            src={eventData?.cover ? eventData.cover : "/images/no_single_activity_cover.png"}
             alt="活動 Banner"
             width={1680}
             height={840}
@@ -146,7 +146,7 @@ export default function EventDetailPage() {
         {/* 桌機版 Banner */}
         <div className="hidden md:block w-full max-w-[1680px] mx-auto rounded-2xl overflow-hidden">
           <Image
-            src="/images/single_activity_cover.png"
+            src={eventData?.cover ? eventData.cover : "/images/no_single_activity_cover.png"}
             alt="活動 Banner"
             width={1680}
             height={840}
