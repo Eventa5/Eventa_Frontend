@@ -281,11 +281,8 @@ export default function EventDetailPage() {
               </div>
               {/* 手機版主辦單位資訊 */}
               <div className="w-full bg-neutral-800 rounded-lg p-8 flex gap-4 items-center justify-between md:hidden">
-                <div className="flex flex-col items-center gap-4 ">
-                  <div className="flex flex-col items-start">
-                    <span className="font-bold text-lg text-white">{organization?.name}</span>
-                    <span className="text-sm text-[#E5E5E5]">Xinyue Firefly Reserve</span>
-                  </div>
+                <div className="flex flex-col items-start gap-4 ">
+                  <span className="font-bold text-lg text-white">{organization?.name}</span>
                   <div className="flex gap-10 mt-2">
                     <button
                       type="button"
@@ -483,10 +480,8 @@ export default function EventDetailPage() {
                 height={48}
                 className="rounded-full"
               />
-              <div className="flex flex-col items-start">
-                <span className="font-bold text-lg text-white">{organization?.name}</span>
-                <span className="text-sm text-[#E5E5E5]">Xinyue Firefly Reserve</span>
-              </div>
+
+              <span className="font-bold text-lg text-white">{organization?.name}</span>
             </div>
 
             <Button
