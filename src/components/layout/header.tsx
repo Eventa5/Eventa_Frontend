@@ -408,7 +408,7 @@ export default function Header() {
                           會員中心
                         </Link>
                       </li>
-                      <li>
+                      {/* <li>
                         <Link
                           href="#"
                           className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"
@@ -421,7 +421,7 @@ export default function Header() {
                           <Settings className="w-4 h-4 mr-3 text-gray-500" />
                           帳號管理
                         </Link>
-                      </li>
+                      </li> */}
                     </ul>
                   </div>
                 )}
