@@ -47,6 +47,7 @@ export default function EventDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const setSearchValue = useSearchStore((s) => s.setSearchValue);
   const [showTicketGuide, setShowTicketGuide] = useState(false);
+  const [liked, setLiked] = useState(false);
 
   useEffect(() => {
     if (!eventId) return;
@@ -57,6 +58,7 @@ export default function EventDetailPage() {
     })
       .then((res) => {
         setEventData(res.data?.data ?? null);
+        setLiked(res.data?.data?.userStatus?.isFavorited ?? false);
         if (!res.data?.data) setError("查無此活動");
         const orgId = res.data?.data?.organizationId;
         if (orgId) {
@@ -287,8 +289,12 @@ export default function EventDetailPage() {
                     <button
                       type="button"
                       className="text-white cursor-pointer"
+                      onClick={() => setLiked((prev) => !prev)}
                     >
-                      <HeartIcon />
+                      <HeartIcon
+                        fill={liked ? "currentColor" : "none"}
+                        className={`${liked ? "text-red-500" : ""}`}
+                      />
                     </button>
                     <a
                       href={organization?.officialSiteUrl ? organization.officialSiteUrl : "#"}
@@ -497,8 +503,12 @@ export default function EventDetailPage() {
               <button
                 type="button"
                 className="text-white cursor-pointer"
+                onClick={() => setLiked((prev) => !prev)}
               >
-                <HeartIcon />
+                <HeartIcon
+                  fill={liked ? "currentColor" : "none"}
+                  className={`${liked ? "text-red-500" : ""}`}
+                />
               </button>
               <a
                 href={organization?.officialSiteUrl ? organization.officialSiteUrl : "#"}
