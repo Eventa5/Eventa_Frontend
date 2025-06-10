@@ -174,11 +174,8 @@ export default function EventDetailPage() {
           {eventData?.categories?.map((category) => (
             <Link
               key={category.id}
-              href="/events"
+              href={`/events?category=${category.name}`}
               className="bg-secondary-100 text-secondary-500 rounded-lg py-2 px-3 sm:px-6 font-bold text-sm md:text-base"
-              onClick={() => {
-                setSearchValue(category.name ?? "");
-              }}
             >
               {category.name}
             </Link>
