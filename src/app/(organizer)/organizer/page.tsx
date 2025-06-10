@@ -121,20 +121,15 @@ export default function OrganizerHomePage() {
   };
 
   const onSubmit = async (data: CreateOrganizerFormData) => {
-    if (isSubmitting) return;
+    if (isSubmitting || !organizerInfo) return;
 
     setIsSubmitting(true);
 
     try {
-      const currentOrganizer = await fetchCurrentOrganizerInfo();
-      if (!currentOrganizer || !currentOrganizer.id) {
-        throw new Error("找不到主辦單位資訊");
-      }
-
       // 更新主辦單位
       const response = await putApiV1Organizations({
         body: {
-          id: currentOrganizer.id,
+          id: organizerInfo.id as number,
           name: data.organizerName,
           email: data.email,
           phoneNumber: data.phoneNumber,
@@ -154,7 +149,7 @@ export default function OrganizerHomePage() {
         try {
           const imageResponse = await postApiV1OrganizationsByOrganizationIdImages({
             path: {
-              organizationId: currentOrganizer.id,
+              organizationId: organizerInfo.id as number,
             },
             body: {
               avatar: avatarFile || undefined,
@@ -170,7 +165,8 @@ export default function OrganizerHomePage() {
           // 圖片上傳失敗不阻止主辦單位更新成功的流程
         }
       }
-
+      const newOrganizerInfo = await fetchCurrentOrganizerInfo();
+      setOrganizerInfo(newOrganizerInfo as OrganizationResponse);
       toast.success("主辦單位資料更新成功");
     } catch (error) {
       handleError(error);
@@ -245,7 +241,7 @@ export default function OrganizerHomePage() {
   return (
     <>
       <Toaster />
-      <div className="p-6">
+      <div className="p-6 md:py-0">
         <h1 className="text-2xl font-bold mb-6">主辦者中心總覽</h1>
       </div>
 
