@@ -6,8 +6,12 @@ export const formatEventDate = (startTime: string, endTime: string) => {
   const end = parseISO(endTime);
 
   // 移除「週」字的星期幾格式
-  const weekday = format(start, "eee", { locale: zhTW }).replace("週", "");
-  const startDate = `${format(start, "yyyy.MM.dd", { locale: zhTW })} (${weekday}) ${format(start, "HH:mm", { locale: zhTW })}`;
+  const weekdayStart = format(start, "eee", { locale: zhTW }).replace("週", "");
+  const weekdayEnd = format(end, "eee", { locale: zhTW }).replace("週", "");
+  const startDate = `${format(start, "yyyy.MM.dd", { locale: zhTW })} (${weekdayStart})`;
+  const startTimeStr = format(start, "HH:mm", { locale: zhTW });
+  const endDate = `${format(end, "yyyy.MM.dd", { locale: zhTW })} (${weekdayEnd})`;
+  const endTimeStr = format(end, "HH:mm", { locale: zhTW });
 
   // 檢查是否為同一天
   const isSameDay =
@@ -15,9 +19,16 @@ export const formatEventDate = (startTime: string, endTime: string) => {
     start.getMonth() === end.getMonth() &&
     start.getDate() === end.getDate();
 
-  const endDate = isSameDay
-    ? format(end, "HH:mm", { locale: zhTW })
-    : `${format(end, "yyyy.MM.dd", { locale: zhTW })} (${format(end, "eee", { locale: zhTW }).replace("週", "")}) ${format(end, "HH:mm", { locale: zhTW })}`;
-
-  return `${startDate} - ${endDate}`;
+  if (isSameDay) {
+    return {
+      isSameDay: true,
+      startDateString: `${startDate}`,
+      timeString: `${startTimeStr} - ${endTimeStr}`,
+    };
+  }
+  return {
+    isSameDay: false,
+    startDateString: `${startDate} ${startTimeStr}`,
+    endDateString: `${endDate} ${endTimeStr}`,
+  };
 };

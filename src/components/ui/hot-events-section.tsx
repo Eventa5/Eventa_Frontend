@@ -11,7 +11,7 @@ interface Event {
   id: string;
   title: string;
   location: string;
-  date: string;
+  date: import("./event-cards").EventCardDate;
   imageUrl: string;
 }
 

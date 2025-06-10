@@ -8,11 +8,18 @@ import { Autoplay, EffectCoverflow, Navigation, Pagination } from "swiper/module
 import { Swiper, SwiperSlide } from "swiper/react";
 
 // 活動卡片類型
+export interface EventCardDate {
+  isSameDay: boolean;
+  startDateString: string;
+  timeString?: string;
+  endDateString?: string;
+}
+
 export interface EventCardProps {
   id: string;
   title: string;
   location: string;
-  date: string;
+  date: EventCardDate;
   imageUrl: string;
   size?: "sm" | "base";
 }
@@ -102,10 +109,24 @@ export const EventCard = ({
         />
 
         <div
-          className={`${size === "sm" ? "hidden md:flex" : "flex"} items-center gap-2 px-2 text-[#A3A3A3]`}
+          className={`${size === "sm" ? "hidden md:flex" : "flex"} items-center gap-3 px-2 text-[#A3A3A3]`}
         >
           <Calendar className="w-4 h-4 shrink-0 stroke-[#A3A3A3]" />
-          <span className="text-sm">{date}</span>
+          <span className="text-sm whitespace-pre-line">
+            {date.isSameDay ? (
+              <>
+                {date.startDateString}
+                <br />
+                {date.timeString}
+              </>
+            ) : (
+              <>
+                {date.startDateString}
+                <br />
+                {date.endDateString}
+              </>
+            )}
+          </span>
         </div>
       </div>
     </Link>
