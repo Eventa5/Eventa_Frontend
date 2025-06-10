@@ -18,7 +18,6 @@ export default function Chatbot() {
   const messageEndRef = useRef<HTMLDivElement>(null);
 
   // 自動滾動到最新消息
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (messageEndRef.current) {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });

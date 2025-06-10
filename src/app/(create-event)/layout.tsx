@@ -1,5 +1,9 @@
 import localFont from "next/font/local";
 import "@/styles/globals.css";
+import CreateEventFooter from "@/components/layout/create-event-footer";
+import CreateEventHeader from "@/components/layout/create-event-header";
+import ErrorDialog from "@/components/ui/error-dialog";
+import type { ReactNode } from "react";
 
 const notoSansTC = localFont({
   src: [
@@ -49,7 +53,7 @@ const notoSerifTC = localFont({
 export default function CreateEventLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
     <html lang="zh-TW">
@@ -57,8 +61,13 @@ export default function CreateEventLayout({
         className={`${notoSansTC.variable} ${notoSerifTC.variable} antialiased font-sans-tc`}
         suppressHydrationWarning
       >
-        <div className="flex flex-col h-screen">
-          <div className="flex-1 overflow-auto">{children}</div>
+        <div className="flex flex-col min-h-screen bg-[#f8fbfd]">
+          <CreateEventHeader />
+          <div className="flex flex-col justify-stretch min-h-[calc(100vh-112px)] items-center px-5 py-8">
+            <div className="w-full min-h-full lg:max-w-[80%]">{children}</div>
+          </div>
+          <CreateEventFooter />
+          <ErrorDialog />
         </div>
       </body>
     </html>
