@@ -45,7 +45,7 @@ export const EventCard = ({
     },
     titleContainer: {
       base: "px-2 h-[54px] 2xl:grow",
-      sm: "px-2 2xl:grow md:h-[54px]",
+      sm: "px-2 md:h-[54px]",
     },
   };
 
