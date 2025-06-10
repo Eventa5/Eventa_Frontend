@@ -58,7 +58,7 @@ export default function EventDetailPage() {
     })
       .then((res) => {
         setEventData(res.data?.data ?? null);
-        setLiked(res.data?.data?.userStatus?.isFavorited ?? false);
+        setLiked(res.data?.data?.userStatus?.isFavorite ?? false);
         if (!res.data?.data) setError("查無此活動");
         const orgId = res.data?.data?.organizationId;
         if (orgId) {

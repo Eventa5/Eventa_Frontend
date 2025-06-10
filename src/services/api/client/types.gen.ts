@@ -35,7 +35,7 @@ export type ActivityResponse = {
   }>;
   likeCount?: number;
   userStatus?: {
-    isFavorited?: boolean;
+    isFavorite?: boolean;
     isRegistered?: boolean;
   };
 };
