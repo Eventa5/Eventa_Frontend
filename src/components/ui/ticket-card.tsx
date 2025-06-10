@@ -75,7 +75,7 @@ export function TicketCard({
                   : "--"}{" "}
                 -{" "}
                 {saleEndAt
-                  ? format(saleEndAt, "yyyy.MM.dd (EEE) HH:mm", {
+                  ? format(saleEndAt, "MM.dd (EEE) HH:mm", {
                       locale: zhTW,
                     })
                   : "--"}
@@ -89,7 +89,7 @@ export function TicketCard({
                       locale: zhTW,
                     })
                   : "--"}{" "}
-                - {endTime ? format(endTime, "yyyy.MM.dd (EEE) HH:mm", { locale: zhTW }) : "--"}
+                - {endTime ? format(endTime, "MM.dd (EEE) HH:mm", { locale: zhTW }) : "--"}
               </p>
             </div>
             {description && (

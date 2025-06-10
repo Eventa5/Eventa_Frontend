@@ -106,14 +106,6 @@ export default function CheckoutPage() {
           <div className="w-full md:w-[440px] space-y-6 shrink-0">
             <div className="relative h-[280px] w-full overflow-hidden rounded-lg">
               <Image
-                src="/eventa-logo.svg"
-                alt="Eventa Logo Balloon and Ticket"
-                width={80}
-                height={80}
-                className="w-14 h-14 sm:w-20 sm:h-20"
-                priority
-              />
-              <Image
                 src={eventData?.cover ? eventData.cover : "/images/no_single_activity_cover.png"}
                 alt={eventData?.title ?? "無標題"}
                 fill
@@ -124,7 +116,9 @@ export default function CheckoutPage() {
             </div>
             <div className="space-y-6">
               <div className="space-y-4">
-                <h1 className="text-2xl font-bold mb-10">{eventData?.title ?? "無標題"}</h1>
+                <h1 className="text-2xl font-bold mb-10 font-serif-tc">
+                  {eventData?.title ?? "無標題"}
+                </h1>
                 <div className="space-y-4">
                   <span className="text-lg font-semibold">活動時間</span>
                   <p className="text-sm text-muted-foreground">
@@ -135,7 +129,7 @@ export default function CheckoutPage() {
                       : "--"}
                     -
                     {eventData?.endTime
-                      ? format(eventData.endTime, "yyyy.MM.dd (E) HH:mm", {
+                      ? format(eventData.endTime, "MM.dd (E) HH:mm", {
                           locale: zhTW,
                         }).replace("週", "")
                       : "--"}
