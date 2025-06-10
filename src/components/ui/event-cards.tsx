@@ -44,8 +44,8 @@ export const EventCard = ({
       sm: "!text-[14px] !leading-5",
     },
     titleContainer: {
-      base: "px-2 h-[54px] grow",
-      sm: "px-2 md:grow md:h-[54px]",
+      base: "px-2 h-[54px] 2xl:grow",
+      sm: "px-2 2xl:grow md:h-[54px]",
     },
   };
 
@@ -97,14 +97,16 @@ export const EventCard = ({
           </h3>
         </div>
 
-        {size !== "sm" && <div className="border-t border-[#E5E5E5] my-1" />}
+        <div
+          className={`${size === "sm" ? "hidden md:block" : ""} border-t border-[#E5E5E5] my-1`}
+        />
 
-        {size !== "sm" && (
-          <div className="flex items-center gap-2 px-2 text-[#A3A3A3]">
-            <Calendar className="w-4 h-4 shrink-0 stroke-[#A3A3A3]" />
-            <span className="text-sm">{date}</span>
-          </div>
-        )}
+        <div
+          className={`${size === "sm" ? "hidden md:flex" : "flex"} items-center gap-2 px-2 text-[#A3A3A3]`}
+        >
+          <Calendar className="w-4 h-4 shrink-0 stroke-[#A3A3A3]" />
+          <span className="text-sm">{date}</span>
+        </div>
       </div>
     </Link>
   );
