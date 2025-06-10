@@ -496,8 +496,9 @@ export default function EventDetailPage() {
               className="w-full bg-primary-500 hover:bg-[#FFCA28] transition-colors text-neutral-800 text-base font-bold rounded-lg mt-2 cursor-pointer
                 "
               onClick={handleCheckout}
+              disabled={eventData?.userStatus?.isRegistered}
             >
-              立即報名
+              {eventData?.userStatus?.isRegistered ? "已報名" : "立即報名"}
             </Button>
             <div className="flex gap-10 mt-2">
               <button
@@ -562,8 +563,9 @@ export default function EventDetailPage() {
             type="button"
             className="bg-primary-500 hover:bg-[#FFCA28] transition-colors cursor-pointer rounded-[12px] h-12 flex items-center justify-center text-base font-bold shadow-lg text-neutral-800 pointer-events-auto w-[80%]"
             onClick={handleCheckout}
+            disabled={eventData?.userStatus?.isRegistered}
           >
-            立即報名
+            {eventData?.userStatus?.isRegistered ? "已報名" : "立即報名"}
           </button>
         </div>
       </div>
