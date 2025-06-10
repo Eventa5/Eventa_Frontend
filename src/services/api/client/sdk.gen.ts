@@ -19,6 +19,9 @@ import type {
   DeleteApiV1OrganizationsResponse,
   GetApiV1ActivitiesByActivityIdData,
   GetApiV1ActivitiesByActivityIdError,
+  GetApiV1ActivitiesByActivityIdIncomeData,
+  GetApiV1ActivitiesByActivityIdIncomeError,
+  GetApiV1ActivitiesByActivityIdIncomeResponse,
   GetApiV1ActivitiesByActivityIdParticipantsData,
   GetApiV1ActivitiesByActivityIdParticipantsError,
   GetApiV1ActivitiesByActivityIdParticipantsResponse,
@@ -50,6 +53,9 @@ import type {
   GetApiV1OrganizationsData,
   GetApiV1OrganizationsError,
   GetApiV1OrganizationsResponse,
+  GetApiV1TicketsByTicketIdData,
+  GetApiV1TicketsByTicketIdError,
+  GetApiV1TicketsByTicketIdResponse,
   GetApiV1UsersGoogleCallbackData,
   GetApiV1UsersGoogleLoginData,
   GetApiV1UsersProfileData,
@@ -76,6 +82,9 @@ import type {
   PatchApiV1OrdersByOrderIdCancelData,
   PatchApiV1OrdersByOrderIdCancelError,
   PatchApiV1OrdersByOrderIdCancelResponse,
+  PatchApiV1TicketsByTicketIdUsedData,
+  PatchApiV1TicketsByTicketIdUsedError,
+  PatchApiV1TicketsByTicketIdUsedResponse,
   PostApiV1ActivitiesByActivityIdCoverData,
   PostApiV1ActivitiesByActivityIdCoverError,
   PostApiV1ActivitiesByActivityIdCoverResponse,
@@ -342,6 +351,29 @@ export const getApiV1ActivitiesByActivityIdParticipants = <ThrowOnError extends 
       },
     ],
     url: "/api/v1/activities/{activityId}/participants",
+    ...options,
+  });
+};
+
+/**
+ * 獲取特定活動的收入
+ * 獲取特定活動的收入，包含總收入、總報名人數、總剩餘可售票券、票種收入小計、票種報名人數小計、近五次區間收入
+ */
+export const getApiV1ActivitiesByActivityIdIncome = <ThrowOnError extends boolean = false>(
+  options: Options<GetApiV1ActivitiesByActivityIdIncomeData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).get<
+    GetApiV1ActivitiesByActivityIdIncomeResponse,
+    GetApiV1ActivitiesByActivityIdIncomeError,
+    ThrowOnError
+  >({
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/v1/activities/{activityId}/income",
     ...options,
   });
 };
@@ -943,6 +975,52 @@ export const postApiV1OrganizationsByOrganizationIdImages = <ThrowOnError extend
       "Content-Type": null,
       ...options?.headers,
     },
+  });
+};
+
+/**
+ * 查看單一票券
+ * 查看單一票券的詳細資訊
+ */
+export const getApiV1TicketsByTicketId = <ThrowOnError extends boolean = false>(
+  options: Options<GetApiV1TicketsByTicketIdData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).get<
+    GetApiV1TicketsByTicketIdResponse,
+    GetApiV1TicketsByTicketIdError,
+    ThrowOnError
+  >({
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/v1/tickets/{ticketId}",
+    ...options,
+  });
+};
+
+/**
+ * 票券報到
+ * 參加活動時點選報到，票券狀態改為used
+ */
+export const patchApiV1TicketsByTicketIdUsed = <ThrowOnError extends boolean = false>(
+  options: Options<PatchApiV1TicketsByTicketIdUsedData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).patch<
+    PatchApiV1TicketsByTicketIdUsedResponse,
+    PatchApiV1TicketsByTicketIdUsedError,
+    ThrowOnError
+  >({
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/v1/tickets/{ticketId}/used",
+    ...options,
   });
 };
 

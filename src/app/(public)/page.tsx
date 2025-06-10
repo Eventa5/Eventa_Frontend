@@ -1,11 +1,9 @@
 import CategorySwiper from "@/components/ui/category-swiper";
-import { EventCard, EventCarousel, ServiceCard } from "@/components/ui/event-cards";
+import { NewEventCarousel, ServiceCard } from "@/components/ui/event-cards";
 import HotEventsSection from "@/components/ui/hot-events-section";
-import Link from "next/link";
 import "@/styles/pages/home.css";
 import CategoriesProvider from "@/features/activities/categories-provider";
 import OtherEventsSection from "@/features/activities/components/other-events-section";
-import { formatEventDate } from "@/features/activities/formatEventDate";
 import ChatButton from "@/features/chatbot/components/chat-button";
 import SearchContainer from "@/features/search/components/search-container";
 import Image from "next/image";
@@ -117,7 +115,7 @@ export default function Home() {
               </p>
             </div>
 
-            <EventCarousel events={newEvents} />
+            <NewEventCarousel />
           </div>
         </section>
         {/* 熱門活動 */}

@@ -17,7 +17,7 @@ interface Event {
 
 export default function HotEventsSection() {
   const { data, error, isLoading } = useSWR("popular-activities", async () => {
-    const response = await getApiV1ActivitiesPopular();
+    const response = await getApiV1ActivitiesPopular({ query: { recent: "0" } });
     return response.data?.data || [];
   });
 
