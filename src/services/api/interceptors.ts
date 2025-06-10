@@ -1,5 +1,4 @@
 import { useAuthStore } from "@/store/auth";
-import { useDialogStore } from "@/store/dialog";
 import { toast } from "sonner";
 import { client } from "./client/client.gen";
 

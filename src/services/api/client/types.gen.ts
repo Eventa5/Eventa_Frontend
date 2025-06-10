@@ -27,6 +27,10 @@ export type ActivityResponse = {
   summary?: string;
   notes?: string;
   livestreamUrl?: string;
+  /**
+   * 活動設置目前的狀態
+   */
+  currentStep?: string;
   createdAt?: string;
   updatedAt?: string;
   categories?: Array<{
@@ -35,7 +39,7 @@ export type ActivityResponse = {
   }>;
   likeCount?: number;
   userStatus?: {
-    isFavorited?: boolean;
+    isFavorite?: boolean;
     isRegistered?: boolean;
   };
 };
