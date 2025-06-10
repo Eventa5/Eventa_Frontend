@@ -15,6 +15,7 @@ interface TicketCardProps {
   startTime?: string | null;
   endTime?: string | null;
   description?: string | null;
+  remainingQuantity?: number;
   isActive?: boolean;
   isFocused?: boolean;
   onQuantityFocus?: () => void;
@@ -30,6 +31,7 @@ export function TicketCard({
   startTime,
   endTime,
   description,
+  remainingQuantity,
   isActive = true,
   isFocused = false,
   onQuantityFocus,
@@ -124,6 +126,7 @@ export function TicketCard({
             disabled={!isActive}
             onFocus={onQuantityFocus}
             onBlur={onQuantityBlur}
+            max={remainingQuantity ?? undefined}
           />
         </div>
       )}
