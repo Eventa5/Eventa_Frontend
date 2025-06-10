@@ -9,92 +9,47 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { TicketCard } from "@/components/ui/ticket-card";
-import { getApiV1ActivitiesByActivityId } from "@/services/api/client/sdk.gen";
-import type { ActivityResponse } from "@/services/api/client/types.gen";
+import {
+  getApiV1ActivitiesByActivityId,
+  getApiV1ActivitiesByActivityIdTicketTypes,
+} from "@/services/api/client/sdk.gen";
+import type { ActivityResponse, TicketTypeResponse } from "@/services/api/client/types.gen";
 import { useAuthStore } from "@/store/auth";
 import { format } from "date-fns";
+import { zhTW } from "date-fns/locale";
 import { Loader } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
+// 定義票券資料類型
 interface TicketState {
   quantity: number;
-  price: number;
 }
-
-// 定義票券資料類型
-interface TicketData {
-  id: string;
-  ticketTitle: string;
-  price: number;
-  booking_time: string;
-  available_time: string;
-  description?: string;
-  isSoldOut?: boolean;
-}
-
-// 票券資料
-const TICKETS_DATA: TicketData[] = [
-  {
-    id: "earlyBird",
-    ticketTitle: "早鳥票",
-    price: 1400,
-    booking_time: "2025.04.05 (六) - 04.19 (六)",
-    available_time: "2025.04.19 (六) 14:30 - 20:00",
-    isSoldOut: true,
-  },
-  {
-    id: "regular",
-    ticketTitle: "全票",
-    price: 1800,
-    booking_time: "2025.04.19 (六) - 05.10 (六)",
-    available_time: "2025.04.19 (六) 14:30 - 20:00",
-  },
-  {
-    id: "couple",
-    ticketTitle: "雙人成行套票",
-    price: 3200,
-    booking_time: "2025.04.19 (六) - 05.10 (六)",
-    available_time: "2025.04.19 (六) 14:30 - 20:00",
-    description: "此票種適用於2人同行，購買後將獲得2張票券。",
-  },
-  {
-    id: "family",
-    ticketTitle: "小家庭套票",
-    price: 4000,
-    booking_time: "2025.04.19 (六) - 05.10 (六)",
-    available_time: "2025.04.19 (六) 14:30 - 20:00",
-    description: "此票種適用於3-4人家庭，購買後將獲得4張票券。",
-  },
-];
 
 export default function CheckoutPage() {
   const params = useParams();
   const eventId = params?.eventId;
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const [focusedTicketId, setFocusedTicketId] = useState<string | null>(null);
-  const [ticketStates, setTicketStates] = useState<Record<string, TicketState>>({
-    earlyBird: { quantity: 0, price: 1400 },
-    regular: { quantity: 0, price: 1800 },
-    couple: { quantity: 0, price: 3200 },
-    family: { quantity: 0, price: 4000 },
-  });
+  const [ticketStates, setTicketStates] = useState<Record<string, TicketState>>({});
 
   const [eventData, setEventData] = useState<ActivityResponse | null>(null);
+  const [ticketTypes, setTicketTypes] = useState<TicketTypeResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const totalQuantity = Object.values(ticketStates).reduce((sum, state) => sum + state.quantity, 0);
-  const totalPrice = Object.values(ticketStates).reduce(
-    (sum, state) => sum + state.quantity * state.price,
-    0
-  );
+  const totalPrice = ticketTypes.reduce((sum, ticket) => {
+    const ticketId = ticket.id?.toString() ?? "";
+    const quantity = ticketStates[ticketId]?.quantity ?? 0;
+    return sum + quantity * (ticket.price ?? 0);
+  }, 0);
 
-  const handleQuantityChange = (ticketType: string, quantity: number) => {
+  const handleQuantityChange = (ticketId: string, quantity: number) => {
     setTicketStates((prev) => ({
       ...prev,
-      [ticketType]: { ...prev[ticketType], quantity },
+      [ticketId]: { quantity },
     }));
   };
 
@@ -113,6 +68,18 @@ export default function CheckoutPage() {
       .finally(() => setLoading(false));
   }, [eventId]);
 
+  useEffect(() => {
+    if (!eventId) return;
+    getApiV1ActivitiesByActivityIdTicketTypes({
+      path: { activityId: Number(eventId) },
+    })
+      .then((res) => {
+        setTicketTypes(res.data?.data ?? []);
+      })
+      .catch(() => {
+        setTicketTypes([]);
+      });
+  }, [eventId]);
   if (!isAuthenticated) return null;
 
   return loading ? (
@@ -162,9 +129,16 @@ export default function CheckoutPage() {
                   <span className="text-lg font-semibold">活動時間</span>
                   <p className="text-sm text-muted-foreground">
                     {eventData?.startTime
-                      ? format(eventData.startTime, "yyyy.MM.dd (E) HH:mm")
+                      ? format(eventData.startTime, "yyyy.MM.dd (E) HH:mm", {
+                          locale: zhTW,
+                        }).replace("週", "")
                       : "--"}
-                    -{eventData?.endTime ? format(eventData.endTime, "yyyy.MM.dd (E) HH:mm") : "--"}
+                    -
+                    {eventData?.endTime
+                      ? format(eventData.endTime, "yyyy.MM.dd (E) HH:mm", {
+                          locale: zhTW,
+                        }).replace("週", "")
+                      : "--"}
                     (GMT+8)
                   </p>
                 </div>
@@ -214,16 +188,19 @@ export default function CheckoutPage() {
               </Select>
             </div>
             <div className="text-md font-bold">請選擇票券</div>
-            {TICKETS_DATA.map((ticket) => (
-              <TicketCard
-                key={ticket.id}
-                {...ticket}
-                isFocused={focusedTicketId === ticket.id}
-                onQuantityFocus={() => setFocusedTicketId(ticket.id)}
-                onQuantityBlur={() => setFocusedTicketId(null)}
-                onQuantityChange={(quantity) => handleQuantityChange(ticket.id, quantity)}
-              />
-            ))}
+            {ticketTypes.map((ticket) => {
+              const ticketId = ticket.id?.toString() ?? "";
+              return (
+                <TicketCard
+                  key={ticketId}
+                  {...ticket}
+                  isFocused={focusedTicketId === ticketId}
+                  onQuantityFocus={() => setFocusedTicketId(ticketId)}
+                  onQuantityBlur={() => setFocusedTicketId(null)}
+                  onQuantityChange={(quantity) => handleQuantityChange(ticketId, quantity)}
+                />
+              );
+            })}
             <div className="space-y-4">
               <span className="block text-right text-lg font-semibold">
                 {totalQuantity} 張票，總計 NT$ {totalPrice.toLocaleString()}
@@ -233,7 +210,7 @@ export default function CheckoutPage() {
                 size="lg"
                 disabled={totalQuantity === 0}
               >
-                前往結帳
+                立即報名
               </Button>
             </div>
           </div>
