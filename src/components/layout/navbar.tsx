@@ -2,11 +2,11 @@
 
 import SelectOrganizerDialog from "@/features/organizer/components/select-organizer-dialog";
 import { useAuthStore } from "@/store/auth";
-import { Home, LogOut, SquarePen, SwitchCamera, UserRound } from "lucide-react";
+import { Home, LogOut, SwitchCamera, UserRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 
 export const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -21,7 +21,7 @@ export const Navbar = () => {
   };
 
   return (
-    <div className="w-full bg-primary-50 md:bg-white py-4 flex justify-end items-center px-6">
+    <div className="w-full bg-primary-50 md:bg-white py-4 flex justify-end items-center px-6 z-50 sticky lg:relative top-0 lg:top-auto">
       <div className="w-full flex items-center justify-between lg:justify-end gap-8">
         <div className="w-9" />
 

@@ -152,6 +152,56 @@ export type UploadCoverResponse = {
   data?: string;
 };
 
+export type GetIncomeResponse = {
+  ticketTypes?: Array<{
+    id?: number;
+    name?: string;
+    price?: number;
+    totalQuantity?: number;
+    remainingQuantity?: number;
+    subtotalIncome?: number;
+    soldCount?: number;
+  }>;
+  totalRemainingQuantity?: number;
+  totalIncome?: number;
+  totalRegisteredQuantity?: number;
+  incomes?: Array<{
+    date?: string;
+    amount?: number;
+  }>;
+};
+
+export type GetCheckedInResponse = {
+  /**
+   * 是否為線上活動
+   */
+  isOnline?: boolean;
+  /**
+   * 活動當前狀態
+   */
+  status?: string;
+  /**
+   * 活動開始時間
+   */
+  startTime?: string;
+  /**
+   * 活動結束時間
+   */
+  endTime?: string;
+  /**
+   * 已報到人數
+   */
+  checkedInCount?: number;
+  /**
+   * 已售票張數
+   */
+  soldCount?: number;
+  /**
+   * 總票數
+   */
+  totalTicketQuantity?: number;
+};
+
 export type CategoriesResponse = {
   id?: number;
   name?: string;
@@ -200,7 +250,15 @@ export type OrderResponse = {
    * 訂單支付過期時間，格式為 ISO 8601
    */
   paidExpiredAt?: string;
+  /**
+   * 訂單創建時間，格式為 ISO 8601
+   */
+  createdAt?: string;
   activity?: {
+    /**
+     * 活動 ID
+     */
+    id?: number;
     /**
      * 活動標題
      */
@@ -208,7 +266,11 @@ export type OrderResponse = {
     /**
      * 活動地點
      */
-    location?: string;
+    location?: string | null;
+    /**
+     * 是否為線上活動
+     */
+    isOnline?: boolean;
     /**
      * 活動開始時間，格式為 ISO 8601
      */
@@ -394,25 +456,48 @@ export type CreateOrderResponse = {
    */
   id?: string;
   /**
-   * 活動 ID
-   */
-  activityId?: number;
-  /**
    * 訂單支付過期時間，格式為 ISO 8601
    */
   paidExpiredAt?: unknown;
   /**
-   * 實際支付金額
-   */
-  paidAmount?: number;
-  /**
-   * 訂單狀態
-   */
-  status?: string;
-  /**
    * 訂單創建時間，格式為 ISO 8601
    */
   createdAt?: unknown;
+  activity?: {
+    /**
+     * 活動 ID
+     */
+    id?: number;
+    /**
+     * 活動標題
+     */
+    title?: string;
+  };
+  /**
+   * 訂單中的票券列表
+   */
+  orderItems?: Array<{
+    ticketType?: {
+      /**
+       * 票種名稱
+       */
+      name?: string;
+      /**
+       * 票種價格
+       */
+      price?: number;
+    };
+    /**
+     * 購買的票券數量
+     */
+    quantity?: number;
+  }>;
+  payment?: {
+    /**
+     * 實際支付金額
+     */
+    paidAmount?: number;
+  };
   /**
    * 發票資訊
    */
@@ -656,6 +741,152 @@ export type UploadOrganizationImageResponse = {
   data?: {
     avatar?: string;
     cover?: string;
+  };
+};
+
+export type TicketDetailResponse = {
+  /**
+   * 票券 ID
+   */
+  id?: string;
+  /**
+   * 票券狀態
+   */
+  status?: string;
+  /**
+   * 被指派的使用者
+   */
+  assignedUser?: {
+    /**
+     * 使用者 ID
+     */
+    id?: string;
+    /**
+     * 使用者名稱
+     */
+    name?: string;
+    /**
+     * 使用者電子郵件
+     */
+    email?: string;
+  } | null;
+  /**
+   * 被指派的使用者名稱
+   */
+  assignedName?: string | null;
+  /**
+   * 被指派的使用者電子郵件
+   */
+  assignedEmail?: string | null;
+  /**
+   * 退款截止時間，格式為 ISO 8601
+   */
+  refundDeadline?: string;
+  /**
+   * QR Code 令牌，目前只有在為 線上活動時，才會有，並且其值為 livestream url
+   */
+  qrCodeToken?: string;
+  /**
+   * 票券名稱
+   */
+  name?: string;
+  /**
+   * 票券價格
+   */
+  price?: number;
+  /**
+   * 票券有效起始時間，格式為 ISO 8601
+   */
+  startTime?: string;
+  /**
+   * 票券有效結束時間，格式為 ISO 8601
+   */
+  endTime?: string;
+  order?: {
+    /**
+     * 對應的訂單 id
+     */
+    id?: string;
+    /**
+     * 訂單狀態
+     */
+    status?: string;
+    /**
+     * 訂單支付時間，格式為 ISO 8601
+     */
+    paidAt?: string;
+    /**
+     * 支付方式
+     */
+    paymentMethod?: string | null;
+  };
+  activity?: {
+    /**
+     * 活動 ID
+     */
+    id?: number;
+    /**
+     * 活動標題
+     */
+    title?: string;
+    /**
+     * 活動摘要
+     */
+    summary?: string | null;
+    /**
+     * 活動注意事項
+     */
+    notes?: string | null;
+    /**
+     * 活動詳細描述，使用 Markdown 格式
+     */
+    descriptionMd?: string | null;
+    /**
+     * 活動地點
+     */
+    location?: string | null;
+    /**
+     * 活動直播連結
+     */
+    livestreamUrl?: string | null;
+    /**
+     * 活動開始時間，格式為 ISO 8601
+     */
+    startTime?: string;
+    /**
+     * 活動結束時間，格式為 ISO 8601
+     */
+    endTime?: string;
+  };
+  organizer?: {
+    /**
+     * 主辦者 ID
+     */
+    id?: number;
+    /**
+     * 主辦者名稱
+     */
+    name?: string;
+    /**
+     * 主辦者電子郵件
+     */
+    email?: string;
+    /**
+     * 主辦者電話號碼
+     */
+    phoneNumber?: string | null;
+    /**
+     * 主辦者國家代碼
+     */
+    countryCode?: string | null;
+    /**
+     * 主辦者電話分機號碼
+     */
+    ext?: string | null;
+    /**
+     * 主辦者官方網站 URL
+     */
+    officialSiteUrl?: string | null;
   };
 };
 
@@ -919,6 +1150,10 @@ export type GetApiV1ActivitiesPopularData = {
      * 每頁資料筆數（預設為 6）
      */
     limit?: number;
+    /**
+     * 0:顯示一般熱門活動，1:顯示最近強檔活動
+     */
+    recent?: string;
   };
   url: "/api/v1/activities/popular";
 };
@@ -935,7 +1170,7 @@ export type GetApiV1ActivitiesPopularError =
 
 export type GetApiV1ActivitiesPopularResponses = {
   /**
-   * 成功獲取活動資料
+   * 請求成功
    */
   200: {
     message?: string;
@@ -1309,6 +1544,107 @@ export type GetApiV1ActivitiesByActivityIdParticipantsResponses = {
 
 export type GetApiV1ActivitiesByActivityIdParticipantsResponse =
   GetApiV1ActivitiesByActivityIdParticipantsResponses[keyof GetApiV1ActivitiesByActivityIdParticipantsResponses];
+
+export type GetApiV1ActivitiesByActivityIdIncomeData = {
+  body?: never;
+  path: {
+    /**
+     * 活動 ID
+     */
+    activityId: number;
+  };
+  query?: {
+    /**
+     * 收入統計區間 d = day | w = week
+     */
+    statisticsPeriod?: string;
+  };
+  url: "/api/v1/activities/{activityId}/income";
+};
+
+export type GetApiV1ActivitiesByActivityIdIncomeErrors = {
+  /**
+   * 格式錯誤
+   */
+  400: ErrorResponse;
+  /**
+   * 未登入
+   */
+  401: ErrorResponse;
+  /**
+   * 無權限，非主辦單位成員
+   */
+  403: ErrorResponse;
+  /**
+   * 活動不存在
+   */
+  404: ErrorResponse;
+};
+
+export type GetApiV1ActivitiesByActivityIdIncomeError =
+  GetApiV1ActivitiesByActivityIdIncomeErrors[keyof GetApiV1ActivitiesByActivityIdIncomeErrors];
+
+export type GetApiV1ActivitiesByActivityIdIncomeResponses = {
+  /**
+   * 請求成功
+   */
+  200: {
+    message?: string;
+    status?: boolean;
+    data?: GetIncomeResponse;
+  };
+};
+
+export type GetApiV1ActivitiesByActivityIdIncomeResponse =
+  GetApiV1ActivitiesByActivityIdIncomeResponses[keyof GetApiV1ActivitiesByActivityIdIncomeResponses];
+
+export type GetApiV1ActivitiesByActivityIdCheckedInData = {
+  body?: never;
+  path: {
+    /**
+     * 活動 ID
+     */
+    activityId: number;
+  };
+  query?: never;
+  url: "/api/v1/activities/{activityId}/checkedIn";
+};
+
+export type GetApiV1ActivitiesByActivityIdCheckedInErrors = {
+  /**
+   * 格式錯誤
+   */
+  400: ErrorResponse;
+  /**
+   * 未登入
+   */
+  401: ErrorResponse;
+  /**
+   * 無權限，非主辦單位成員
+   */
+  403: ErrorResponse;
+  /**
+   * 活動不存在
+   */
+  404: ErrorResponse;
+};
+
+export type GetApiV1ActivitiesByActivityIdCheckedInError =
+  GetApiV1ActivitiesByActivityIdCheckedInErrors[keyof GetApiV1ActivitiesByActivityIdCheckedInErrors];
+
+export type GetApiV1ActivitiesByActivityIdCheckedInResponses = {
+  /**
+   * 請求成功
+   */
+  200: {
+    message?: string;
+    status?: boolean;
+    data?: GetCheckedInResponse;
+  };
+};
+
+export type GetApiV1ActivitiesByActivityIdCheckedInResponse =
+  GetApiV1ActivitiesByActivityIdCheckedInResponses[keyof GetApiV1ActivitiesByActivityIdCheckedInResponses];
 
 export type GetApiV1ActivitiesByActivityIdData = {
   body?: never;
@@ -2052,6 +2388,43 @@ export type PatchApiV1OrdersByOrderIdCancelResponses = {
 export type PatchApiV1OrdersByOrderIdCancelResponse =
   PatchApiV1OrdersByOrderIdCancelResponses[keyof PatchApiV1OrdersByOrderIdCancelResponses];
 
+export type PostApiV1OrdersByOrderIdCheckoutData = {
+  body?: never;
+  path: {
+    orderId: string;
+  };
+  query?: never;
+  url: "/api/v1/orders/{orderId}/checkout";
+};
+
+export type PostApiV1OrdersByOrderIdCheckoutErrors = {
+  /**
+   * 未提供授權令牌
+   */
+  401: ErrorResponse;
+  /**
+   * 訂單不存在
+   */
+  404: ErrorResponse;
+  /**
+   * 只能結帳未付款的訂單
+   */
+  409: ErrorResponse;
+};
+
+export type PostApiV1OrdersByOrderIdCheckoutError =
+  PostApiV1OrdersByOrderIdCheckoutErrors[keyof PostApiV1OrdersByOrderIdCheckoutErrors];
+
+export type PostApiV1OrdersByOrderIdCheckoutResponses = {
+  /**
+   * 回傳 html 的 form 表單，前端需要在原頁開啟來提交
+   */
+  200: string;
+};
+
+export type PostApiV1OrdersByOrderIdCheckoutResponse =
+  PostApiV1OrdersByOrderIdCheckoutResponses[keyof PostApiV1OrdersByOrderIdCheckoutResponses];
+
 export type DeleteApiV1OrganizationsData = {
   body: DeleteOrganizationRequest;
   path?: never;
@@ -2251,6 +2624,102 @@ export type PostApiV1OrganizationsByOrganizationIdImagesResponses = {
 
 export type PostApiV1OrganizationsByOrganizationIdImagesResponse =
   PostApiV1OrganizationsByOrganizationIdImagesResponses[keyof PostApiV1OrganizationsByOrganizationIdImagesResponses];
+
+export type GetApiV1TicketsByTicketIdData = {
+  body?: never;
+  path: {
+    ticketId: string;
+  };
+  query?: never;
+  url: "/api/v1/tickets/{ticketId}";
+};
+
+export type GetApiV1TicketsByTicketIdErrors = {
+  /**
+   * 格式錯誤
+   */
+  400: ErrorResponse;
+  /**
+   * 未提供授權令牌
+   */
+  401: ErrorResponse;
+  /**
+   * 票券不存在
+   */
+  404: ErrorResponse;
+};
+
+export type GetApiV1TicketsByTicketIdError =
+  GetApiV1TicketsByTicketIdErrors[keyof GetApiV1TicketsByTicketIdErrors];
+
+export type GetApiV1TicketsByTicketIdResponses = {
+  /**
+   * 成功獲取票券詳細資訊
+   */
+  200: {
+    message?: string;
+    status?: boolean;
+    data?: TicketDetailResponse;
+  };
+};
+
+export type GetApiV1TicketsByTicketIdResponse =
+  GetApiV1TicketsByTicketIdResponses[keyof GetApiV1TicketsByTicketIdResponses];
+
+export type PatchApiV1TicketsByTicketIdUsedData = {
+  body?: never;
+  path: {
+    /**
+     * 票券 ID
+     */
+    ticketId: string;
+  };
+  query?: never;
+  url: "/api/v1/tickets/{ticketId}/used";
+};
+
+export type PatchApiV1TicketsByTicketIdUsedErrors = {
+  /**
+   * 格式錯誤
+   */
+  400: ErrorResponse;
+  /**
+   * 未登入
+   */
+  401: ErrorResponse;
+  /**
+   * 非主辦單位，無權限報到
+   */
+  403: ErrorResponse;
+  /**
+   * 票券不存在
+   */
+  404: ErrorResponse;
+  /**
+   * 票券狀態非assigned，無法報到
+   */
+  409: ErrorResponse;
+};
+
+export type PatchApiV1TicketsByTicketIdUsedError =
+  PatchApiV1TicketsByTicketIdUsedErrors[keyof PatchApiV1TicketsByTicketIdUsedErrors];
+
+export type PatchApiV1TicketsByTicketIdUsedResponses = {
+  /**
+   * 報到成功
+   */
+  200: {
+    message?: string;
+    status?: boolean;
+    data?: {
+      id?: string;
+      status?: string;
+    };
+  };
+};
+
+export type PatchApiV1TicketsByTicketIdUsedResponse =
+  PatchApiV1TicketsByTicketIdUsedResponses[keyof PatchApiV1TicketsByTicketIdUsedResponses];
 
 export type PostApiV1UsersSignupData = {
   body: SignupRequest;
