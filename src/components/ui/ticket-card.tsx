@@ -40,6 +40,8 @@ export function TicketCard({
 }: TicketCardProps) {
   const [quantity, setQuantity] = useState(0);
 
+  const isAvailable = isActive && (remainingQuantity ?? 0) !== 0;
+
   const handleQuantityChange = (value: number) => {
     setQuantity(value);
     onQuantityChange(value);
@@ -49,7 +51,7 @@ export function TicketCard({
     <div
       className={cn(
         "relative flex items-stretch border border-gray-200 rounded-sm overflow-hidden",
-        !isActive && "bg-[var(--color-neutral-100)]",
+        !isAvailable && "bg-[var(--color-neutral-100)]",
         isFocused && quantity > 0 && "border-l-8 border-l-primary-500 bg-[#FDFBF6]"
       )}
     >
@@ -58,7 +60,7 @@ export function TicketCard({
         <div>
           <div className="flex items-center gap-2">
             <span className="font-bold text-lg tracking-wide">{name}</span>
-            {!isActive && <span className="text-sm font-semibold text-neutral-400">已售完</span>}
+            {!isAvailable && <span className="text-sm font-semibold text-neutral-400">已售完</span>}
           </div>
           <div className="mt-2 flex items-center gap-2">
             <span className="font-bold text-xl tracking-wide">NT$ {price?.toLocaleString()}</span>
@@ -102,7 +104,7 @@ export function TicketCard({
             )}
           </div>
         </Collapse>
-        {!isActive && (
+        {!isAvailable && (
           <>
             <Separator className="my-4" />
             <div className="flex items-center justify-between">
@@ -118,12 +120,12 @@ export function TicketCard({
         )}
       </div>
       {/* 右側數量調整 */}
-      {isActive && (
+      {isAvailable && (
         <div className={cn("flex flex-col justify-center items-center px-6")}>
           <QuantityInput
             defaultValue={0}
             onValueChange={handleQuantityChange}
-            disabled={!isActive}
+            disabled={!isAvailable}
             onFocus={onQuantityFocus}
             onBlur={onQuantityBlur}
             max={remainingQuantity ?? undefined}
