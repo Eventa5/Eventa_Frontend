@@ -58,9 +58,9 @@ function OrganizerLayoutContent({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen">
       <SidebarNav />
-      <div className="flex-1 flex flex-col w-[calc(100%)]">
+      <div className="flex-1 flex flex-col w-[calc(100%)] lg:pl-[220px]">
         <Navbar />
-        <main className="flex-1 lg:p-6">{children}</main>
+        <main className="flex-1 lg:p-6 lg:pt-0">{children}</main>
       </div>
     </div>
   );
