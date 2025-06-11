@@ -1,75 +1,13 @@
 import CategorySwiper from "@/components/ui/category-swiper";
-import { NewEventCarousel, ServiceCard } from "@/components/ui/event-cards";
 import HotEventsSection from "@/components/ui/hot-events-section";
+import { ServiceCard } from "@/components/ui/service-card";
 import "@/styles/pages/home.css";
 import CategoriesProvider from "@/features/activities/categories-provider";
+import { NewEventCarousel } from "@/features/activities/components/new-event-carousel";
 import OtherEventsSection from "@/features/activities/components/other-events-section";
 import ChatButton from "@/features/chatbot/components/chat-button";
 import SearchContainer from "@/features/search/components/search-container";
 import Image from "next/image";
-
-const newEvents = [
-  {
-    id: "n1",
-    title: "風格時尚：夏日之最秀",
-    location: "台北市",
-    date: {
-      isSameDay: false,
-      startDateString: "2025.05.01 (一)",
-      timeString: "10:00 - 12:00",
-      endDateString: "2025.05.15 (一)",
-    },
-    imageUrl: "/images/carousel-image1.jpg",
-  },
-  {
-    id: "n2",
-    title: "創意工作坊：當代藝術解析",
-    location: "高雄市",
-    date: {
-      isSameDay: false,
-      startDateString: "2025.06.05 (四)",
-      timeString: "14:00 - 16:00",
-      endDateString: "2025.06.05 (四)",
-    },
-    imageUrl: "/images/carousel-image2.jpg",
-  },
-  {
-    id: "n3",
-    title: "電影放映會：奧斯卡精選",
-    location: "台南市",
-    date: {
-      isSameDay: false,
-      startDateString: "2025.05.25 (日)",
-      timeString: "13:30 - 17:00",
-      endDateString: "2025.05.25 (日)",
-    },
-    imageUrl: "/images/carousel-image3.jpg",
-  },
-  {
-    id: "n4",
-    title: "美食饗宴：世界小吃巡禮",
-    location: "台中市",
-    date: {
-      isSameDay: false,
-      startDateString: "2025.07.12 (六)",
-      timeString: "11:00 - 15:00",
-      endDateString: "2025.07.12 (六)",
-    },
-    imageUrl: "/images/carousel-image4.jpg",
-  },
-  {
-    id: "n5",
-    title: "健康生活工作坊：身心平衡之道",
-    location: "新北市",
-    date: {
-      isSameDay: false,
-      startDateString: "2025.08.18 (日)",
-      timeString: "09:30 - 12:30",
-      endDateString: "2025.08.18 (日)",
-    },
-    imageUrl: "/images/carousel-image5.jpg",
-  },
-];
 
 export default function Home() {
   return (

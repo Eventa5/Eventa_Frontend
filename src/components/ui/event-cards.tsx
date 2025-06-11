@@ -1,14 +1,8 @@
 "use client";
 
-import { formatEventDate } from "@/features/activities/formatEventDate";
-import { getApiV1ActivitiesPopular } from "@/services/api/client/sdk.gen";
-import { Calendar, MoveLeft, MoveRight } from "lucide-react";
+import { Calendar } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import type { JSX } from "react";
-import { Autoplay, EffectCoverflow, Navigation, Pagination } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
-import useSWR from "swr";
 
 // 活動卡片類型
 export interface EventCardDate {
@@ -124,7 +118,7 @@ export const EventCard = ({
               </>
             ) : (
               <>
-                {date.startDateString}
+                {date.startDateString} -
                 <br />
                 {date.endDateString}
               </>
@@ -135,173 +129,3 @@ export const EventCard = ({
     </Link>
   );
 };
-
-export const EventCarousel = ({ events }: { events: EventCardProps[] }) => {
-  return (
-    <div className="relative w-full">
-      <Swiper
-        effect={"coverflow"}
-        grabCursor={true}
-        centeredSlides={true}
-        breakpoints={{
-          0: {
-            slidesPerView: 1,
-            spaceBetween: 100,
-          },
-          640: {
-            slidesPerView: 1.3,
-            spaceBetween: -200,
-          },
-          1024: {
-            slidesPerView: 2.2,
-            spaceBetween: -314,
-          },
-          1280: {
-            slidesPerView: 3,
-            spaceBetween: -314,
-          },
-        }}
-        onSwiper={(swiper) => {
-          setTimeout(() => {
-            swiper.update();
-          }, 100); // 或更久，看情況
-        }}
-        loop={true}
-        navigation={{
-          enabled: true,
-          nextEl: ".event-swiper-next",
-          prevEl: ".event-swiper-prev",
-        }}
-        autoplay={{ delay: 5000, disableOnInteraction: false }}
-        pagination={{
-          clickable: true,
-          el: ".swiper-pagination",
-          bulletClass: "swiper-pagination-bullet",
-          bulletActiveClass: "swiper-pagination-bullet-active",
-        }}
-        coverflowEffect={{
-          rotate: 5,
-          stretch: 0,
-          depth: 150,
-          modifier: 5,
-          slideShadows: false,
-        }}
-        modules={[Autoplay, EffectCoverflow, Navigation, Pagination]}
-      >
-        {events.map((event) => (
-          <SwiperSlide key={event.id}>
-            <div className="py-4 px-2 md:py-6 md:px-4">
-              <Link href={`/events/${event.id}`}>
-                {event.imageUrl ? (
-                  <Image
-                    src={event.imageUrl}
-                    alt={event.title}
-                    width={628}
-                    height={450}
-                    className="rounded-[30px] object-cover w-full aspect-[16/9] shadow-sm"
-                  />
-                ) : (
-                  <div className="rounded-[30px] object-cover w-full aspect-[16/9] shadow-sm bg-neutral-600" />
-                )}
-              </Link>
-            </div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
-
-      <div className="swiper-pagination mt-8" />
-
-      <button
-        type="button"
-        className="event-swiper-prev absolute left-2 md:left-6 top-1/2 z-10 -translate-y-1/2 bg-[#FDFBF5] w-[40px] h-[40px] md:w-[48px] md:h-[48px] border-2 border-[#262626] rounded-full flex items-center justify-center cursor-pointer shadow-sm hover:shadow-md transition-shadow"
-      >
-        <MoveLeft className="w-4 h-4 md:w-5 md:h-5 stroke-[#262626]" />
-      </button>
-      <button
-        type="button"
-        className="event-swiper-next absolute right-2 md:right-6 top-1/2 z-10 -translate-y-1/2 bg-[#FDFBF5] w-[40px] h-[40px] md:w-[48px] md:h-[48px] border-2 border-[#262626] rounded-full flex items-center justify-center cursor-pointer shadow-sm hover:shadow-md transition-shadow"
-      >
-        <MoveRight className="w-4 h-4 md:w-5 md:h-5 stroke-[#262626]" />
-      </button>
-    </div>
-  );
-};
-
-// 服務卡片
-interface ServiceCardProps {
-  title: JSX.Element;
-  description: string[];
-  imageUrl: string;
-  imageAlt: string;
-  buttonText: string;
-  linkUrl: string;
-}
-
-export const ServiceCard = ({
-  title,
-  description,
-  imageUrl,
-  imageAlt,
-  buttonText,
-  linkUrl,
-}: ServiceCardProps) => {
-  return (
-    <div className="flex flex-col-reverse items-center justify-start  2xl:flex-row bg-white rounded-[30px] rounded-tl-[160px] overflow-hidden shadow-md px-8 md:px-[45px] w-[343px] h-[405px]  2xl:w-auto  2xl:h-[374px]">
-      <div className="pr-4 relative shrink-0 flex items-center justify-center w-[144px] h-[144px]  2xl:w-[200px]  2xl:h-[200px]">
-        <Image
-          src={imageUrl}
-          alt={imageAlt}
-          width={200}
-          height={200}
-          className="object-cover"
-        />
-      </div>
-      <div className="flex flex-col shrink-0  2xl:w-[322px]">
-        <div className="space-y-4 flex flex-col items-center  2xl:items-start w-[276px]  2xl:w-full">
-          <h3 className="font-bold text-center whitespace-nowrap  2xl:text-start text-[24px]  2xl:text-[30px] text-black leading-tight font-serif-tc">
-            {title}
-          </h3>
-          <div className="text-center  2xl:text-start">
-            {description.map((item, i) => (
-              <p
-                key={`desc-${item}`}
-                className="text-[#2E2E2E] text-[12px]  2xl:text-[14px] whitespace-nowrap"
-              >
-                {item}
-              </p>
-            ))}
-          </div>
-        </div>
-        <Link
-          href={linkUrl}
-          className="mt-6 inline-flex items-center gap-2 bg-[#F07348] text-white px-6 py-3 rounded-xl font-bold  2xl:self-start"
-        >
-          <span className="ml-2">→</span>
-          {buttonText}
-        </Link>
-      </div>
-    </div>
-  );
-};
-
-export function NewEventCarousel() {
-  const { data, isLoading, error } = useSWR("popular-events", async () => {
-    const response = await getApiV1ActivitiesPopular({ query: { recent: "1" } });
-    return response.data?.data || [];
-  });
-
-  if (isLoading) return <div className="text-center text-2xl font-bold">載入中...</div>;
-  if (error) return <div className="text-center text-2xl font-bold">載入失敗</div>;
-  if (!data || data.length === 0)
-    return <div className="text-center text-2xl font-bold">暫無資料</div>;
-
-  const events = data.map((item) => ({
-    id: String(item.id),
-    title: item.title || "",
-    location: item.location || "",
-    date: formatEventDate(item.startTime || "", item.endTime || ""),
-    imageUrl: item.cover || "",
-  }));
-
-  return <EventCarousel events={events} />;
-}

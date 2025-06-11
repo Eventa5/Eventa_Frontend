@@ -1,79 +1,81 @@
 "use client";
 import { EventCard } from "@/components/ui/event-cards";
 import { formatEventDate } from "@/features/activities/formatEventDate";
-import { getApiV1Activities } from "@/services/api/client/sdk.gen";
-import type { ActivitiesResponse } from "@/services/api/client/types.gen";
+import { useActivitiesStore } from "@/store/activities";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useInView } from "react-intersection-observer";
-import useSWR from "swr";
-
-const fetcher = async (url: string): Promise<ActivitiesResponse[]> => {
-  const response = await getApiV1Activities({
-    query: {
-      page: 1,
-      limit: 8,
-    },
-  });
-  return response.data?.data || [];
-};
 
 export default function OtherEventsSection() {
-  const [page, setPage] = useState(1);
-  const [allEvents, setAllEvents] = useState<ActivitiesResponse[]>([]);
-  const [isInfiniteScrollEnabled, setIsInfiniteScrollEnabled] = useState(false);
   const { ref, inView } = useInView();
-
+  const isLoadingSecondPage = useRef(false);
+  const isMounted = useRef(false);
   const {
-    data: events,
-    error,
+    activities,
     isLoading,
-    mutate,
-  } = useSWR<ActivitiesResponse[]>(
-    `/api/v1/activities?page=${page}`,
-    async () => {
-      const response = await getApiV1Activities({
-        query: {
-          page,
-          limit: 8,
-        },
-      });
-      return response.data?.data || [];
-    },
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    }
-  );
+    error,
+    page,
+    hasMore,
+    isFirstPageLoaded,
+    isInfiniteScrollEnabled,
+    fetchOtherActivities,
+    resetOtherActivities,
+    enableInfiniteScroll,
+  } = useActivitiesStore();
 
+  // 只在組件首次掛載時載入第一頁
   useEffect(() => {
-    if (events) {
-      setAllEvents((prev) => {
-        const newEvents = events.filter(
-          (event) => !prev.some((prevEvent) => prevEvent.id === event.id)
-        );
-        return [...prev, ...newEvents];
+    if (!isMounted.current) {
+      isMounted.current = true;
+      fetchOtherActivities(1);
+    }
+    return () => {
+      resetOtherActivities();
+      isMounted.current = false;
+    };
+  }, [fetchOtherActivities, resetOtherActivities]);
+
+  // 處理無限滾動
+  useEffect(() => {
+    if (
+      inView &&
+      hasMore &&
+      !isLoading &&
+      isInfiniteScrollEnabled &&
+      !isLoadingSecondPage.current
+    ) {
+      fetchOtherActivities(page + 1);
+    }
+  }, [inView, hasMore, isLoading, page, fetchOtherActivities, isInfiniteScrollEnabled]);
+
+  const handleLoadMore = useCallback(() => {
+    if (!isInfiniteScrollEnabled) {
+      isLoadingSecondPage.current = true;
+      // 立即載入第二頁
+      fetchOtherActivities(2).then(() => {
+        // 等待第二頁載入完成後，再啟用無限滾動
+        setTimeout(() => {
+          enableInfiniteScroll();
+          isLoadingSecondPage.current = false;
+        }, 100);
       });
     }
-  }, [events]);
+  }, [fetchOtherActivities, isInfiniteScrollEnabled, enableInfiniteScroll]);
 
-  useEffect(() => {
-    if (inView && isInfiniteScrollEnabled && events && events.length > 0) {
-      setPage((prev) => prev + 1);
-    }
-  }, [inView, events, isInfiniteScrollEnabled]);
-
-  const handleLoadMore = () => {
-    setIsInfiniteScrollEnabled(true);
-    setPage((prev) => prev + 1);
-  };
-
-  if (isLoading && page === 1) {
-    return <div className="text-center text-2xl font-bold py-2">載入中...</div>;
+  if (isLoading && !isFirstPageLoaded) {
+    return (
+      <div className="flex justify-center items-center min-h-[200px]">
+        <div className="text-2xl font-bold text-[#262626]">載入中...</div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div>載入失敗，請稍後再試</div>;
+    return (
+      <div className="flex justify-center items-center min-h-[200px]">
+        <div className="text-xl text-red-500">載入失敗，請稍後再試</div>
+      </div>
+    );
   }
 
   return (
@@ -92,8 +94,9 @@ export default function OtherEventsSection() {
             <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">活動</h2>
           </div>
         </div>
+
         <div className="grid grid-cols-1 md:grid-cols-[repeat(2,_302px)] lg:grid-cols-[repeat(3,_302px)] 2xl:grid-cols-[repeat(4,_302px)] gap-6 justify-items-center">
-          {allEvents.map((event) => (
+          {activities.map((event) => (
             <EventCard
               key={`event-${event.id}-${event.startTime}`}
               id={String(event.id)}
@@ -105,6 +108,7 @@ export default function OtherEventsSection() {
             />
           ))}
         </div>
+
         <div className="mt-12 flex justify-center">
           {!isInfiniteScrollEnabled ? (
             <button
@@ -119,7 +123,7 @@ export default function OtherEventsSection() {
               ref={ref}
               className="h-10"
             >
-              {isLoading && <div>載入更多活動中...</div>}
+              {isLoading && <div className="text-[#525252]">載入更多活動中...</div>}
             </div>
           )}
         </div>

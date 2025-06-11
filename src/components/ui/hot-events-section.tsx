@@ -16,10 +16,18 @@ interface Event {
 }
 
 export default function HotEventsSection() {
-  const { data, error, isLoading } = useSWR("popular-activities", async () => {
-    const response = await getApiV1ActivitiesPopular({ query: { recent: "0" } });
-    return response.data?.data || [];
-  });
+  const { data, error, isLoading } = useSWR(
+    "popular-activities",
+    async () => {
+      const response = await getApiV1ActivitiesPopular({ query: { recent: "0" } });
+      return response.data?.data || [];
+    },
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 60000, // 1分鐘內不會重複請求
+    }
+  );
 
   if (isLoading) {
     return <div className="w-full h-[400px] flex items-center justify-center">載入中...</div>;

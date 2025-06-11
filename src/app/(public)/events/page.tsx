@@ -1,10 +1,12 @@
 "use client";
 
-import { EventCard, NewEventCarousel } from "@/components/ui/event-cards";
+import { EventCard } from "@/components/ui/event-cards";
 import HotEventsSection from "@/components/ui/hot-events-section";
+import { NewEventCarousel } from "@/features/activities/components/new-event-carousel";
 import OtherEventsSection from "@/features/activities/components/other-events-section";
 import { formatEventDate } from "@/features/activities/formatEventDate";
 import SearchContainer from "@/features/search/components/search-container";
+import { useActivitiesStore } from "@/store/activities";
 import { useSearchStore } from "@/store/search";
 import Image from "next/image";
 import Link from "next/link";
@@ -152,12 +154,13 @@ const otherEvents = [
 ];
 
 export default function EventsPage() {
+  const { activities } = useActivitiesStore();
   const searchValue = useSearchStore((s) => s.searchValue);
   const filteredEvents = searchValue
-    ? otherEvents.filter(
-        (event) => event.title.includes(searchValue) || event.location.includes(searchValue)
+    ? activities.filter(
+        (event) => event.title?.includes(searchValue) || event.location?.includes(searchValue)
       )
-    : otherEvents;
+    : activities;
 
   return (
     <main className="flex flex-col w-full min-h-screen bg-primary-50 pt-10 -mt-10">
@@ -190,8 +193,11 @@ export default function EventsPage() {
                   {filteredEvents.map((event) => (
                     <EventCard
                       key={event.id}
-                      {...event}
-                      date={formatEventDate("2025-04-10T14:00:00", "2025-04-10T16:00:00")}
+                      id={String(event.id)}
+                      title={event.title || ""}
+                      location={event.location || ""}
+                      date={formatEventDate(event.startTime || "", event.endTime || "")}
+                      imageUrl={event.cover || ""}
                       size="sm"
                     />
                   ))}
