@@ -1,19 +1,19 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { TicketCard } from "@/components/ui/ticket-card";
+import CancelOrderDialog from "@/features/orders/components/cancel-order-dialog";
 import {
   getApiV1ActivitiesByActivityId,
   getApiV1ActivitiesByActivityIdTicketTypes,
+  patchApiV1OrdersByOrderIdCancel,
+  postApiV1Orders,
 } from "@/services/api/client/sdk.gen";
-import type { ActivityResponse, TicketTypeResponse } from "@/services/api/client/types.gen";
+import type {
+  ActivityResponse,
+  CreateOrderResponse,
+  TicketTypeResponse,
+} from "@/services/api/client/types.gen";
 import { useAuthStore } from "@/store/auth";
 import { format } from "date-fns";
 import { zhTW } from "date-fns/locale";
@@ -21,11 +21,59 @@ import { Loader } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 // 定義票券資料類型
 interface TicketState {
   quantity: number;
 }
+
+const mockOrderData = {
+  message: "訂單創建成功",
+  status: true,
+  data: {
+    id: "O25061114093222072",
+    paidExpiredAt: "2025-06-11T06:19:32.084Z",
+    createdAt: "2025-06-11T06:09:32.084Z",
+    activity: {
+      id: 1,
+      title: "EVENET音樂祭",
+    },
+    orderItems: [
+      {
+        ticketType: {
+          name: "早鳥票",
+          price: 250,
+          startTime: "2025-06-11T06:09:32.084Z",
+          endTime: "2025-06-11T06:19:32.084Z",
+        },
+        quantity: 1,
+      },
+      {
+        ticketType: {
+          name: "一般票",
+          price: 500,
+          startTime: "2025-06-11T06:09:32.084Z",
+          endTime: "2025-06-11T06:19:32.084Z",
+        },
+        quantity: 1,
+      },
+    ],
+    payment: {
+      paidAmount: 750,
+    },
+    invoice: {
+      invoiceAddress: null,
+      invoiceTitle: null,
+      invoiceTaxId: null,
+      invoiceReceiverName: null,
+      invoiceReceiverPhoneNumber: null,
+      invoiceReceiverEmail: null,
+      invoiceCarrier: null,
+      invoiceType: "b2c",
+    },
+  },
+};
 
 export default function CheckoutPage() {
   const params = useParams();
@@ -38,6 +86,9 @@ export default function CheckoutPage() {
   const [ticketTypes, setTicketTypes] = useState<TicketTypeResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [orderCreated, setOrderCreated] = useState(false);
+  const [orderData, setOrderData] = useState<CreateOrderResponse | null>(null);
+  const [showCancelOrderDialog, setShowCancelOrderDialog] = useState(false);
 
   const totalQuantity = Object.values(ticketStates).reduce((sum, state) => sum + state.quantity, 0);
   const totalPrice = ticketTypes.reduce((sum, ticket) => {
@@ -102,7 +153,7 @@ export default function CheckoutPage() {
     <div className="container mx-auto px-4 py-12">
       <div className="max-w-[1180px] mx-auto">
         <div className="flex flex-col md:flex-row gap-12 justify-center">
-          {/* 左側活動資訊 */}
+          {/* 活動資訊 */}
           <div className="w-full md:w-[440px] space-y-6 shrink-0">
             <div className="relative h-[280px] w-full overflow-hidden rounded-lg">
               <Image
@@ -167,20 +218,97 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          {/* 右側票券選擇 */}
-          <div className="w-full md:w-[640px] space-y-6 shrink-0">
-            <div className="text-md font-bold">請選擇票種</div>
-            <div className="w-full">
-              <Select defaultValue="1">
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">場次一：04/19（六）</SelectItem>
-                  <SelectItem value="2">場次二：04/20（日）</SelectItem>
-                </SelectContent>
-              </Select>
+          {/* 訂單確認 */}
+          <div className={`w-full md:w-[640px] space-y-6 shrink-0 ${orderCreated ? "" : "hidden"}`}>
+            {/* 訂單明細表格 */}
+            <div className="mt-6 border rounded-sm  border-gray-200 overflow-hidden">
+              <table className="w-full text-center">
+                <thead className="bg-neutral-700 text-white">
+                  <tr>
+                    <th className="py-3 font-bold">項目</th>
+                    <th className="py-3 font-bold">數量</th>
+                    <th className="py-3 font-bold">價格</th>
+                    <th className="py-3 font-bold">小計</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {mockOrderData.data.orderItems.map((ticket) => (
+                    <tr
+                      key={`${ticket.ticketType.name}-${ticket.ticketType.price}-${ticket.quantity}`}
+                      className="border-t border-gray-200"
+                    >
+                      <td className="py-4 font-bold text-left pl-6">
+                        {ticket.ticketType.name}
+                        <div className="text-xs text-neutral-400 font-normal mt-1">
+                          票券可用時間
+                          <br />
+                          {format(ticket.ticketType.startTime, "yyyy.MM.dd (EEE) HH:mm", {
+                            locale: zhTW,
+                          }).replace("週", "")}
+                          -
+                          {format(ticket.ticketType.endTime, "MM.dd (EEE) HH:mm", {
+                            locale: zhTW,
+                          }).replace("週", "")}
+                          (GMT+8)
+                        </div>
+                      </td>
+                      <td className="py-4">{ticket.quantity}</td>
+                      <td className="py-4">NT${ticket.ticketType.price?.toLocaleString()}</td>
+                      <td className="py-4">
+                        NT$
+                        {(ticket.ticketType.price * ticket.quantity).toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
+            <div className="flex-1 py-4 flex flex-col items-end">
+              <div className="flex items-end">
+                <span className="font-bold text-lg tracking-wide mr-4">付款金額</span>
+                <span className="font-bold text-lg tracking-wide">
+                  NT$ {mockOrderData.data.payment.paidAmount?.toLocaleString()}
+                </span>
+              </div>
+              <div className="text-sm text-neutral-700 mt-1">
+                付款期限：
+                {format(new Date(mockOrderData.data.paidExpiredAt), "yyyy.MM.dd  HH:mm")}
+              </div>
+            </div>
+            <div className="flex gap-8 mt-8">
+              <Button
+                variant="outline"
+                className="flex-1 font-semibold"
+                onClick={() => {
+                  setShowCancelOrderDialog(true);
+                }}
+              >
+                上一步
+              </Button>
+              <CancelOrderDialog
+                isOpen={showCancelOrderDialog}
+                onClose={() => setShowCancelOrderDialog(false)}
+                onConfirm={() => {
+                  patchApiV1OrdersByOrderIdCancel({
+                    path: { orderId: orderData?.id ?? "" },
+                  });
+                  setOrderCreated(false);
+                  setShowCancelOrderDialog(false);
+                }}
+                orderId={orderData?.id ?? ""}
+              />
+              <Button
+                className="flex-1 font-semibold bg-neutral-700 text-white hover:bg-neutral-800"
+                onClick={() => {
+                  /* 前往付款邏輯 */
+                }}
+              >
+                前往付款
+              </Button>
+            </div>
+          </div>
+          {/* 票券選擇 */}
+          <div className={`w-full md:w-[640px] space-y-6 shrink-0 ${orderCreated ? "hidden" : ""}`}>
             <div className="text-md font-bold">請選擇票券</div>
             {ticketTypes.map((ticket) => {
               const ticketId = ticket.id?.toString() ?? "";
@@ -203,6 +331,39 @@ export default function CheckoutPage() {
                 className="w-full font-semibold"
                 size="lg"
                 disabled={totalQuantity === 0}
+                onClick={async () => {
+                  try {
+                    const orderBody = {
+                      activityId: Number(eventId),
+                      tickets: Object.entries(ticketStates)
+                        .filter(([_, state]) => state.quantity > 0)
+                        .map(([ticketId, state]) => ({
+                          id: Number(ticketId),
+                          quantity: state.quantity,
+                        })),
+                      paidAmount: totalPrice,
+                      commonlyUsedInvoicesId: null,
+                      ticket: {
+                        invoiceAddress: "",
+                        invoiceReceiverName: "",
+                        invoiceReceiverPhoneNumber: "",
+                        invoiceReceiverEmail: "",
+                        invoiceTaxId: "",
+                        invoiceTitle: "",
+                        invoiceCarrier: "",
+                        invoiceType: "b2c",
+                      },
+                    };
+                    const res = await postApiV1Orders({ body: orderBody });
+                    if (res?.data?.data) {
+                      setOrderData(res?.data?.data ?? null);
+                      toast.success("訂單建立成功！");
+                      setOrderCreated(true);
+                    }
+                  } catch (e: any) {
+                    toast.error(e?.message || "訂單建立失敗，請稍後再試");
+                  }
+                }}
               >
                 立即報名
               </Button>
