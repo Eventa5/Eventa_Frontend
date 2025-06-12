@@ -8,6 +8,7 @@ import {
   getApiV1ActivitiesByActivityIdTicketTypes,
   patchApiV1OrdersByOrderIdCancel,
   postApiV1Orders,
+  postApiV1OrdersByOrderIdCheckout,
 } from "@/services/api/client/sdk.gen";
 import type {
   ActivityResponse,
@@ -102,6 +103,25 @@ export default function CheckoutPage() {
       ...prev,
       [ticketId]: { quantity },
     }));
+  };
+
+  const handleCheckout = (orderId: string) => {
+    postApiV1OrdersByOrderIdCheckout({
+      path: { orderId },
+    }).then((res) => {
+      if (res.data) {
+        // 建立一個 div，插入 form
+        const div = document.createElement("div");
+        div.innerHTML = res.data;
+        document.body.appendChild(div);
+
+        // 自動送出 form
+        const form = div.querySelector("form");
+        if (form) {
+          (form as HTMLFormElement).submit();
+        }
+      }
+    });
   };
 
   useEffect(() => {
@@ -300,7 +320,7 @@ export default function CheckoutPage() {
               <Button
                 className="flex-1 font-semibold bg-neutral-700 text-white hover:bg-neutral-800"
                 onClick={() => {
-                  /* 前往付款邏輯 */
+                  handleCheckout(orderData?.id ?? "");
                 }}
               >
                 前往付款
