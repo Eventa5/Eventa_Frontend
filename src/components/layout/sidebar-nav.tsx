@@ -168,11 +168,11 @@ export const SidebarNav = () => {
 
   // 手機版漢堡選單按鈕
   const MobileMenuButton = () => (
-    <div className="lg:hidden fixed top-5 left-7 z-50">
+    <div className="lg:hidden fixed top-5 left-7 z-100">
       <button
         type="button"
         onClick={() => setMobileMenuOpen(true)}
-        className="bg-white rounded-lg cursor-pointer"
+        className={`bg-white rounded-lg cursor-pointer p-1 ${mobileMenuOpen ? "" : "shadow-md"}`}
       >
         {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
       </button>
@@ -184,7 +184,7 @@ export const SidebarNav = () => {
     <>
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-white z-50 lg:hidden flex flex-col mt-[68px] p-4"
+          className="fixed inset-0 bg-white z-50 lg:hidden flex flex-col pt-[68px] p-4"
           ref={mobileMenuRef}
         >
           {/* 選單內容 */}
@@ -326,7 +326,7 @@ export const SidebarNav = () => {
       <>
         <MobileMenuButton />
         <MobileMenu />
-        <div className="hidden lg:flex w-[220px] shrink-0 p-6 bg-[#FDFBF5] flex-col gap-14">
+        <div className="hidden lg:flex w-[220px] shrink-0 p-6 bg-[#FDFBF5] flex-col gap-14 h-screen fixed top-0 left-0">
           <div className="flex justify-center">
             <Link href="/organizer">
               <Image
