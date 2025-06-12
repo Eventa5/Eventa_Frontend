@@ -20,6 +20,7 @@ import { format } from "date-fns";
 import { zhTW } from "date-fns/locale";
 import { Loader } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -290,10 +291,12 @@ export default function CheckoutPage() {
                   NT$ {mockOrderData.data.payment.paidAmount?.toLocaleString()}
                 </span>
               </div>
-              <div className="text-sm text-neutral-700 mt-1">
-                付款期限：
-                {format(new Date(mockOrderData.data.paidExpiredAt), "yyyy.MM.dd  HH:mm")}
-              </div>
+              {totalPrice > 0 && (
+                <div className="text-sm text-neutral-700 mt-1">
+                  付款期限：
+                  {format(new Date(mockOrderData.data.paidExpiredAt), "yyyy.MM.dd  HH:mm")}
+                </div>
+              )}
             </div>
             <div className="flex gap-8 mt-8">
               <Button
@@ -317,14 +320,23 @@ export default function CheckoutPage() {
                 }}
                 orderId={orderData?.id ?? ""}
               />
-              <Button
-                className="flex-1 font-semibold bg-neutral-700 text-white hover:bg-neutral-800"
-                onClick={() => {
-                  handleCheckout(orderData?.id ?? "");
-                }}
-              >
-                前往付款
-              </Button>
+              {totalPrice > 0 ? (
+                <Button
+                  className="flex-1 font-semibold bg-neutral-700 text-white hover:bg-neutral-800"
+                  onClick={() => {
+                    handleCheckout(orderData?.id ?? "");
+                  }}
+                >
+                  前往付款
+                </Button>
+              ) : (
+                <Link
+                  href={`/attendee/orders/${orderData?.id}`}
+                  className="flex-1 font-semibold bg-neutral-700 text-white hover:bg-neutral-800 rounded-md py-2 px-4 text-center text-sm"
+                >
+                  至訂單管理查看
+                </Link>
+              )}
             </div>
           </div>
           {/* 票券選擇 */}
