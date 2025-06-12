@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useCallback, useState } from "react";
+import React, { useEffect, useCallback, useState, useRef, use } from "react";
 
 import { CalendarIcon, Search } from "lucide-react";
 import type { DateRange } from "react-day-picker";
@@ -36,39 +36,121 @@ export default function OrdersPage() {
     from: undefined,
     to: undefined,
   });
+  const [queryParams, setQueryParams] = useState({
+    page: 1,
+    limit: 8,
+    title: undefined as string | undefined,
+    from: undefined as string | undefined,
+    to: undefined as string | undefined,
+    status: undefined as string | undefined,
+  });
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // 狀態對應
-  const statusMap: Record<OrderTabsValue, string[]> = {
-    all: [],
-    registered: ["已付款", "已使用"],
-    pending: ["待付款"],
-    cancelled: ["已取消"],
-    expired: ["已逾期"],
-  };
+  // 使用 useState 來管理計數
+  const [counts, setCounts] = useState({
+    all: 0,
+    paid: 0,
+    pending: 0,
+    canceled: 0,
+    expired: 0,
+  });
 
-  // 準備 API 查詢參數
-  const queryParams = {
-    title: search || undefined,
-    from: searchDate?.from?.toISOString().split("T")[0],
-    to: searchDate?.to?.toISOString().split("T")[0],
-    status: tab === "all" ? undefined : statusMap[tab].join(","),
-  };
+  // 取得所有訂單用於計算數量
+  const allOrdersParams = { limit: 100 };
+  const { data: allOrdersData } = useOrders(allOrdersParams);
+  const allOrders = allOrdersData?.data || [];
 
-  const { data: ordersData, error, isLoading } = useOrders(queryParams);
+  // 當所有訂單資料載入時，計算各狀態數量
+  useEffect(() => {
+    if (allOrders.length > 0) {
+      setCounts({
+        all: allOrders.length,
+        paid: allOrders.filter((o: OrderResponse) => o.status === "paid").length,
+        pending: allOrders.filter((o: OrderResponse) => o.status === "pending").length,
+        canceled: allOrders.filter((o: OrderResponse) => o.status === "canceled").length,
+        expired: allOrders.filter((o: OrderResponse) => o.status === "expired").length,
+      });
+    }
+  }, [allOrders]);
+
+  const { data: ordersData, error, isLoading, mutate } = useOrders(queryParams);
   const orders = ordersData?.data || [];
 
-  // 計算各狀態數量
-  const counts = {
-    all: orders.length,
-    registered: orders.filter((o: OrderResponse) => o.status === "已付款" || o.status === "已使用")
-      .length,
-    pending: orders.filter((o: OrderResponse) => o.status === "待付款").length,
-    cancelled: orders.filter((o: OrderResponse) => o.status === "已取消").length,
-    expired: orders.filter((o: OrderResponse) => o.status === "已逾期").length,
+  // 格式化日期為指定格式並使用台灣時區
+  const formatDate = useCallback((date: Date) => {
+    // 轉換為台灣時區的日期
+    const taiwanDate = new Date(date.toLocaleString("en-US", { timeZone: "Asia/Taipei" }));
+    // 調整為台灣時區的 ISO 字串
+    const year = taiwanDate.getFullYear();
+    const month = String(taiwanDate.getMonth() + 1).padStart(2, "0");
+    const day = String(taiwanDate.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }, []);
+
+  // 處理日期選擇
+  const handleDateSelect = (date: DateRange | undefined) => {
+    setSearchDate(date);
+    // 當日期變更時觸發搜尋
+    const fromDate = date?.from ? formatDate(date.from) : undefined;
+    const toDate = date?.to ? formatDate(date.to) : undefined;
+
+    // 如果兩個日期都選擇完成且不是同一天，或是兩個日期都清除，則觸發搜尋
+    if (
+      (date?.from && date?.to && fromDate !== toDate) ||
+      (date?.from === undefined && date?.to === undefined)
+    ) {
+      setQueryParams((prev) => ({
+        ...prev,
+        page: 1,
+        from: date?.from === undefined ? undefined : fromDate,
+        to: date?.to === undefined ? undefined : toDate,
+      }));
+    }
   };
 
+  // 處理清除按鈕點擊
+  const handleClearDate = () => {
+    setSearchDate({ from: undefined, to: undefined });
+    setQueryParams((prev) => ({
+      ...prev,
+      page: 1,
+      from: undefined,
+      to: undefined,
+    }));
+  };
+
+  // 處理搜尋按鈕點擊
+  const handleSearch = useCallback(() => {
+    const searchValue = searchInputRef.current?.value || "";
+    const newParams = {
+      page: 1,
+      limit: 8,
+      title: searchValue || undefined,
+      from: undefined as string | undefined,
+      to: undefined as string | undefined,
+      status: tab === "all" ? undefined : tab,
+    };
+
+    // 如果有選擇日期，則加入日期參數
+    if (searchDate?.from && searchDate?.to) {
+      newParams.from = formatDate(searchDate.from);
+      newParams.to = formatDate(searchDate.to);
+    }
+
+    setQueryParams(newParams);
+  }, [searchDate, tab, formatDate]);
+
+  // 處理 tab 變更
+  const handleTabChange = useCallback((newTab: OrderTabsValue) => {
+    setTab(newTab);
+    setQueryParams((prev) => ({
+      ...prev,
+      page: 1,
+      status: newTab === "all" ? undefined : newTab,
+    }));
+  }, []);
+
   const [visibleCount, setVisibleCount] = React.useState(3);
-  const [filteredOrders, setFilteredOrders] = React.useState<OrderResponse[]>(orders);
 
   // 依年月分組
   function groupOrdersByYearAndMonth(orders: OrderResponse[]) {
@@ -84,11 +166,11 @@ export default function OrdersPage() {
       {} as Record<string, Record<string, OrderResponse[]>>
     );
   }
-  // 依 tab 狀態過濾訂單
-  const tabFilteredOrders =
-    tab === "all"
-      ? filteredOrders
-      : filteredOrders.filter((o) => o.status && statusMap[tab].includes(o.status));
+  // // 依 tab 狀態過濾訂單
+  // const tabFilteredOrders =
+  //   tab === "all"
+  //     ? filteredOrders
+  //     : filteredOrders.filter((o) => o.status && statusMap[tab].includes(o.status));
 
   const monthMap = {
     "01": { zh: "一月", en: "January" },
@@ -105,64 +187,50 @@ export default function OrdersPage() {
     "12": { zh: "十二月", en: "December" },
   };
 
-  const grouped = groupOrdersByYearAndMonth(tabFilteredOrders);
+  const grouped = groupOrdersByYearAndMonth(orders);
   const sortedYears = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
 
-  // 搜尋功能：依關鍵字與日期區間過濾
-  const handleSearch = useCallback(() => {
-    const keyword = search.trim().toLowerCase();
-    const filtered = orders.filter((order) => {
-      if (!order.activity) return false;
+  // 處理分頁變更
+  const handlePageChange = (page: number) => {
+    setQueryParams((prev) => ({
+      ...prev,
+      page,
+    }));
+  };
 
-      // 關鍵字比對（活動名稱、訂單編號、地點）
-      const matchKeyword =
-        !keyword ||
-        order.activity.title?.toLowerCase().includes(keyword) ||
-        order.id?.toLowerCase().includes(keyword) ||
-        order.activity.location?.toLowerCase().includes(keyword);
-
-      // 日期區間比對（只比對起始日）
-      let matchDate = true;
-      if (searchDate?.from && order.activity.startTime) {
-        const orderDate = new Date(
-          order.activity.startTime.split(" ")[0].replace(/-/g, "-")
-        ).getTime();
-        const fromTime = searchDate.from.getTime();
-        const toTime = searchDate.to ? searchDate.to.getTime() : null;
-        if (toTime) {
-          matchDate = orderDate >= fromTime && orderDate <= toTime;
-        } else {
-          matchDate = orderDate >= fromTime;
-        }
-      }
-      return matchKeyword && matchDate;
-    });
-    setFilteredOrders(filtered);
-  }, [search, searchDate?.from, searchDate?.to, orders]);
-
-  useEffect(() => {
-    if (orders.length > 0) {
-      handleSearch();
+  // 重置搜尋條件
+  const handleReset = useCallback(() => {
+    if (searchInputRef.current) {
+      searchInputRef.current.value = "";
     }
-  }, [handleSearch, orders]);
+    setSearchDate({ from: undefined, to: undefined });
+    setQueryParams({
+      page: 1,
+      limit: 8,
+      title: undefined,
+      from: undefined,
+      to: undefined,
+      status: tab === "all" ? undefined : tab,
+    });
+  }, [tab]);
 
   return (
     <div className="container max-w-6xl mx-auto p-4 py-16 md:pb-[200px]">
       <h1 className="text-center md:text-left text-lg md:text-2xl font-bold mb-4">訂單管理</h1>
       <OrderTabs
         value={tab}
-        onValueChange={setTab}
+        onValueChange={handleTabChange}
         counts={{
           all: counts.all || undefined,
-          registered: counts.registered || undefined,
+          paid: counts.paid || undefined,
           pending: counts.pending || undefined,
-          cancelled: counts.cancelled || undefined,
+          canceled: counts.canceled || undefined,
           expired: counts.expired || undefined,
         }}
         className="mb-4 border-b border-neutral-300"
       />
       <form
-        className="flex flex-col md:flex-row gap-2 mb-6 items-center"
+        className="flex flex-col md:flex-row gap-2 mb-6 md:items-center"
         onSubmit={(e) => {
           e.preventDefault();
           handleSearch();
@@ -174,7 +242,7 @@ export default function OrdersPage() {
               <Button
                 id="date"
                 variant="outline"
-                className="w-full flex justify-between items-center font-normal border-neutral-300 text-neutral-400 bg-white"
+                className="w-full flex justify-between items-center font-normal border-neutral-300 text-neutral-400 bg-white md:text-base"
               >
                 <span className={searchDate?.from ? "text-neutral-900" : "text-neutral-400"}>
                   {searchDate?.from ? (
@@ -202,7 +270,7 @@ export default function OrdersPage() {
                   <button
                     type="button"
                     className="text-xs text-neutral-400 hover:text-neutral-600 underline"
-                    onClick={() => setSearchDate({ from: undefined, to: undefined })}
+                    onClick={handleClearDate}
                   >
                     清除
                   </button>
@@ -212,7 +280,7 @@ export default function OrdersPage() {
                 mode="range"
                 defaultMonth={searchDate?.from}
                 selected={searchDate}
-                onSelect={setSearchDate}
+                onSelect={handleDateSelect}
                 numberOfMonths={2}
                 classNames={{
                   selected: "bg-accent",
@@ -220,27 +288,33 @@ export default function OrdersPage() {
                     "rounded-l-md bg-primary-500 hover:bg-primary-500 custom-range-start",
                   range_end: "rounded-r-md bg-primary-500 hover:bg-primary-500 custom-range-end",
                 }}
-                showOutsideDays={false}
               />
             </PopoverContent>
           </Popover>
         </div>
         <div className="relative w-full md:w-1/3">
           <Input
-            className="w-full border border-neutral-300 text-neutral-400 placeholder-neutral-400 pr-10"
+            ref={searchInputRef}
+            className="w-full border border-neutral-300 text-neutral-400 placeholder-neutral-400 pr-10 text-sm md:text-base"
             placeholder="輸入關鍵字搜尋..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            defaultValue={search}
             type="search"
           />
           <button
             type="submit"
             className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400"
-            tabIndex={-1}
           >
             <Search className="w-5 h-5 text-neutral-400" />
           </button>
         </div>
+        <Button
+          type="button"
+          variant="outline"
+          className="border-neutral-300 text-neutral-400 hover:text-neutral-600 text-sm md:text-base"
+          onClick={handleReset}
+        >
+          清除條件
+        </Button>
       </form>
 
       {isLoading ? (
@@ -295,7 +369,7 @@ export default function OrdersPage() {
               </div>
             );
           }
-          if (tabFilteredOrders.length === 0) {
+          if (orders.length === 0) {
             return (
               <div className="text-center text-neutral-400 py-12 text-lg">無符合條件的訂單</div>
             );
@@ -319,7 +393,7 @@ export default function OrdersPage() {
                             value={month}
                             className="border-none mb-2 md:mb-6"
                           >
-                            <AccordionTrigger className="flex items-center px-1 py-2 group hover:no-underline">
+                            <AccordionTrigger className="flex items-center px-1 py-2 pb-4 group hover:no-underline">
                               <span className="flex items-center gap-2">
                                 <span className="text-2xl font-bold leading-none">
                                   {monthMap[month as keyof typeof monthMap].zh}
@@ -344,7 +418,7 @@ export default function OrdersPage() {
                 );
               })}
               {/* 查看更多按鈕 */}
-              {tabFilteredOrders.length > visibleCount && (
+              {orders.length > visibleCount && (
                 <div className="flex justify-center pt-6">
                   <Button
                     onClick={() => {}}

@@ -4,16 +4,16 @@ import { CalendarX, ClipboardCheck, ClipboardList, ClipboardX, WalletCards } fro
 import type React from "react";
 import { Tabs, TabsList, TabsTrigger } from "./tabs";
 
-export type OrderTabsValue = "all" | "registered" | "pending" | "cancelled" | "expired";
+export type OrderTabsValue = "all" | "paid" | "pending" | "canceled" | "expired";
 
 export interface OrderTabsProps {
   value: OrderTabsValue;
   onValueChange: (value: OrderTabsValue) => void;
   counts: {
     all: number | undefined;
-    registered: number | undefined;
+    paid: number | undefined;
     pending: number | undefined;
-    cancelled: number | undefined;
+    canceled: number | undefined;
     expired: number | undefined;
   };
   className?: string;
@@ -33,7 +33,7 @@ const tabConfig = [
     underline: "secondary-500",
   },
   {
-    value: "registered",
+    value: "paid",
     label: "已付款",
     icon: ClipboardCheck,
     iconClass: "text-green-500",
@@ -57,7 +57,7 @@ const tabConfig = [
     underline: "primary-600",
   },
   {
-    value: "cancelled",
+    value: "canceled",
     label: "已取消",
     icon: ClipboardX,
     iconClass: "text-neutral-400",
@@ -88,10 +88,14 @@ export const OrderTabs: React.FC<OrderTabsProps> = ({
   counts,
   className,
 }) => {
+  const handleTabChange = (newValue: string) => {
+    onValueChange(newValue as OrderTabsValue);
+  };
+
   return (
     <Tabs
       value={value}
-      onValueChange={(v) => onValueChange(v as OrderTabsValue)}
+      onValueChange={handleTabChange}
       className={cn(className, "overflow-x-auto touch-scroll scrollbar-hide cursor-grab")}
     >
       <ScrollArea className="w-full overflow-x-auto">

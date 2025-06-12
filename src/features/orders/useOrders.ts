@@ -18,7 +18,7 @@ export interface Order {
   };
 }
 
-export type OrderTabsValue = "all" | "registered" | "pending" | "cancelled" | "expired";
+export type OrderTabsValue = "all" | "paid" | "pending" | "canceled" | "expired";
 
 interface OrdersResponse {
   data: OrderResponse[];
@@ -32,16 +32,26 @@ export const useOrders = (params?: {
   from?: string;
   to?: string;
 }) => {
-  const { data, error, isLoading } = useSWR<OrdersResponse>(["orders", params], async () => {
-    const response = await getApiV1Orders({
-      query: params,
-    });
-    return { data: response.data?.data || [] };
-  });
+  const { data, error, isLoading, mutate } = useSWR<OrdersResponse>(
+    ["orders", params],
+    async () => {
+      const queryParams = {
+        ...params,
+        from: params?.from || undefined,
+        to: params?.to || undefined,
+      };
+
+      const response = await getApiV1Orders({
+        query: queryParams,
+      });
+      return { data: response.data?.data || [] };
+    }
+  );
 
   return {
     data,
     error,
     isLoading,
+    mutate,
   };
 };
