@@ -173,10 +173,7 @@ export default function AttendeesPage() {
               <thead className="bg-gray-50 border-b border-gray-100">
                 <tr>
                   <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    參加者姓名
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    參加者信箱
+                    票券編號
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     票種
@@ -216,10 +213,7 @@ export default function AttendeesPage() {
                         className="hover:bg-gray-50 transition-colors"
                       >
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {participant.assignedName}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {participant.assignedEmail}
+                          {participant.id}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {participant.ticketType?.name}
@@ -247,7 +241,6 @@ export default function AttendeesPage() {
                             : "-"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          {" "}
                           {participant.status === "unassigned" && (
                             <Button
                               size="sm"
@@ -321,13 +314,7 @@ export default function AttendeesPage() {
                     >
                       <div className="flex justify-between items-center mb-3">
                         <div className="flex-1">
-                          <h3 className="font-medium text-gray-900">
-                            {participant.assignedName}
-                            <span className="text-gray-500 text-sm">
-                              {" "}
-                              ({participant.assignedEmail})
-                            </span>
-                          </h3>
+                          <h3 className="font-medium text-gray-900">{participant.id}</h3>
                         </div>
                         <Badge
                           variant="outline"
@@ -365,7 +352,7 @@ export default function AttendeesPage() {
                               : "-"}
                           </span>
                         </div>
-                      </div>{" "}
+                      </div>
                       {participant.status === "unassigned" && (
                         <div className="mt-3">
                           <Button
