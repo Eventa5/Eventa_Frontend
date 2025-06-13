@@ -169,31 +169,31 @@ export default function EventDetailPage() {
         </div>
       </div>
       {/* 標題與標籤區塊 */}
-      <div className="w-full max-w-[1280px] mx-auto px-4 pt-10 sm:pt-10 sm:pb-6">
+      <div className="w-full max-w-[1280px] mx-auto px-4 pt-10 lg:pt-10 lg:pb-6">
         <div className="flex gap-4 mb-4">
           {eventData?.categories?.map((category) => (
             <Link
               key={category.id}
               href={`/events?category=${category.name}`}
-              className="bg-secondary-100 text-secondary-500 rounded-lg py-2 px-3 sm:px-6 font-bold text-sm md:text-base"
+              className="bg-secondary-100 text-secondary-500 rounded-lg py-2 px-3 lg:px-6 font-bold text-sm lg:text-base"
             >
               {category.name}
             </Link>
           ))}
         </div>
-        <h1 className="font-black text-3xl font-serif-tc md:text-5xl text-[#000] leading-tight">
+        <h1 className="font-black text-3xl font-serif-tc lg:text-5xl text-[#000] leading-tight">
           {eventData?.title ?? "無標題"}
         </h1>
       </div>
       {/* 主內容與右側資訊欄雙欄排版 */}
-      <div className="flex flex-col md:flex-row md:items-start w-full max-w-[1280px] mx-auto px-4 py-0 sm:py-10 mb-16 gap-8">
+      <div className="flex flex-col lg:flex-row lg:items-start w-full max-w-[1280px] mx-auto px-4 py-0 lg:py-10 mb-16 gap-8">
         {/* 左側主內容（flex-1） */}
         <div className="flex-1 flex flex-col gap-20">
           {/* 內容區塊 */}
-          <section className="flex flex-col md:flex-row gap-8">
+          <section className="flex flex-col lg:flex-row gap-8">
             {/* 左側主內容 */}
             <div className="flex flex-col items-start">
-              <div className="hidden md:flex flex-col items-center gap-4">
+              <div className="hidden lg:flex flex-col items-center gap-4">
                 <Image
                   src="/images/balloon.png"
                   alt="Ballon Yellow"
@@ -207,7 +207,7 @@ export default function EventDetailPage() {
             </div>
             <div className="flex-1 flex flex-col gap-10">
               {/* 關於活動 */}
-              <p className="text-neutral-800 leading-relaxed mt-0 sm:mt-16">
+              <p className="text-neutral-800 leading-relaxed mt-0 lg:mt-16">
                 {eventData?.summary ?? ""}
               </p>
               <div className="flex flex-wrap gap-2">
@@ -220,7 +220,7 @@ export default function EventDetailPage() {
                         router.push(`/events?search=${tag}`);
                         setSearchValue(tag);
                       }}
-                      className="border border-neutral-500 rounded-full px-4 py-1 text-neutral-500 text-base sm:text-sm cursor-pointer"
+                      className="border border-neutral-500 rounded-full px-4 py-1 text-neutral-500 text-base lg:text-sm cursor-pointer"
                     >
                       #{tag}
                     </button>
@@ -228,8 +228,8 @@ export default function EventDetailPage() {
               </div>
               <Separator />
               {/* 活動資訊表格 */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 pl-0 md:pl-8">
-                <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg sm:text-base">
+              <div className="flex flex-col lg:flex-row items-start lg:items-center gap-3 pl-0 lg:pl-8">
+                <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg lg:text-base">
                   <Calendar className="w-5 h-5" />
                   活動時間
                 </span>
@@ -255,16 +255,16 @@ export default function EventDetailPage() {
                 </a>
               </div>
               <Separator />
-              <div className="flex flex-col sm:flex-row items-start gap-3 pl-0 md:pl-8">
-                <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg sm:text-base">
+              <div className="flex flex-col lg:flex-row items-start gap-3 pl-0 lg:pl-8">
+                <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg lg:text-base">
                   <MapPin className="w-5 h-5" />
                   活動地點
                 </span>
                 <span className="text-neutral-800">{eventLocation}</span>
               </div>
               <Separator />
-              <div className="flex flex-col sm:flex-row items-start gap-3 pl-0 md:pl-8">
-                <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg sm:text-base">
+              <div className="flex flex-col lg:flex-row items-start gap-3 pl-0 lg:pl-8">
+                <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg lg:text-base">
                   <LinkIcon className="w-5 h-5" />
                   相關連結
                 </span>
@@ -282,7 +282,7 @@ export default function EventDetailPage() {
                 </a>
               </div>
               {/* 手機版主辦單位資訊 */}
-              <div className="w-full bg-neutral-800 rounded-lg p-8 flex gap-4 items-center justify-between md:hidden">
+              <div className="w-full bg-neutral-800 rounded-lg p-8 flex gap-4 items-center justify-between lg:hidden">
                 <div className="flex flex-col items-start gap-4 ">
                   <span className="font-bold text-lg text-white">{organization?.name}</span>
                   <div className="flex gap-10 mt-2">
@@ -327,12 +327,12 @@ export default function EventDetailPage() {
                   alt="主辦單位頭貼"
                   width={90}
                   height={90}
-                  className="rounded-full w-24 sm:w-32 md:w-40"
+                  className="rounded-full w-24 sm:w-32 md:w-36"
                 />
               </div>
               {/* 注意事項 */}
               <div
-                className={`rounded-[24px] p-6 flex flex-col gap-4 md:rounded-full md:flex-row md:items-center md:gap-8 md:px-8 md:py-6 ${
+                className={`rounded-[24px] p-6 flex flex-col gap-4 lg:rounded-full lg:flex-row lg:items-center lg:gap-8 lg:px-8 lg:py-6 ${
                   eventData?.isOnline ? "bg-[#FCE3DA]" : "bg-[#FFF0CA]"
                 }`}
               >
@@ -385,8 +385,8 @@ export default function EventDetailPage() {
           </section>
 
           {/* 活動地圖區塊 */}
-          <section className="flex sm:flex-row flex-col gap-0 sm:gap-8">
-            <div className="hidden sm:flex flex-col items-start">
+          <section className="flex lg:flex-row flex-col gap-0 lg:gap-8">
+            <div className="hidden lg:flex flex-col items-start">
               <div className="flex flex-col items-center gap-4">
                 <Image
                   src="/images/balloon.png"
@@ -400,8 +400,8 @@ export default function EventDetailPage() {
               </div>
             </div>
             {/* 手機版活動地圖標題 */}
-            <div className="flex items-end  justify-center gap-8 mb-6 sm:hidden">
-              <span className="font-bold font-serif-tc text-3xl sm:text-2xl text-neutral-800">
+            <div className="flex items-end justify-center gap-8 mb-6 lg:hidden">
+              <span className="font-bold font-serif-tc text-3xl lg:text-2xl text-neutral-800">
                 活動
               </span>
               <Image
@@ -411,11 +411,11 @@ export default function EventDetailPage() {
                 height={32}
                 className="mx-2"
               />
-              <span className="font-bold font-serif-tc text-3xl sm:text-2xl text-neutral-800">
+              <span className="font-bold font-serif-tc text-3xl lg:text-2xl text-neutral-800">
                 地圖
               </span>
             </div>
-            <div className="w-full max-w-[845px] rounded-[16px] overflow-hidden mt-0 sm:mt-16">
+            <div className="w-full max-w-[845px] rounded-[16px] overflow-hidden mt-0 lg:mt-16">
               <iframe
                 title="活動地圖"
                 width="100%"
@@ -432,8 +432,8 @@ export default function EventDetailPage() {
           </section>
 
           {/* 活動簡介區塊 */}
-          <section className="flex flex-col md:flex-row gap-0 sm:gap-8">
-            <div className="hidden sm:flex flex-col items-start">
+          <section className="flex flex-col lg:flex-row gap-0 lg:gap-8">
+            <div className="hidden lg:flex flex-col items-start">
               <div className="flex flex-col items-center gap-4">
                 <Image
                   src="/images/balloon.png"
@@ -447,8 +447,8 @@ export default function EventDetailPage() {
               </div>
             </div>
             {/* 手機版活動簡介標題 */}
-            <div className="flex items-end  justify-center gap-8 mb-6 sm:hidden">
-              <span className="font-bold font-serif-tc text-3xl sm:text-2xl text-neutral-800">
+            <div className="flex items-end  justify-center gap-8 mb-6 lg:hidden">
+              <span className="font-bold font-serif-tc text-3xl lg:text-2xl text-neutral-800">
                 活動
               </span>
               <Image
@@ -458,11 +458,11 @@ export default function EventDetailPage() {
                 height={32}
                 className="mx-2"
               />
-              <span className="font-bold font-serif-tc text-3xl sm:text-2xl text-neutral-800">
+              <span className="font-bold font-serif-tc text-3xl lg:text-2xl text-neutral-800">
                 簡介
               </span>
             </div>
-            <div className="flex flex-col gap-2 mt-0 sm:mt-16">
+            <div className="flex flex-col gap-2 mt-0 lg:mt-16">
               <div
                 className="text-base text-[#525252]"
                 // biome-ignore lint/security/noDangerouslySetInnerHtml: 已用 DOMPurify 處理
@@ -474,7 +474,7 @@ export default function EventDetailPage() {
           </section>
         </div>
         {/* 右側主辦單位資訊 */}
-        <aside className="w-full hidden md:flex md:w-[320px] flex-col gap-8 mt-0 sm:mt-16">
+        <aside className="w-full hidden lg:flex lg:w-[320px] flex-col gap-8 mt-0 lg:mt-16">
           <div className="bg-neutral-800 rounded-lg p-6 flex flex-col gap-4 items-center">
             <div className="flex items-center gap-4">
               <Image
@@ -496,7 +496,6 @@ export default function EventDetailPage() {
               className="w-full bg-primary-500 hover:bg-[#FFCA28] transition-colors text-neutral-800 text-base font-bold rounded-lg mt-2 cursor-pointer
                 "
               onClick={handleCheckout}
-              disabled={eventData?.userStatus?.isRegistered}
             >
               {eventData?.userStatus?.isRegistered ? "已報名" : "立即報名"}
             </Button>
@@ -557,13 +556,12 @@ export default function EventDetailPage() {
         </aside>
       </div>
       {/* 手機版底部固定報名 bar */}
-      <div className="fixed bottom-0 left-0 w-full bg-transparent z-50 sm:hidden px-8 pb-8 pointer-events-none">
+      <div className="fixed bottom-0 left-0 w-full bg-transparent z-50 lg:hidden px-8 pb-8 pointer-events-none">
         <div className="flex items-center gap-4">
           <button
             type="button"
-            className="bg-primary-500 hover:bg-[#FFCA28] transition-colors cursor-pointer rounded-[12px] h-12 flex items-center justify-center text-base font-bold shadow-lg text-neutral-800 pointer-events-auto w-[80%]"
+            className="bg-primary-500 hover:bg-[#FFCA28] transition-colors cursor-pointer rounded-[12px] h-12 md:h-16 flex items-center justify-center text-base font-bold shadow-lg text-neutral-800 pointer-events-auto w-[80%]"
             onClick={handleCheckout}
-            disabled={eventData?.userStatus?.isRegistered}
           >
             {eventData?.userStatus?.isRegistered ? "已報名" : "立即報名"}
           </button>
