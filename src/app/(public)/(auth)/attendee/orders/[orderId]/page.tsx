@@ -11,23 +11,32 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { EventCard } from "@/components/ui/event-cards";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { formatEventDate } from "@/features/activities/formatEventDate";
 import RefundConfirmDialog from "@/features/orders/components/refund-confirm-dialog";
 import RefundFailDialog from "@/features/orders/components/refund-fail-dialog";
 import RefundSuccessDialog from "@/features/orders/components/refund-success-dialog";
-import { Ticket, getTicketStatusColor } from "@/features/orders/orderDetail";
+import {
+  getTicketStatusColor,
+  orderStatusMap,
+  ticketStatusMap,
+} from "@/features/orders/orderDetail";
 import {
   getApiV1Activities,
   getApiV1ActivitiesByActivityId,
   getApiV1OrdersByOrderId,
   getApiV1UsersProfile,
 } from "@/services/api/client/sdk.gen";
-import type {
-  ActivityResponse,
-  OrderDetailResponse,
-  UserResponse,
-} from "@/services/api/client/types.gen";
+import type { ActivityResponse, OrderDetailResponse } from "@/services/api/client/types.gen";
 import {
   Calendar,
   CreditCard,
@@ -96,6 +105,7 @@ export default function OrderDetailPage() {
     activityName: string;
     cancelTime: string;
   } | null>(null);
+  const [showSimilarActivities, setShowSimilarActivities] = useState(false);
 
   // 使用 useSWR 獲取訂單資料
   const {
@@ -112,19 +122,12 @@ export default function OrderDetailPage() {
     error: activityError,
     isLoading: activityLoading,
   } = useSWR<ActivityResponse>(order?.activity?.title ? `/api/activities/${order.id}` : null, () =>
-    activityFetcher(Number(order?.id))
+    activityFetcher(Number((order?.activity as { id?: number })?.id))
   );
-
-  // 使用 useSWR 獲取個人資料
-  const {
-    data: userProfile,
-    error: profileError,
-    isLoading: profileLoading,
-  } = useSWR<UserResponse>("/api/users/profile", profileFetcher);
 
   // 使用 useSWR 獲取相似活動資料
   const { data: similarActivities } = useSWR(
-    activity?.categories?.map((cat) => cat.id),
+    order?.activity?.categories?.map((cat) => cat.id),
     similarActivitiesFetcher,
     {
       revalidateOnFocus: false,
@@ -132,10 +135,7 @@ export default function OrderDetailPage() {
   );
 
   const handleViewSimilarActivities = () => {
-    if (activity?.categories?.length) {
-      const categoryName = activity.categories[0].name;
-      router.push(`/events?category=${categoryName}`);
-    }
+    setShowSimilarActivities(true);
   };
 
   const handleTagClick = (tag: string) => {
@@ -276,7 +276,7 @@ export default function OrderDetailPage() {
             <div className="flex-1 min-w-0">
               {/* 標籤列 */}
               <div className="flex gap-2 mb-6">
-                {activity?.categories?.map((category) => (
+                {order?.activity?.categories?.map((category) => (
                   <span
                     key={category.id}
                     className="bg-secondary-100 text-secondary-500 px-4 md:px-6 py-1 md:py-2 rounded-lg text-sm md:text-lg font-semibold cursor-pointer hover:bg-secondary-200 transition-colors"
@@ -285,27 +285,29 @@ export default function OrderDetailPage() {
                     {category.name}
                   </span>
                 ))}
-                <span
+                {/* <span
                   className="bg-secondary-100 text-secondary-500 px-4 md:px-6 py-1 md:py-2 rounded-lg text-sm md:text-lg font-semibold cursor-pointer hover:bg-secondary-200 transition-colors"
                   onClick={() => handleCategoryClick(activity?.isOnline ? "線上活動" : "線下活動")}
                 >
                   {activity?.isOnline ? "線上活動" : "線下活動"}
-                </span>
+                </span> */}
               </div>
-              <div className="md:flex mb-4 items-center gap-2">
+              <div className="md:flex mb-4 items-center gap-4">
                 <h2 className="text-3xl md:text-5xl font-extrabold mb-2 font-serif-tc">
-                  {activity?.title}
+                  {order?.activity?.title}
                 </h2>
-                <Button
-                  type="button"
-                  className="px-4 py-1 rounded mr-2 bg-primary-300"
-                  onClick={handleViewSimilarActivities}
-                >
-                  查看類似活動
-                </Button>
+                {similarActivities && similarActivities.length > 0 && (
+                  <Button
+                    type="button"
+                    className="px-4 py-1 rounded mr-2 bg-primary-300"
+                    onClick={handleViewSimilarActivities}
+                  >
+                    查看類似活動
+                  </Button>
+                )}
               </div>
               <div className="flex items-center gap-2 mb-6 md:mb-16">
-                {mockTags.map((tag) => (
+                {order?.activity?.tags?.split(",").map((tag: string) => (
                   <Badge
                     variant="outline"
                     key={tag}
@@ -355,15 +357,22 @@ export default function OrderDetailPage() {
                         <p className="font-semibold md:w-1/5 md:mb-0 mb-2">訂單狀態</p>
                         <div className="md:flex md:w-4/5 gap-2 items-center">
                           <span className="inline-block py-1 rounded-full font-medium mb-2 md:mb-0">
-                            {order.status}
+                            {orderStatusMap[order.status as keyof typeof orderStatusMap]}
                           </span>
                           <div>
-                            {["已付款", "待付款"].includes(order.status || "") && (
+                            {order.status === "pending" && (
                               <>
                                 <Button
                                   type="button"
                                   className="py-2 md:py-2.5 rounded mr-2 font-semibold h-auto w-[120px]"
-                                  onClick={() => router.push(`/attendee/orders/${order.id}/pay`)}
+                                  onClick={() => {
+                                    const activityId = (order.activity as { id?: number })?.id;
+                                    if (activityId) {
+                                      router.push(
+                                        `/events/${activityId}/checkout?orderId=${order.id}`
+                                      );
+                                    }
+                                  }}
                                 >
                                   前往付款
                                 </Button>
@@ -376,6 +385,16 @@ export default function OrderDetailPage() {
                                   退票
                                 </Button>
                               </>
+                            )}
+                            {order.status === "paid" && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                className="border-neutral-300 text-neutral-600 py-2 md:py-2.5 rounded hover:bg-neutral-400 hover:text-white w-[120px] h-auto"
+                                onClick={() => setShowRefundConfirm(true)}
+                              >
+                                退票
+                              </Button>
                             )}
                           </div>
                         </div>
@@ -397,7 +416,7 @@ export default function OrderDetailPage() {
                         <div className="space-y-1 md:grow-1 md:flex items-center gap-2">
                           <p className="font-semibold md:w-1/5 md:mb-0 mb-2">姓名</p>
                           <div className="flex md:w-4/5 gap-2 items-center">
-                            {userProfile?.name}
+                            {order?.user?.name}
                           </div>
                         </div>
                       </li>
@@ -406,7 +425,7 @@ export default function OrderDetailPage() {
                         <div className="space-y-1 md:grow-1 md:flex items-center gap-2">
                           <p className="font-semibold md:w-1/5 md:mb-0 mb-2">電子郵件</p>
                           <div className="flex md:w-4/5 gap-2 items-center">
-                            {userProfile?.email}
+                            {order?.user?.email}
                           </div>
                         </div>
                       </li>
@@ -415,7 +434,7 @@ export default function OrderDetailPage() {
                         <div className="space-y-1 md:grow-1 md:flex items-center gap-2">
                           <p className="font-semibold md:w-1/5 md:mb-0 mb-2">行動電話</p>
                           <div className="flex md:w-4/5 gap-2 items-center">
-                            {userProfile?.phoneNumber}
+                            {order?.user?.phoneNumber}
                           </div>
                         </div>
                       </li>
@@ -424,7 +443,7 @@ export default function OrderDetailPage() {
                         <div className="space-y-1 md:grow-1 md:flex items-center gap-2">
                           <p className="font-semibold md:w-1/5 md:mb-0 mb-2">性別</p>
                           <div className="flex md:w-4/5 gap-2 items-center">
-                            {genderMap[userProfile?.gender as keyof typeof genderMap]}
+                            {genderMap[order?.user?.gender as keyof typeof genderMap]}
                           </div>
                         </div>
                       </li>
@@ -481,8 +500,14 @@ export default function OrderDetailPage() {
                           </div>
                           <div className="text-sm mb-1 text-neutral-600">票券編號：{ticket.id}</div>
                           <div className="text-sm mb-1 text-neutral-600">
-                            有效期限：{order?.paidAt?.slice(0, 10)} {order?.paidAt?.slice(11, 16)} ~{" "}
-                            {order?.paidExpiredAt?.slice(11, 16)}
+                            付款有效期限：
+                            {
+                              formatEventDate(
+                                order?.paidExpiredAt || "",
+                                order?.paidExpiredAt || ""
+                              ).startDateString
+                            }{" "}
+                            23:59
                           </div>
                           <div className="text-sm mb-1 text-neutral-600">
                             票價：
@@ -502,7 +527,7 @@ export default function OrderDetailPage() {
                             <span
                               className={`border px-4 py-1 md:px-6 md:py-2 rounded-full text-sm mb-2 text-center ${statusColor}`}
                             >
-                              {ticket.status}
+                              {ticketStatusMap[ticket.status as keyof typeof ticketStatusMap]}
                             </span>
                           )}
                           {/* 狀態按鈕區塊 */}
@@ -542,6 +567,35 @@ export default function OrderDetailPage() {
         open={showRefundFail}
         onClose={() => setShowRefundFail(false)}
       />
+
+      {/* 推薦活動彈窗 */}
+      <Dialog
+        open={showSimilarActivities}
+        onOpenChange={setShowSimilarActivities}
+      >
+        <DialogContent className="max-w-3xl border-neutral-300">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">
+              <DialogDescription>推薦活動</DialogDescription>
+            </DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 max-h-[80vh] overflow-y-auto">
+            {similarActivities?.map((activity) => (
+              <EventCard
+                key={activity.id}
+                id={activity.id?.toString() || ""}
+                title={activity.title || ""}
+                location={activity.location || ""}
+                date={
+                  formatEventDate(activity.startTime || "", activity.endTime || "").startDateString
+                }
+                imageUrl={activity.cover || ""}
+                size="sm"
+              />
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
