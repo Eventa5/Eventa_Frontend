@@ -53,6 +53,8 @@ export default function OrdersPage() {
     pending: 0,
     canceled: 0,
     expired: 0,
+    processing: 0,
+    failed: 0,
   });
 
   // 取得所有訂單用於計算數量
@@ -75,6 +77,8 @@ export default function OrdersPage() {
         pending: allOrders.filter((o: OrderResponse) => o.status === "pending").length,
         canceled: allOrders.filter((o: OrderResponse) => o.status === "canceled").length,
         expired: allOrders.filter((o: OrderResponse) => o.status === "expired").length,
+        processing: allOrders.filter((o: OrderResponse) => o.status === "processing").length,
+        failed: allOrders.filter((o: OrderResponse) => o.status === "failed").length,
       });
     }
   }, [allOrders]);
@@ -156,7 +160,29 @@ export default function OrdersPage() {
     }));
   }, []);
 
-  const [visibleCount, setVisibleCount] = React.useState(3);
+  const [visibleCount, setVisibleCount] = React.useState(8);
+  const [isLoadingMore, setIsLoadingMore] = React.useState(false);
+
+  // 處理載入更多
+  const handleLoadMore = useCallback(async () => {
+    if (isLoadingMore) return;
+
+    setIsLoadingMore(true);
+    try {
+      const nextPage = Math.ceil(visibleCount / queryParams.limit) + 1;
+      const newParams = {
+        ...queryParams,
+        page: nextPage,
+      };
+
+      await mutate(newParams as any);
+      setVisibleCount((prev) => prev + 8); // 假設每頁固定載入 8 筆資料
+    } catch (error) {
+      console.error("載入更多訂單時發生錯誤:", error);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [isLoadingMore, queryParams, mutate, visibleCount]);
 
   // 依年月分組
   function groupOrdersByYearAndMonth(orders: OrderResponse[]) {
@@ -232,6 +258,8 @@ export default function OrdersPage() {
           pending: counts.pending || undefined,
           canceled: counts.canceled || undefined,
           expired: counts.expired || undefined,
+          processing: counts.processing || undefined,
+          failed: counts.failed || undefined,
         }}
         className="mb-4 border-b border-neutral-300"
       />
@@ -426,12 +454,13 @@ export default function OrdersPage() {
               {orders.length > visibleCount && (
                 <div className="flex justify-center pt-6">
                   <Button
-                    onClick={() => {}}
+                    onClick={handleLoadMore}
                     type="button"
                     variant="outline"
                     className="border-neutral-600 text-neutral-600 hover:cursor-pointer px-15 py-3"
+                    disabled={isLoadingMore}
                   >
-                    查看更多
+                    {isLoadingMore ? "載入中..." : "查看更多"}
                   </Button>
                 </div>
               )}

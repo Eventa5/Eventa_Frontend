@@ -1,5 +1,5 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatEventDate } from "@/features/activities/formatEventDate";
+import { orderStatusMap } from "@/features/orders/orderDetail";
 import type { OrderResponse } from "@/services/api/client/types.gen";
 import { CalendarIcon, GlobeIcon, MapPinIcon } from "lucide-react";
 import Link from "next/link";
@@ -24,14 +24,6 @@ interface OrderCardProps {
   order: OrderResponse;
 }
 
-const OrderStatusMap = {
-  paid: "已付款",
-  pending: "待付款",
-  expired: "已逾期",
-  canceled: "已取消",
-  used: "已使用",
-};
-
 export const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
   if (!order.activity || !order.activity.startTime || !order.activity.endTime)
     return (
@@ -55,6 +47,12 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
     case "used":
       statusClass = "text-white bg-neutral-400";
       break;
+    case "processing":
+      statusClass = "text-neutral-800 bg-primary-200";
+      break;
+    case "failed":
+      statusClass = "text-neutral-800 bg-red-100";
+      break;
     default:
       statusClass = "text-gray-600";
   }
@@ -70,7 +68,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
         <div className="w-full md:flex md:flex-row md:items-center">
           <div className="flex-shrink-0 flex items-center h-full mb-4 md:mb-0 order-1 md:order-2">
             <span className={`px-4 py-1 rounded-full text-sm font-medium ${statusClass}`}>
-              {OrderStatusMap[order.status as keyof typeof OrderStatusMap] ?? order.status}
+              {orderStatusMap[order.status as keyof typeof orderStatusMap] ?? order.status}
             </span>
           </div>
           <div className="flex-1 min-w-0 flex items-center order-2 md:order-1">

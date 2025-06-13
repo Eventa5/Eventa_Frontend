@@ -96,6 +96,8 @@ export const orderStatusMap = {
   paid: "已付款",
   canceled: "已取消",
   expired: "已逾期",
+  processing: "付款中",
+  failed: "付款失敗",
 };
 
 export const ticketStatusMap = {
