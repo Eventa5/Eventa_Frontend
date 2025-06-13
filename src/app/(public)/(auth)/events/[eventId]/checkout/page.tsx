@@ -30,53 +30,6 @@ interface TicketState {
   quantity: number;
 }
 
-const mockOrderData = {
-  message: "訂單創建成功",
-  status: true,
-  data: {
-    id: "O25061114093222072",
-    paidExpiredAt: "2025-06-11T06:19:32.084Z",
-    createdAt: "2025-06-11T06:09:32.084Z",
-    activity: {
-      id: 1,
-      title: "EVENET音樂祭",
-    },
-    orderItems: [
-      {
-        ticketType: {
-          name: "早鳥票",
-          price: 250,
-          startTime: "2025-06-11T06:09:32.084Z",
-          endTime: "2025-06-11T06:19:32.084Z",
-        },
-        quantity: 1,
-      },
-      {
-        ticketType: {
-          name: "一般票",
-          price: 500,
-          startTime: "2025-06-11T06:09:32.084Z",
-          endTime: "2025-06-11T06:19:32.084Z",
-        },
-        quantity: 1,
-      },
-    ],
-    payment: {
-      paidAmount: 750,
-    },
-    invoice: {
-      invoiceAddress: null,
-      invoiceTitle: null,
-      invoiceTaxId: null,
-      invoiceReceiverName: null,
-      invoiceReceiverPhoneNumber: null,
-      invoiceReceiverEmail: null,
-      invoiceCarrier: null,
-      invoiceType: "b2c",
-    },
-  },
-};
-
 export default function CheckoutPage() {
   const params = useParams();
   const eventId = params?.eventId;
@@ -253,31 +206,31 @@ export default function CheckoutPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {mockOrderData.data.orderItems.map((ticket) => (
+                  {orderData?.orderItems?.map((ticket) => (
                     <tr
-                      key={`${ticket.ticketType.name}-${ticket.ticketType.price}-${ticket.quantity}`}
+                      key={`${ticket.ticketType?.name}-${ticket.ticketType?.price}-${ticket.quantity}`}
                       className="border-t border-gray-200"
                     >
                       <td className="py-4 font-bold text-left pl-6">
-                        {ticket.ticketType.name}
+                        {ticket.ticketType?.name}
                         <div className="text-xs text-neutral-400 font-normal mt-1">
                           票券可用時間
                           <br />
-                          {format(ticket.ticketType.startTime, "yyyy.MM.dd (EEE) HH:mm", {
+                          {format(ticket.ticketType?.startTime ?? "", "yyyy.MM.dd (EEE) HH:mm", {
                             locale: zhTW,
                           }).replace("週", "")}
                           -
-                          {format(ticket.ticketType.endTime, "MM.dd (EEE) HH:mm", {
+                          {format(ticket.ticketType?.endTime ?? "", "MM.dd (EEE) HH:mm", {
                             locale: zhTW,
                           }).replace("週", "")}
                           (GMT+8)
                         </div>
                       </td>
                       <td className="py-4">{ticket.quantity}</td>
-                      <td className="py-4">NT${ticket.ticketType.price?.toLocaleString()}</td>
+                      <td className="py-4">NT${ticket.ticketType?.price?.toLocaleString()}</td>
                       <td className="py-4">
                         NT$
-                        {(ticket.ticketType.price * ticket.quantity).toLocaleString()}
+                        {(ticket.ticketType?.price ?? 0) * (ticket?.quantity ?? 0)}
                       </td>
                     </tr>
                   ))}
@@ -288,13 +241,13 @@ export default function CheckoutPage() {
               <div className="flex items-end">
                 <span className="font-bold text-lg tracking-wide mr-4">付款金額</span>
                 <span className="font-bold text-lg tracking-wide">
-                  NT$ {mockOrderData.data.payment.paidAmount?.toLocaleString()}
+                  NT$ {orderData?.payment?.paidAmount?.toLocaleString()}
                 </span>
               </div>
-              {totalPrice > 0 && (
+              {totalPrice > 0 && !!orderData?.paidExpiredAt && (
                 <div className="text-sm text-neutral-700 mt-1">
                   付款期限：
-                  {format(new Date(mockOrderData.data.paidExpiredAt), "yyyy.MM.dd  HH:mm")}
+                  {format(new Date(orderData.paidExpiredAt as string), "yyyy.MM.dd  HH:mm")}
                 </div>
               )}
             </div>
