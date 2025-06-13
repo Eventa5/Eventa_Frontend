@@ -44,6 +44,9 @@ import type {
   GetApiV1CurrenciesData,
   GetApiV1CurrenciesError,
   GetApiV1CurrenciesResponse,
+  GetApiV1OrdersByOrderIdCheckoutResultData,
+  GetApiV1OrdersByOrderIdCheckoutResultError,
+  GetApiV1OrdersByOrderIdCheckoutResultResponse,
   GetApiV1OrdersByOrderIdData,
   GetApiV1OrdersByOrderIdError,
   GetApiV1OrdersByOrderIdResponse,
@@ -109,6 +112,7 @@ import type {
   PostApiV1OrdersData,
   PostApiV1OrdersError,
   PostApiV1OrdersResponse,
+  PostApiV1OrdersReturnData,
   PostApiV1OrganizationsByOrganizationIdImagesData,
   PostApiV1OrganizationsByOrganizationIdImagesError,
   PostApiV1OrganizationsByOrganizationIdImagesResponse,
@@ -807,6 +811,24 @@ export const postApiV1Orders = <ThrowOnError extends boolean = false>(
 };
 
 /**
+ * 後端來接受 ECPay 回傳的訂單資訊
+ */
+export const postApiV1OrdersReturn = <ThrowOnError extends boolean = false>(
+  options?: Options<PostApiV1OrdersReturnData, ThrowOnError>
+) => {
+  return (options?.client ?? _heyApiClient).post<unknown, unknown, ThrowOnError>({
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/v1/orders/return",
+    ...options,
+  });
+};
+
+/**
  * 查看單一訂單
  * 查看單一訂單的詳細資訊
  */
@@ -871,6 +893,29 @@ export const postApiV1OrdersByOrderIdCheckout = <ThrowOnError extends boolean = 
       },
     ],
     url: "/api/v1/orders/{orderId}/checkout",
+    ...options,
+  });
+};
+
+/**
+ * 獲取付款結果
+ * 獲取訂單的付款結果
+ */
+export const getApiV1OrdersByOrderIdCheckoutResult = <ThrowOnError extends boolean = false>(
+  options: Options<GetApiV1OrdersByOrderIdCheckoutResultData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).get<
+    GetApiV1OrdersByOrderIdCheckoutResultResponse,
+    GetApiV1OrdersByOrderIdCheckoutResultError,
+    ThrowOnError
+  >({
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/v1/orders/{orderId}/checkout/result",
     ...options,
   });
 };
