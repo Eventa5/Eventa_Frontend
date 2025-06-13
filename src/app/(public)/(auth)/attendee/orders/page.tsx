@@ -57,8 +57,14 @@ export default function OrdersPage() {
 
   // 取得所有訂單用於計算數量
   const allOrdersParams = { limit: 100 };
+  const [allOrders, setAllOrders] = useState<OrderResponse[]>([]);
   const { data: allOrdersData } = useOrders(allOrdersParams);
-  const allOrders = allOrdersData?.data || [];
+
+  useEffect(() => {
+    if (allOrdersData?.data) {
+      setAllOrders(allOrdersData.data);
+    }
+  }, [allOrdersData?.data]);
 
   // 當所有訂單資料載入時，計算各狀態數量
   useEffect(() => {
