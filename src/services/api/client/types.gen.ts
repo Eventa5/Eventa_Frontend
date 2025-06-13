@@ -486,6 +486,14 @@ export type CreateOrderResponse = {
        * 票種價格
        */
       price?: number;
+      /**
+       * 票種開始時間，格式為 ISO 8601
+       */
+      startTime?: string;
+      /**
+       * 票種結束時間，格式為 ISO 8601
+       */
+      endTime?: string;
     };
     /**
      * 購買的票券數量
@@ -858,7 +866,7 @@ export type TicketDetailResponse = {
      */
     endTime?: string;
   };
-  organizer?: {
+  organization?: {
     /**
      * 主辦者 ID
      */
@@ -2303,6 +2311,13 @@ export type PostApiV1OrdersResponses = {
 
 export type PostApiV1OrdersResponse = PostApiV1OrdersResponses[keyof PostApiV1OrdersResponses];
 
+export type PostApiV1OrdersReturnData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/v1/orders/return";
+};
+
 export type GetApiV1OrdersByOrderIdData = {
   body?: never;
   path: {
@@ -2424,6 +2439,60 @@ export type PostApiV1OrdersByOrderIdCheckoutResponses = {
 
 export type PostApiV1OrdersByOrderIdCheckoutResponse =
   PostApiV1OrdersByOrderIdCheckoutResponses[keyof PostApiV1OrdersByOrderIdCheckoutResponses];
+
+export type GetApiV1OrdersByOrderIdCheckoutResultData = {
+  body?: never;
+  path: {
+    orderId: string;
+  };
+  query?: never;
+  url: "/api/v1/orders/{orderId}/checkout/result";
+};
+
+export type GetApiV1OrdersByOrderIdCheckoutResultErrors = {
+  /**
+   * 付款資料格式錯誤，請聯繫管理員
+   */
+  400: ErrorResponse;
+  /**
+   * 未提供授權令牌
+   */
+  401: ErrorResponse;
+  /**
+   * 訂單不存在
+   */
+  404: ErrorResponse;
+  /**
+   * 此訂單尚未進行結帳
+   */
+  409: ErrorResponse;
+};
+
+export type GetApiV1OrdersByOrderIdCheckoutResultError =
+  GetApiV1OrdersByOrderIdCheckoutResultErrors[keyof GetApiV1OrdersByOrderIdCheckoutResultErrors];
+
+export type GetApiV1OrdersByOrderIdCheckoutResultResponses = {
+  /**
+   * 成功獲取付款結果
+   */
+  200: {
+    message?: string;
+    status?: boolean;
+    data?: {
+      /**
+       * true 表示成功，false 表示失敗
+       */
+      result?: boolean;
+      /**
+       * 付款結果的訊息，失敗的訊息是由綠界回傳的，應可直接使用
+       */
+      resultMessage?: string;
+    };
+  };
+};
+
+export type GetApiV1OrdersByOrderIdCheckoutResultResponse =
+  GetApiV1OrdersByOrderIdCheckoutResultResponses[keyof GetApiV1OrdersByOrderIdCheckoutResultResponses];
 
 export type DeleteApiV1OrganizationsData = {
   body: DeleteOrganizationRequest;
