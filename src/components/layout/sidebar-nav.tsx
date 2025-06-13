@@ -6,11 +6,11 @@ import {
   ChevronLeft,
   Gauge,
   LayoutDashboard,
-  LogOut,
   Menu,
   PenSquare,
   Ticket,
   User,
+  Users,
   X,
 } from "lucide-react";
 import Image from "next/image";
@@ -18,12 +18,12 @@ import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import React, { useRef, useEffect } from "react";
-import { Button } from "../ui/button";
 
 interface NavItemProps {
   href: string;
   icon: React.ReactNode;
   label: string;
+  hidden?: boolean;
   isActive: boolean;
   subItems?: SubNavItemProps[];
   isSubMenuOpen?: boolean;
@@ -42,6 +42,7 @@ const NavItem: React.FC<NavItemProps> = ({
   href,
   icon,
   label,
+  hidden = false,
   isActive,
   subItems,
   isSubMenuOpen,
@@ -61,41 +62,43 @@ const NavItem: React.FC<NavItemProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-full">
-      <Link
-        href={href}
-        className={cn(
-          "flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-lg transition-colors",
-          isMobile ? "py-4 px-4 text-base" : "",
-          isActive ? "bg-[#FFE6A6] text-[#262626]" : "hover:bg-[#FFEEC4] text-[#262626]"
-        )}
-        onClick={handleClick}
-      >
-        {icon}
-        <span>{label}</span>
-      </Link>
+    !hidden && (
+      <div className="flex flex-col w-full">
+        <Link
+          href={href}
+          className={cn(
+            "flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-lg transition-colors",
+            isMobile ? "py-4 px-4 text-base" : "",
+            isActive ? "bg-[#FFE6A6] text-[#262626]" : "hover:bg-[#FFEEC4] text-[#262626]"
+          )}
+          onClick={handleClick}
+        >
+          {icon}
+          <span>{label}</span>
+        </Link>
 
-      {hasSubItems && isSubMenuOpen && (
-        <div className={cn("flex flex-col mt-2 space-y-2", isMobile ? "pl-6" : "pl-8")}>
-          {subItems.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              className={cn(
-                "text-sm py-1",
-                isMobile ? "py-3 px-4 text-base" : "",
-                item.isActive
-                  ? "text-[#525252] font-semibold"
-                  : "text-[#737373] hover:text-[#525252]"
-              )}
-              onClick={isMobile ? onMobileNavClose : undefined}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </div>
-      )}
-    </div>
+        {hasSubItems && isSubMenuOpen && (
+          <div className={cn("flex flex-col mt-2 space-y-2", isMobile ? "pl-6" : "pl-8")}>
+            {subItems.map((item) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                className={cn(
+                  "text-sm py-1",
+                  isMobile ? "py-3 px-4 text-base" : "",
+                  item.isActive
+                    ? "text-[#525252] font-semibold"
+                    : "text-[#737373] hover:text-[#525252]"
+                )}
+                onClick={isMobile ? onMobileNavClose : undefined}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    )
   );
 };
 
@@ -109,15 +112,17 @@ export const SidebarNav = () => {
   const [openSubMenus, setOpenSubMenus] = React.useState<{
     edit?: boolean;
     tickets?: boolean;
+    attendees?: boolean;
   }>({
-    edit: false,
-    tickets: false,
+    edit: true,
+    tickets: true,
+    attendees: true,
   });
 
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
-  const toggleSubMenu = (menu: "edit" | "tickets") => {
+  const toggleSubMenu = (menu: "edit" | "tickets" | "attendees") => {
     setOpenSubMenus((prev) => ({
       ...prev,
       [menu]: !prev[menu],
@@ -158,11 +163,12 @@ export const SidebarNav = () => {
   }, [mobileMenuOpen]);
 
   // 圖標組件替換為Lucide圖標
-  const DashboardIcon = () => <Gauge className="w-5 h-5" />;
-  const EventsIcon = () => <LayoutDashboard className="w-5 h-5" />;
-  const EditIcon = () => <PenSquare className="w-5 h-5" />;
-  const TicketIcon = () => <Ticket className="w-5 h-5" />;
-  const BackIcon = () => <ChevronLeft className="w-5 h-5" />;
+  const DashboardIcon = () => <Gauge className="w-4 h-4" />;
+  const EventsIcon = () => <LayoutDashboard className="w-4 h-4" />;
+  const EditIcon = () => <PenSquare className="w-4 h-4" />;
+  const TicketIcon = () => <Ticket className="w-4 h-4" />;
+  const UsersIcon = () => <Users className="w-4 h-4" />;
+  const BackIcon = () => <ChevronLeft className="w-4 h-4" />;
   const MenuIcon = () => <Menu className="w-6 h-6" />;
   const CloseIcon = () => <X className="w-6 h-6" />;
 
@@ -172,7 +178,7 @@ export const SidebarNav = () => {
       <button
         type="button"
         onClick={() => setMobileMenuOpen(true)}
-        className={`bg-white rounded-lg cursor-pointer p-1 ${mobileMenuOpen ? "" : "shadow-md"}`}
+        className="bg-white rounded-lg cursor-pointer p-1"
       >
         {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
       </button>
@@ -222,6 +228,14 @@ export const SidebarNav = () => {
                     onMobileNavClose={closeMobileMenu}
                   />
                   <NavItem
+                    href={`/organizer/events/${eventId}`}
+                    icon={<DashboardIcon />}
+                    label="總覽"
+                    isActive={pathname === `/organizer/events/${eventId}`}
+                    isMobile={true}
+                    onMobileNavClose={closeMobileMenu}
+                  />
+                  <NavItem
                     href={`/organizer/events/${eventId}/edit/basicinfo`}
                     icon={<EditIcon />}
                     label="編輯活動"
@@ -256,17 +270,13 @@ export const SidebarNav = () => {
                         label: "票券設定",
                         isActive: pathname.includes("/edit/tickets/setting"),
                       },
-                      {
-                        href: `/organizer/events/${eventId}/edit/tickets/advanced`,
-                        label: "進階設定",
-                        isActive: pathname.includes("/edit/tickets/advanced"),
-                      },
                     ]}
                   />
                   <NavItem
                     href={`/organizer/events/${eventId}/ticket/sales`}
                     icon={<TicketIcon />}
                     label="票券"
+                    hidden={true}
                     isActive={pathname.includes(`/organizer/events/${eventId}/ticket`)}
                     isSubMenuOpen={openSubMenus.tickets}
                     onToggleSubMenu={() => toggleSubMenu("tickets")}
@@ -282,6 +292,23 @@ export const SidebarNav = () => {
                         href: `/organizer/events/${eventId}/ticket/checkin`,
                         label: "報到狀況",
                         isActive: pathname.includes("/ticket/checkin"),
+                      },
+                    ]}
+                  />
+                  <NavItem
+                    href={`/organizer/events/${eventId}/attendees`}
+                    icon={<TicketIcon />}
+                    label="參加人"
+                    isActive={pathname.includes(`/organizer/events/${eventId}/attendees`)}
+                    isSubMenuOpen={openSubMenus.attendees}
+                    onToggleSubMenu={() => toggleSubMenu("attendees")}
+                    isMobile={true}
+                    onMobileNavClose={closeMobileMenu}
+                    subItems={[
+                      {
+                        href: `/organizer/events/${eventId}/attendees`,
+                        label: "參加名單",
+                        isActive: pathname.includes("/attendees"),
                       },
                     ]}
                   />
@@ -363,11 +390,11 @@ export const SidebarNav = () => {
     <>
       <MobileMenuButton />
       <MobileMenu />
-      <div className="hidden md:flex w-[220px] p-6 bg-[#FDFBF5] flex-col gap-14">
+      <div className="hidden lg:flex w-[220px] shrink-0 p-6 bg-[#FDFBF5] flex-col gap-14 h-screen fixed top-0 left-0">
         <div className="flex justify-center">
           <Link href="/organizer">
             <Image
-              src="/eventa-logo.svg"
+              src="/eventa-logo-horizontal.svg"
               alt="Eventa"
               width={120}
               height={40}
@@ -382,6 +409,12 @@ export const SidebarNav = () => {
             icon={<BackIcon />}
             label="活動列表"
             isActive={false}
+          />
+          <NavItem
+            href={`/organizer/events/${eventId}`}
+            icon={<DashboardIcon />}
+            label="總覽"
+            isActive={pathname === `/organizer/events/${eventId}`}
           />
           <NavItem
             href={`/organizer/events/${eventId}/edit/basicinfo`}
@@ -416,17 +449,13 @@ export const SidebarNav = () => {
                 label: "票券設定",
                 isActive: pathname.includes("/edit/tickets/setting"),
               },
-              {
-                href: `/organizer/events/${eventId}/edit/tickets/advanced`,
-                label: "進階設定",
-                isActive: pathname.includes("/edit/tickets/advanced"),
-              },
             ]}
           />
           <NavItem
             href={`/organizer/events/${eventId}/ticket/sales`}
             icon={<TicketIcon />}
             label="票券"
+            hidden={true}
             isActive={pathname.includes(`/organizer/events/${eventId}/ticket`)}
             isSubMenuOpen={openSubMenus.tickets}
             onToggleSubMenu={() => toggleSubMenu("tickets")}
@@ -440,6 +469,21 @@ export const SidebarNav = () => {
                 href: `/organizer/events/${eventId}/ticket/checkin`,
                 label: "報到狀況",
                 isActive: pathname.includes("/ticket/checkin"),
+              },
+            ]}
+          />
+          <NavItem
+            href={`/organizer/events/${eventId}/attendees`}
+            icon={<UsersIcon />}
+            label="參加人"
+            isActive={pathname.includes(`/organizer/events/${eventId}/attendees`)}
+            isSubMenuOpen={openSubMenus.attendees}
+            onToggleSubMenu={() => toggleSubMenu("attendees")}
+            subItems={[
+              {
+                href: `/organizer/events/${eventId}/attendees`,
+                label: "參加名單",
+                isActive: pathname.includes("/attendees"),
               },
             ]}
           />
