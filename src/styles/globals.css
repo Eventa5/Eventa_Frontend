@@ -4,7 +4,10 @@
 @import "swiper/css/navigation";
 @import "swiper/css/pagination";
 @import "swiper/css/effect-coverflow";
+@import "quill/dist/quill.core.css";
+@import "lucide-static/font/lucide.css";
 
+@import "./customs/quill.css";
 @import "./customs/swiper.css";
 
 @custom-variant dark (&:is(.dark *));
@@ -169,5 +172,16 @@
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }

@@ -7,9 +7,18 @@
     "enabled": true,
     "rules": {
       "recommended": true,
+      "correctness": {
+        "useExhaustiveDependencies": "off"
+      },
       "a11y": {
         "useKeyWithClickEvents": "off",
         "noAutofocus": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "off"
+      },
+      "style": {
+        "noNonNullAssertion": "warn"
       }
     }
   },

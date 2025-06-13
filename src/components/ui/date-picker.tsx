@@ -21,6 +21,9 @@ interface DatePickerProps {
   endMonth?: Date;
   defaultMonth?: Date;
   components?: Partial<CustomComponents>;
+  classNames?: ClassNames;
+  popoverContentClassName?: string;
+  footerText?: string;
 }
 
 export function DatePicker({
@@ -36,6 +39,9 @@ export function DatePicker({
   endMonth,
   defaultMonth,
   components,
+  classNames,
+  popoverContentClassName,
+  footerText,
 }: DatePickerProps) {
   return (
     <Popover>
@@ -57,7 +63,7 @@ export function DatePicker({
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-auto p-0"
+        className={`w-auto p-0 ${popoverContentClassName}`}
         align="start"
       >
         <Calendar
@@ -74,11 +80,14 @@ export function DatePicker({
             month_caption: "flex items-center gap-2",
             caption_label: "text-sm font-medium",
             dropdowns: "flex gap-2",
+            ...classNames,
           }}
           footer={
-            <div className="px-4 pt-0 pb-4">
-              <p className="text-xs text-muted-foreground">請選擇您的生日日期。</p>
-            </div>
+            footerText && (
+              <div className="px-4 pt-0 pb-4">
+                <p className="text-xs text-muted-foreground">{footerText}</p>
+              </div>
+            )
           }
         />
       </PopoverContent>

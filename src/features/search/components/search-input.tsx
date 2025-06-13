@@ -8,9 +8,10 @@ import { useRef } from "react";
 
 interface SearchInputProps {
   className?: string;
+  showBorder?: boolean;
 }
 
-export default function SearchInput({ className = "" }: SearchInputProps) {
+export default function SearchInput({ className = "", showBorder = false }: SearchInputProps) {
   const searchValue = useSearchStore((s) => s.searchValue);
   const setSearchValue = useSearchStore((s) => s.setSearchValue);
   const isSearchOpen = useSearchStore((s) => s.isSearchOpen);
@@ -46,7 +47,11 @@ export default function SearchInput({ className = "" }: SearchInputProps) {
   };
 
   return (
-    <div className={`relative w-full ${className}`}>
+    <div
+      className={`relative w-full max-w-[900px] ${className} ${
+        showBorder ? "rounded-xl border border-primary-500 border-2" : ""
+      }`}
+    >
       <div className="w-full bg-white rounded-xl px-6 py-3 flex items-center gap-2">
         <input
           ref={inputRef}

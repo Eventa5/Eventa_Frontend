@@ -8,7 +8,11 @@ import SearchButton from "./search-button";
 import SearchInput from "./search-input";
 import SearchOverlay from "./search-overlay";
 
-export default function SearchContainer() {
+interface SearchContainerProps {
+  showBorder?: boolean;
+}
+
+export default function SearchContainer({ showBorder = false }: SearchContainerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const isSearchOpen = useSearchStore((s) => s.isSearchOpen);
   const setIsSearchOpen = useSearchStore((s) => s.setIsSearchOpen);
@@ -38,8 +42,8 @@ export default function SearchContainer() {
       className="relative w-full"
       ref={containerRef}
     >
-      {!isMobile && <SearchInput />}
-      {isMobile && <SearchButton />}
+      {!isMobile && <SearchInput showBorder={showBorder} />}
+      {isMobile && <SearchButton showBorder={showBorder} />}
       <SearchOverlay />
       <MobileSearchOverlay />
     </div>
