@@ -32,10 +32,12 @@ export default function Header() {
   const setLoginTab = useDialogStore((s) => s.setLoginTab);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const logout = useAuthStore((s) => s.logout);
+  const userProfile = useAuthStore((s) => s.userProfile);
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileAuthOpen, setMobileAuthOpen] = useState(false);
+  const [mobileUserMenuOpen, setMobileUserMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const mobileAuthRef = useRef<HTMLDivElement>(null);
@@ -151,7 +153,7 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full bg-white md:bg-[#FFFCF5] px-4 sm:px-8 py-6 flex flex-col items-center z-50 relative mb-10">
+    <header className="w-full bg-[#FFFCF5] px-4 sm:px-8 py-6 flex flex-col items-center z-50 relative mb-10">
       <div className="w-full max-w-6xl flex items-center justify-between">
         {/* 左側選單 */}
         <div className="hidden md:flex flex-1 items-center">
@@ -180,7 +182,7 @@ export default function Header() {
             className="flex flex-col items-center"
           >
             <span
-              className="block rounded-full bg-white md:bg-[#FFFCF5] -mb-2 z-10 p-10"
+              className="block rounded-full bg-[#FFFCF5] -mb-2 z-10 p-10"
               title="Eventa Logo"
             >
               <Image
@@ -217,15 +219,27 @@ export default function Header() {
                   onClick={() => setMenuOpen(!menuOpen)}
                   className="flex items-center gap-2 cursor-pointer"
                 >
-                  <div className="bg-neutral-800 p-2 rounded-full">
-                    <User className="w-4 h-4 text-white" />
-                  </div>
-                  <p className="text-[14px]">使用者</p>
+                  {userProfile?.avatar ? (
+                    <Image
+                      src={userProfile.avatar}
+                      alt="User Profile"
+                      width={32}
+                      height={32}
+                      className="rounded-full"
+                    />
+                  ) : (
+                    <div className="rounded-full p-2 bg-neutral-800">
+                      <User className="w-4 h-4 text-white" />
+                    </div>
+                  )}
+                  <p className="text-[14px]">{userProfile?.displayName || "使用者"}</p>
                 </button>
                 {menuOpen && (
                   <div className="absolute right-0 mt-2 w-56 bg-white shadow-lg rounded-md z-50 border border-gray-100">
                     <div className="p-4 border-b border-gray-100">
-                      <p className="font-medium text-gray-900">您好，使用者</p>
+                      <p className="font-medium text-gray-900">
+                        您好，{userProfile?.displayName || "使用者"}
+                      </p>
                       <p className="text-xs text-gray-500 mt-1">管理您的活動和個人資料</p>
                     </div>
                     <ul className="py-2">
@@ -308,9 +322,9 @@ export default function Header() {
           className="fixed flex flex-col inset-0 bg-white z-50 md:hidden"
           ref={mobileMenuRef}
         >
-          <div className="w-full px-4 py-2 flex justify-between items-center">
+          <div className="w-full px-4 py-2 flex justify-between items-center bg-primary-50 relative">
             <div className="invisible w-10">{/* 空間平衡佔位元素 */}</div>
-            <div className="rounded-full bg-white p-6">
+            <div className="rounded-full bg-primary-50 p-6 absolute top-0 left-1/2 -translate-x-1/2">
               <Image
                 src="/eventa-logo.svg"
                 alt="Eventa Logo"
@@ -363,19 +377,79 @@ export default function Header() {
               <div className="">
                 <div className="border-t border-gray-200 my-8" />
 
+                {mobileUserMenuOpen && (
+                  <div className="mb-4 border-b border-gray-200">
+                    <ul className="py-2">
+                      <li>
+                        <Link
+                          href="/attendee/orders"
+                          className="flex items-center cursor-pointer px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setMobileMenuOpen(false);
+                            setMobileUserMenuOpen(false);
+                            setTimeout(() => {
+                              router.push("/attendee/orders");
+                            }, 0);
+                          }}
+                        >
+                          <Ticket className="w-4 h-4 mr-3 text-gray-500" />
+                          訂單管理
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          href="/attendee/profile"
+                          className="flex items-center cursor-pointer px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setMobileMenuOpen(false);
+                            setMobileUserMenuOpen(false);
+                            setTimeout(() => {
+                              router.push("/attendee/profile");
+                            }, 0);
+                          }}
+                        >
+                          <User className="w-4 h-4 mr-3 text-gray-500" />
+                          會員中心
+                        </Link>
+                      </li>
+                      {/* <li>
+                        <Link
+                          href="#"
+                          className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setMobileMenuOpen(false);
+                            setMobileUserMenuOpen(false);
+                          }}
+                        >
+                          <Settings className="w-4 h-4 mr-3 text-gray-500" />
+                          帳號管理
+                        </Link>
+                      </li> */}
+                    </ul>
+                  </div>
+                )}
+
                 <div className="flex items-end justify-between px-4">
-                  <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    className="flex items-center gap-2 cursor-pointer"
+                    onClick={() => setMobileUserMenuOpen(!mobileUserMenuOpen)}
+                  >
                     <div className="bg-neutral-800 p-3 rounded-full flex items-center justify-center">
                       <User className="w-4 h-4 text-white" />
                     </div>
-                    <span className="text-sm">使用者#001</span>
-                  </div>
+                    <span className="text-sm">{userProfile?.displayName || "使用者"}</span>
+                  </button>
                   <button
                     type="button"
                     className="border border-neutral-400 rounded-lg px-4 py-3 text-xs text-neutral-600 cursor-pointer"
                     onClick={() => {
                       logout();
                       setMobileMenuOpen(false);
+                      setMobileUserMenuOpen(false);
                       router.push("/");
                     }}
                   >
