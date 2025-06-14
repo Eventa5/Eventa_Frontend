@@ -2,16 +2,20 @@
 
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/useMediaQuery";
+import { useCategoriesStore } from "@/store/categories";
 import { useSearchStore } from "@/store/search";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { CATEGORIES, POPULAR_SEARCHES } from "../constants/search";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { POPULAR_SEARCHES } from "../constants/search";
+import "swiper/css";
 
 export default function SearchOverlay() {
   const isSearchOpen = useSearchStore((s) => s.isSearchOpen);
   const toggleSearch = useSearchStore((s) => s.toggleSearch);
   const setSearchValue = useSearchStore((s) => s.setSearchValue);
+  const { categories } = useCategoriesStore();
   const [isVisible, setIsVisible] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -83,21 +87,29 @@ export default function SearchOverlay() {
       {/* 分類搜尋 */}
       <div className="flex flex-col gap-4">
         <h3 className="font-bold text-[#262626]">想找哪一類的活動 ?</h3>
-        <div className="flex gap-4 overflow-x-auto pb-2">
-          {CATEGORIES.map((category) => (
-            <div
-              key={category.id}
-              className="flex flex-col items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0"
-              onClick={() => handleCategorySearch(category.id)}
+        <Swiper
+          spaceBetween={16}
+          slidesPerView="auto"
+          className="w-full"
+        >
+          {categories.map((category) => (
+            <SwiperSlide
+              key={category.name}
+              className="!w-auto"
             >
               <div
-                className="w-[80px] h-[80px] bg-cover bg-center rounded-xl"
-                style={{ backgroundImage: `url('${category.imagePath}')` }}
-              />
-              <span className="text-sm">{category.name}</span>
-            </div>
+                className="flex flex-col items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+                onClick={() => handleCategorySearch(category.name)}
+              >
+                <div
+                  className="w-[80px] h-[80px] bg-cover bg-center rounded-xl"
+                  style={{ backgroundImage: `url('${category.imageUrl}')` }}
+                />
+                <span className="text-sm">{category.name}</span>
+              </div>
+            </SwiperSlide>
           ))}
-        </div>
+        </Swiper>
       </div>
     </div>
   );

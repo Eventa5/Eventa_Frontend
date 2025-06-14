@@ -1,8 +1,5 @@
 import ProfileForm from "@/features/profile/components/profile-form";
-import { getApiV1UsersProfile } from "@/services/api/client/sdk.gen";
-import type { UserResponse } from "@/services/api/client/types.gen";
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 export const dynamic = "force-dynamic";
@@ -12,25 +9,7 @@ export const metadata: Metadata = {
   description: "管理您在 Eventa 上的個人資料",
 };
 
-async function getProfileData(): Promise<UserResponse> {
-  try {
-    const response = await getApiV1UsersProfile();
-
-    if (response.data?.data) {
-      return response.data.data;
-    }
-
-    throw new Error(response.error?.message || "無法獲取個人檔案");
-  } catch (error) {
-    console.error("獲取用戶檔案失敗:", error);
-    // 如果是認證錯誤，重定向到登入頁面
-    redirect("/?redirect=/attendee/profile");
-  }
-}
-
-export default async function ProfilePage() {
-  const profileData = await getProfileData();
-
+export default function ProfilePage() {
   return (
     <div className="flex min-h-screen flex-col">
       <main className="container mx-auto flex-1 px-4 py-8">
@@ -43,7 +22,7 @@ export default async function ProfilePage() {
           </div>
 
           <Suspense fallback={<div>載入中...</div>}>
-            <ProfileForm initialData={profileData} />
+            <ProfileForm />
           </Suspense>
         </div>
       </main>

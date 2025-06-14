@@ -1,8 +1,12 @@
 "use client";
 
-import { EventCard, EventCarousel } from "@/components/ui/event-cards";
+import { EventCard } from "@/components/ui/event-cards";
 import HotEventsSection from "@/components/ui/hot-events-section";
+import { NewEventCarousel } from "@/features/activities/components/new-event-carousel";
+import OtherEventsSection from "@/features/activities/components/other-events-section";
+import { formatEventDate } from "@/features/activities/formatEventDate";
 import SearchContainer from "@/features/search/components/search-container";
+import { useActivitiesStore } from "@/store/activities";
 import { useSearchStore } from "@/store/search";
 import Image from "next/image";
 import Link from "next/link";
@@ -150,12 +154,13 @@ const otherEvents = [
 ];
 
 export default function EventsPage() {
+  const { activities } = useActivitiesStore();
   const searchValue = useSearchStore((s) => s.searchValue);
   const filteredEvents = searchValue
-    ? otherEvents.filter(
-        (event) => event.title.includes(searchValue) || event.location.includes(searchValue)
+    ? activities.filter(
+        (event) => event.title?.includes(searchValue) || event.location?.includes(searchValue)
       )
-    : otherEvents;
+    : activities;
 
   return (
     <main className="flex flex-col w-full min-h-screen bg-primary-50 pt-10 -mt-10">
@@ -188,7 +193,11 @@ export default function EventsPage() {
                   {filteredEvents.map((event) => (
                     <EventCard
                       key={event.id}
-                      {...event}
+                      id={String(event.id)}
+                      title={event.title || ""}
+                      location={event.location || ""}
+                      date={formatEventDate(event.startTime || "", event.endTime || "")}
+                      imageUrl={event.cover || ""}
                       size="sm"
                     />
                   ))}
@@ -228,7 +237,7 @@ export default function EventsPage() {
                 不只是活動，更是讓生活亮起來的機會，錯過這波話題活動，就真的只能看別人打卡了！
               </p>
             </div>
-            <EventCarousel events={newEvents} />
+            <NewEventCarousel />
           </div>
         </section>
       )}
@@ -253,46 +262,11 @@ export default function EventsPage() {
               討論度最高的熱門活動都在這裡！
             </p>
           </div>
-          <HotEventsSection events={hotEvents} />
+          <HotEventsSection />
         </div>
       </section>
       {/* 其他活動（搜尋時以外才顯示） */}
-      {!searchValue && (
-        <section className="py-20 md:py-32 px-4 md:px-8">
-          <div className="flex flex-col items-center">
-            <div className="flex flex-col items-center mb-12">
-              <div className="flex items-end gap-6 mb-6 font-serif-tc">
-                <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">其他</h2>
-                <Image
-                  src="/images/balloon-red.png"
-                  width={50}
-                  height={100}
-                  className="w-6 h-12 md:w-10 md:h-20"
-                  alt="氣球"
-                />
-                <h2 className="text-[24px] md:text-[48px] font-bold text-[#262626]">活動</h2>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-[repeat(2,_302px)] lg:grid-cols-[repeat(3,_302px)] 2xl:grid-cols-[repeat(4,_302px)] gap-6 justify-items-center mx-auto">
-              {filteredEvents.map((event) => (
-                <EventCard
-                  key={event.id}
-                  {...event}
-                  size="sm"
-                />
-              ))}
-            </div>
-            <div className="mt-12 flex justify-center">
-              <Link
-                href="/events"
-                className="px-8 py-3 border border-[#525252] rounded-xl text-[#525252] hover:bg-[#F5F5F5] transition-colors"
-              >
-                查看更多
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
+      {!searchValue && <OtherEventsSection />}
     </main>
   );
 }
