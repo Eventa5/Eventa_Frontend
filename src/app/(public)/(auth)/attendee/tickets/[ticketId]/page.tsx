@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { formatEventDate } from "@/features/activities/formatEventDate";
 import { getApiV1TicketsByTicketId, getApiV1UsersProfile } from "@/services/api/client/sdk.gen";
 import type { TicketDetailResponse } from "@/services/api/client/types.gen";
 import { format } from "date-fns";
@@ -192,20 +193,28 @@ export default function TicketDetailPage() {
                 <div className="flex-1">
                   <h3 className="font-semibold text-gray-900 mb-1 md:text-lg">活動日期</h3>
                   <p className="text-gray-700 md:text-lg">
-                    {ticket.startTime && format(new Date(ticket.startTime), "yyyy.MM.dd")}（
-                    {ticket.startTime &&
-                      format(new Date(ticket.startTime), "EEEE", { locale: zhTW }).replace(
-                        "星期",
-                        ""
-                      )}
-                    ）{ticket.startTime && format(new Date(ticket.startTime), "HH:mm")} -{" "}
-                    {ticket.endTime && format(new Date(ticket.endTime), "yyyy.MM.dd")}（
-                    {ticket.endTime &&
-                      format(new Date(ticket.endTime), "EEEE", { locale: zhTW }).replace(
-                        "星期",
-                        ""
-                      )}
-                    ）{ticket.endTime && format(new Date(ticket.endTime), "HH:mm")} (GMT+8)
+                    {ticket?.activity?.startTime && ticket?.activity?.endTime && (
+                      <span className="whitespace-pre-line">
+                        {(() => {
+                          const date = formatEventDate(
+                            ticket.activity.startTime,
+                            ticket.activity.endTime
+                          );
+                          return date.isSameDay ? (
+                            <>
+                              {date.startDateString} <br className="sm:hidden" />
+                              {date.timeString}
+                            </>
+                          ) : (
+                            <>
+                              {date.startDateString} <br className="sm:hidden" /> -{" "}
+                              {date.endDateString}
+                            </>
+                          );
+                        })()}
+                        <span className="text-sm text-gray-500"> (GMT+8)</span>
+                      </span>
+                    )}
                   </p>
                 </div>
               </div>
@@ -221,7 +230,7 @@ export default function TicketDetailPage() {
                     <p className="text-gray-700 md:text-lg mb-2">{ticket.activity.location}</p>
                     {ticket.activity.notes && (
                       <div className="bg-secondary-50 border border-secondary-200 rounded-lg p-3">
-                        <p className="text-secondary-800 text-sm leading-relaxed">
+                        <p className="text-secondary-800 text-sm leading-relaxed whitespace-pre-line">
                           {ticket.activity.notes}
                         </p>
                       </div>
