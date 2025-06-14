@@ -133,7 +133,7 @@ export const OrderTabs: React.FC<OrderTabsProps> = ({
       className={cn(className, "overflow-x-auto touch-scroll scrollbar-hide cursor-grab")}
     >
       <ScrollArea className="w-full overflow-x-auto">
-        <TabsList className="bg-transparent p-0 gap-6 h-auto">
+        <TabsList className="bg-transparent p-0 h-auto">
           {tabConfig.map((tab) => {
             const Icon = tab.icon;
             return (
@@ -141,7 +141,7 @@ export const OrderTabs: React.FC<OrderTabsProps> = ({
                 key={tab.value}
                 value={tab.value}
                 className={cn(
-                  "group relative flex items-center gap-1.5 px-4 py-3 bg-transparent border-0 text-base font-medium transition-none focus-visible:outline-none focus-visible:shadow-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:font-bold hover:font-bold rounded-none",
+                  "group relative flex items-center px-4 py-3 bg-transparent border-0 text-base font-medium transition-none focus-visible:outline-none focus-visible:shadow-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:font-bold hover:font-bold rounded-none min-w-[152px] justify-center",
                   {
                     "data-[state=active]:border-b-2 data-[state=active]:border-secondary-500":
                       tab.underline === "secondary-500",
