@@ -1,4 +1,4 @@
-name: 構建與部署
+name: 構建與部署測試機
 
 on:
   push:
