@@ -287,7 +287,7 @@ export default function CheckoutPage() {
                   href={`/attendee/orders/${orderData?.id}`}
                   className="flex-1 font-semibold bg-neutral-700 text-white hover:bg-neutral-800 rounded-md py-2 px-4 text-center text-sm"
                 >
-                  至訂單管理查看
+                  前往訂單管理查看票券
                 </Link>
               )}
             </div>
