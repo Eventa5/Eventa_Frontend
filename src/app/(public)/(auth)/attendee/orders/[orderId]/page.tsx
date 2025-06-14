@@ -327,14 +327,14 @@ export default function OrderDetailPage() {
 
                   <ul className="text-neutral-800 text-base">
                     <li className="mb-4 flex item-start md:items-center gap-3 md:w-full">
-                      <Hash className="w-5 h-5 md:w-6 md:h-6 text-neutral-500" />
+                      <Hash className="w-5 h-5 md:w-6 md:h-6 text-neutral-500 mt-0.5 md:mt-0 shrink-0" />
                       <div className="space-y-1 md:grow-1 md:flex items-center gap-2">
                         <p className="font-semibold md:w-1/5 md:mb-0 mb-2">訂單編號</p>
                         <div className="md:w-4/5">{order.id}</div>
                       </div>
                     </li>
                     <li className="mb-4 flex item-start md:items-center gap-3 md:w-full">
-                      <Receipt className="w-5 h-5 md:w-6 md:h-6 text-neutral-500" />
+                      <Receipt className="w-5 h-5 md:w-6 md:h-6 text-neutral-500 mt-0.5 md:mt-0 shrink-0" />
                       <div className="space-y-1 md:grow-1 md:flex items-center gap-2">
                         <p className="font-semibold md:w-1/5 md:mb-0 mb-2">總價</p>
                         <div className="flex md:w-4/5 gap-2 items-center text-xl font-bold">
@@ -343,7 +343,7 @@ export default function OrderDetailPage() {
                       </div>
                     </li>
                     <li className="mb-4 flex item-start md:items-center gap-3 md:w-full">
-                      <CreditCard className="w-5 h-5 md:w-6 md:h-6 text-neutral-500" />
+                      <CreditCard className="w-5 h-5 md:w-6 md:h-6 text-neutral-500 mt-0.5 md:mt-0 shrink-0" />
                       <div className="space-y-1 md:grow-1 md:flex items-center gap-2">
                         <p className="font-semibold md:w-1/5 md:mb-0 mb-2">付款方式</p>
                         <div className="flex md:w-4/5 gap-2 items-center">
@@ -352,7 +352,7 @@ export default function OrderDetailPage() {
                       </div>
                     </li>
                     <li className="flex item-start md:items-center gap-3 md:w-full">
-                      <Calendar className="w-5 h-5 md:w-6 md:h-6 text-neutral-500" />
+                      <Calendar className="w-5 h-5 md:w-6 md:h-6 text-neutral-500 mt-0.5 md:mt-0 shrink-0" />
                       <div className="space-y-1 md:grow-1 md:flex items-center gap-2">
                         <p className="font-semibold md:w-1/5 md:mb-0 mb-2">訂單狀態</p>
                         <div className="md:flex md:w-4/5 gap-2 items-center">
@@ -364,7 +364,7 @@ export default function OrderDetailPage() {
                               <>
                                 <Button
                                   type="button"
-                                  className="py-2 md:py-2.5 rounded mr-2 font-semibold h-auto w-[120px]"
+                                  className="py-2 md:py-2.5 rounded mr-2 font-semibold h-auto w-[120px] mb-2 sm:mb-0"
                                   onClick={() => {
                                     const activityId = (order.activity as { id?: number })?.id;
                                     if (activityId) {
