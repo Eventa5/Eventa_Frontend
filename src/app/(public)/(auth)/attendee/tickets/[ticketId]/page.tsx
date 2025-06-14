@@ -207,12 +207,11 @@ export default function TicketDetailPage() {
                             </>
                           ) : (
                             <>
-                              {date.startDateString} <br className="sm:hidden" /> -{" "}
+                              {date.startDateString} - <br className="sm:hidden" />
                               {date.endDateString}
                             </>
                           );
                         })()}
-                        <span className="text-sm text-gray-500"> (GMT+8)</span>
                       </span>
                     )}
                   </p>
