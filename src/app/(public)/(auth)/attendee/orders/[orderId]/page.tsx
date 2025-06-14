@@ -573,7 +573,7 @@ export default function OrderDetailPage() {
         open={showSimilarActivities}
         onOpenChange={setShowSimilarActivities}
       >
-        <DialogContent className="max-w-3xl border-neutral-300">
+        <DialogContent className="max-w-3xl border-neutral-300 bg-primary-50">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">
               <DialogDescription>推薦活動</DialogDescription>
@@ -586,9 +586,7 @@ export default function OrderDetailPage() {
                 id={activity.id?.toString() || ""}
                 title={activity.title || ""}
                 location={activity.location || ""}
-                date={
-                  formatEventDate(activity.startTime || "", activity.endTime || "").startDateString
-                }
+                date={formatEventDate(activity.startTime || "", activity.endTime || "")}
                 imageUrl={activity.cover || ""}
                 size="sm"
               />
