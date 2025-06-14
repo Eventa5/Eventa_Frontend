@@ -23,8 +23,8 @@ export interface OrderTabsProps {
     pending: number | undefined;
     canceled: number | undefined;
     expired: number | undefined;
-    processing: number | undefined;
-    failed: number | undefined;
+    // processing: number | undefined;
+    // failed: number | undefined;
   };
   className?: string;
 }
@@ -90,30 +90,30 @@ const tabConfig = [
       "group-data-[state=active]:bg-gray-400 group-data-[state=active]:text-white group-data-[state=active]:border-gray-400",
     underline: "gray-400",
   },
-  {
-    value: "processing",
-    label: "付款中",
-    icon: Loader2,
-    iconClass: "text-primary-600",
-    labelClass: "group-hover:text-primary-600 group-data-[state=active]:text-primary-600",
-    badge:
-      "group-hover:bg-primary-600 group-data-[state=active]:bg-primary-600 group-hover:text-white group-data-[state=active]:text-white group-hover:border-primary-600 group-data-[state=active]:border-primary-600",
-    badgeActive:
-      "group-data-[state=active]:bg-primary-600 group-data-[state=active]:text-white group-data-[state=active]:border-primary-600",
-    underline: "primary-600",
-  },
-  {
-    value: "failed",
-    label: "付款失敗",
-    icon: X,
-    iconClass: "text-red-500",
-    labelClass: "group-hover:text-red-500 group-data-[state=active]:text-red-500",
-    badge:
-      "group-hover:bg-red-500 group-data-[state=active]:bg-red-500 group-hover:text-white group-data-[state=active]:text-white group-hover:border-red-500 group-data-[state=active]:border-red-500",
-    badgeActive:
-      "group-data-[state=active]:bg-red-500 group-data-[state=active]:text-white group-data-[state=active]:border-red-500",
-    underline: "red-500",
-  },
+  // {
+  //   value: "processing",
+  //   label: "付款中",
+  //   icon: Loader2,
+  //   iconClass: "text-primary-600",
+  //   labelClass: "group-hover:text-primary-600 group-data-[state=active]:text-primary-600",
+  //   badge:
+  //     "group-hover:bg-primary-600 group-data-[state=active]:bg-primary-600 group-hover:text-white group-data-[state=active]:text-white group-hover:border-primary-600 group-data-[state=active]:border-primary-600",
+  //   badgeActive:
+  //     "group-data-[state=active]:bg-primary-600 group-data-[state=active]:text-white group-data-[state=active]:border-primary-600",
+  //   underline: "primary-600",
+  // },
+  // {
+  //   value: "failed",
+  //   label: "付款失敗",
+  //   icon: X,
+  //   iconClass: "text-red-500",
+  //   labelClass: "group-hover:text-red-500 group-data-[state=active]:text-red-500",
+  //   badge:
+  //     "group-hover:bg-red-500 group-data-[state=active]:bg-red-500 group-hover:text-white group-data-[state=active]:text-white group-hover:border-red-500 group-data-[state=active]:border-red-500",
+  //   badgeActive:
+  //     "group-data-[state=active]:bg-red-500 group-data-[state=active]:text-white group-data-[state=active]:border-red-500",
+  //   underline: "red-500",
+  // },
 ];
 
 export const OrderTabs: React.FC<OrderTabsProps> = ({

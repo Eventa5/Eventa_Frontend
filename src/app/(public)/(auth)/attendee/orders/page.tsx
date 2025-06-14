@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useCallback, useState, useRef, use } from "react";
+import React, { useEffect, useCallback, useState, useRef } from "react";
 
 import { CalendarIcon, Search } from "lucide-react";
 import type { DateRange } from "react-day-picker";
@@ -258,8 +258,6 @@ export default function OrdersPage() {
           pending: counts.pending || undefined,
           canceled: counts.canceled || undefined,
           expired: counts.expired || undefined,
-          processing: counts.processing || undefined,
-          failed: counts.failed || undefined,
         }}
         className="mb-4 border-b border-neutral-300"
       />

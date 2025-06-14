@@ -2,7 +2,7 @@ import { getApiV1Orders } from "@/services/api/client/sdk.gen";
 import type { OrderResponse } from "@/services/api/client/types.gen";
 import useSWR from "swr";
 
-export type OrderStatus = "已付款" | "待付款" | "已取消" | "已逾期" | "已使用";
+export type OrderStatus = "paid" | "pending" | "canceled" | "expired" | "processing" | "failed";
 
 export interface Order {
   id: string;

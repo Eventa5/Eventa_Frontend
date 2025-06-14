@@ -76,33 +76,45 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
               <div className="text-lg font-bold mb-4">{order.activity.title}</div>
               <div className="md:flex items-center text-sm text-gray-600 mb-2 gap-6">
                 <span className="flex items-center gap-1 mb-2 md:mb-0">
-                  <CalendarIcon className="w-4 h-4" />
-                  {formatEventDate(order.activity.startTime, order.activity.endTime).isSameDay ? (
-                    `${formatEventDate(order.activity.startTime, order.activity.endTime).startDateString} ${formatEventDate(order.activity.startTime, order.activity.endTime).timeString}`
-                  ) : (
-                    <>
-                      {
-                        formatEventDate(order.activity.startTime, order.activity.endTime)
-                          .startDateString
-                      }{" "}
-                      -{" "}
-                      {
-                        formatEventDate(order.activity.startTime, order.activity.endTime)
-                          .endDateString
-                      }
-                    </>
-                  )}
+                  <CalendarIcon className="w-4 h-4 shrink-0" />
+                  <span className="whitespace-pre-line">
+                    {formatEventDate(order.activity.startTime, order.activity.endTime).isSameDay ? (
+                      <>
+                        {
+                          formatEventDate(order.activity.startTime, order.activity.endTime)
+                            .startDateString
+                        }
+                        <br className="sm:hidden" />{" "}
+                        {
+                          formatEventDate(order.activity.startTime, order.activity.endTime)
+                            .timeString
+                        }
+                      </>
+                    ) : (
+                      <>
+                        {
+                          formatEventDate(order.activity.startTime, order.activity.endTime)
+                            .startDateString
+                        }{" "}
+                        - <br className="sm:hidden" />
+                        {
+                          formatEventDate(order.activity.startTime, order.activity.endTime)
+                            .endDateString
+                        }
+                      </>
+                    )}
+                  </span>
                 </span>
 
                 {order.activity.location && (
-                  <span className="flex items-center gap-1">
-                    <MapPinIcon className="w-4 h-4" />
+                  <span className="flex items-center gap-1 mb-2 md:mb-0">
+                    <MapPinIcon className="w-4 h-4 shrink-0" />
                     {order.activity.location}
                   </span>
                 )}
                 {order.activity.isOnline && (
-                  <span className="flex items-center gap-1">
-                    <GlobeIcon className="w-4 h-4" />
+                  <span className="flex items-center gap-1 mb-2 md:mb-0">
+                    <GlobeIcon className="w-4 h-4 shrink-0" />
                     線上活動
                   </span>
                 )}
