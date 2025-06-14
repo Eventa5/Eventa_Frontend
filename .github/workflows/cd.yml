@@ -17,9 +17,10 @@ jobs:
       - name: 檢出程式碼
         uses: actions/checkout@v4
 
-      - name: 安裝依賴並執行建構
+      - name: 安裝依賴、生成 API 客戶端代碼、執行建構
         run: |
           npm ci
+          npm run generate:api
           npm run build
 
       - name: 將建構的檔案複製到上下文目錄

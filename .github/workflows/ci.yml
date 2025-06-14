@@ -22,6 +22,9 @@ jobs:
       - name: 安裝依賴項
         run: npm ci
 
+      - name: 生成 API 客戶端代碼
+        run: npm run generate:api
+
       - name: 執行代碼檢查
         run: npm run lint
 
