@@ -12,6 +12,7 @@ import {
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { getApiV1TicketsByTicketId, getApiV1UsersProfile } from "@/services/api/client/sdk.gen";
 import type { TicketDetailResponse } from "@/services/api/client/types.gen";
 import { format } from "date-fns";
@@ -69,9 +70,39 @@ export default function TicketDetailPage() {
       <div className="container max-w-6xl mx-auto p-4 py-16 md:pb-[200px]">
         <div className="mx-auto max-w-2xl">
           <Card className="shadow-xl border-0 overflow-hidden">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-center">
-                <Loader className="animate-spin rounded-full h-8 w-8 text-primary-500" />
+            <CardHeader className="bg-gradient-to-r from-neutral-100 to-neutral-50 text-neutral-900 p-6">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-8 w-64" />
+                <Skeleton className="h-8 w-24" />
+              </div>
+            </CardHeader>
+            <CardContent className="p-6 space-y-6">
+              <div className="sm:flex items-start gap-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center mb-2 sm:mb-0">
+                  <Calendar className="h-5 w-5 md:h-6 md:w-6 text-neutral-600" />
+                </div>
+                <div className="flex-1">
+                  <Skeleton className="h-6 w-32 mb-2" />
+                  <Skeleton className="h-4 w-48" />
+                </div>
+              </div>
+              <div className="sm:flex items-start gap-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center mb-2 sm:mb-0">
+                  <Clock className="h-5 w-5 md:h-6 md:w-6 text-neutral-600" />
+                </div>
+                <div className="flex-1">
+                  <Skeleton className="h-6 w-32 mb-2" />
+                  <Skeleton className="h-4 w-48" />
+                </div>
+              </div>
+              <div className="sm:flex items-start gap-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center mb-2 sm:mb-0">
+                  <MapPin className="h-5 w-5 md:h-6 md:w-6 text-neutral-600" />
+                </div>
+                <div className="flex-1">
+                  <Skeleton className="h-6 w-32 mb-2" />
+                  <Skeleton className="h-4 w-48" />
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -345,7 +376,7 @@ export default function TicketDetailPage() {
               </Collapsible>
 
               {/* Participant Info */}
-              <Collapsible
+              {/* <Collapsible
                 open={expandedSections.participant}
                 onOpenChange={() => toggleSection("participant")}
               >
@@ -368,13 +399,15 @@ export default function TicketDetailPage() {
                           {ticket.assignedName || userProfile?.name}
                         </span>
                       </div>
-                      {/* <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3">
                         <Phone className="h-5 w-5 md:h-6 md:w-6 text-neutral-500" />
                         <div>
                           <div className="text-xs text-neutral-800">聯絡電話</div>
-                          <div className="font-medium text-neutral-800 text-lg">{ticket.organizer.phoneNumber}</div>
+                          <div className="font-medium text-neutral-800 text-lg">
+                            {ticket.assignedPhoneNumber || userProfile?.phoneNumber}
+                          </div>
                         </div>
-                      </div> */}
+                      </div>
                       <div className="flex justify-between">
                         <span className="text-neutral-800 md:text-lg">電子郵件</span>
                         <span className="font-semibold text-neutral-800 md:text-lg">
@@ -384,7 +417,7 @@ export default function TicketDetailPage() {
                     </div>
                   </div>
                 </CollapsibleContent>
-              </Collapsible>
+              </Collapsible> */}
 
               {/* Contact Organizer */}
               <Collapsible
