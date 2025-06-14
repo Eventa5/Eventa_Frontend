@@ -229,7 +229,7 @@ export default function EventDetailPage() {
               <Separator />
               {/* 活動資訊表格 */}
               <div className="flex flex-col lg:flex-row items-start lg:items-center gap-3 pl-0 lg:pl-8">
-                <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg lg:text-base">
+                <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg lg:text-base text-nowrap">
                   <Calendar className="w-5 h-5" />
                   活動時間
                 </span>
@@ -248,7 +248,7 @@ export default function EventDetailPage() {
                   )}&location=${encodeURIComponent(eventData?.location ?? "")}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-sm text-primary-700 font-bold cursor-pointer"
+                  className="flex items-center gap-1 text-sm text-primary-700 font-bold cursor-pointer text-nowrap"
                 >
                   <PlusIcon className="w-4 h-4" />
                   加入行事曆
