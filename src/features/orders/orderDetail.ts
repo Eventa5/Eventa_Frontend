@@ -76,17 +76,34 @@ export const mockTickets: Ticket[] = [
 
 export const getTicketStatusColor = (status: string) => {
   switch (status) {
-    case "未分票":
-      return "border-yellow-400 text-yellow-600 bg-yellow-50";
-    case "已分票":
-      return "border-green-400 text-green-600 bg-green-50";
-    case "已取消":
+    case "unassigned":
+      return "border-yellow-400 text-yellow-600 bg-yellow-50 hidden";
+    case "assigned":
+      return "border-green-400 text-green-600 bg-green-50 hidden";
+    case "canceled":
       return "border-secondary-500 text-secondary-500 bg-secondary-50";
-    case "已使用":
+    case "used":
       return "border-neutral-400 text-neutral-600 bg-neutral-100";
-    case "已逾期":
+    case "overdue":
       return "border-gray-400 text-gray-500 bg-gray-100";
     default:
       return "border-gray-300 text-gray-600 bg-gray-50";
   }
+};
+
+export const orderStatusMap = {
+  pending: "待付款",
+  paid: "已付款",
+  canceled: "已取消",
+  expired: "已逾期",
+  processing: "付款中",
+  failed: "付款失敗",
+};
+
+export const ticketStatusMap = {
+  used: "已使用",
+  assigned: "已分票",
+  unassigned: "未分票",
+  canceled: "已取消",
+  overdue: "已逾期",
 };

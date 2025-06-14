@@ -171,6 +171,37 @@ export type GetIncomeResponse = {
   }>;
 };
 
+export type GetCheckedInResponse = {
+  /**
+   * 是否為線上活動
+   */
+  isOnline?: boolean;
+  /**
+   * 活動當前狀態
+   */
+  status?: string;
+  /**
+   * 活動開始時間
+   */
+  startTime?: string;
+  /**
+   * 活動結束時間
+   */
+  endTime?: string;
+  /**
+   * 已報到人數
+   */
+  checkedInCount?: number;
+  /**
+   * 已售票張數
+   */
+  soldCount?: number;
+  /**
+   * 總票數
+   */
+  totalTicketQuantity?: number;
+};
+
 export type CategoriesResponse = {
   id?: number;
   name?: string;
@@ -219,7 +250,15 @@ export type OrderResponse = {
    * 訂單支付過期時間，格式為 ISO 8601
    */
   paidExpiredAt?: string;
+  /**
+   * 訂單創建時間，格式為 ISO 8601
+   */
+  createdAt?: string;
   activity?: {
+    /**
+     * 活動 ID
+     */
+    id?: number;
     /**
      * 活動標題
      */
@@ -227,7 +266,11 @@ export type OrderResponse = {
     /**
      * 活動地點
      */
-    location?: string;
+    location?: string | null;
+    /**
+     * 是否為線上活動
+     */
+    isOnline?: boolean;
     /**
      * 活動開始時間，格式為 ISO 8601
      */
@@ -413,25 +456,56 @@ export type CreateOrderResponse = {
    */
   id?: string;
   /**
-   * 活動 ID
-   */
-  activityId?: number;
-  /**
    * 訂單支付過期時間，格式為 ISO 8601
    */
   paidExpiredAt?: unknown;
   /**
-   * 實際支付金額
-   */
-  paidAmount?: number;
-  /**
-   * 訂單狀態
-   */
-  status?: string;
-  /**
    * 訂單創建時間，格式為 ISO 8601
    */
   createdAt?: unknown;
+  activity?: {
+    /**
+     * 活動 ID
+     */
+    id?: number;
+    /**
+     * 活動標題
+     */
+    title?: string;
+  };
+  /**
+   * 訂單中的票券列表
+   */
+  orderItems?: Array<{
+    ticketType?: {
+      /**
+       * 票種名稱
+       */
+      name?: string;
+      /**
+       * 票種價格
+       */
+      price?: number;
+      /**
+       * 票種開始時間，格式為 ISO 8601
+       */
+      startTime?: string;
+      /**
+       * 票種結束時間，格式為 ISO 8601
+       */
+      endTime?: string;
+    };
+    /**
+     * 購買的票券數量
+     */
+    quantity?: number;
+  }>;
+  payment?: {
+    /**
+     * 實際支付金額
+     */
+    paidAmount?: number;
+  };
   /**
    * 發票資訊
    */
@@ -792,7 +866,7 @@ export type TicketDetailResponse = {
      */
     endTime?: string;
   };
-  organizer?: {
+  organization?: {
     /**
      * 主辦者 ID
      */
@@ -1532,6 +1606,54 @@ export type GetApiV1ActivitiesByActivityIdIncomeResponses = {
 export type GetApiV1ActivitiesByActivityIdIncomeResponse =
   GetApiV1ActivitiesByActivityIdIncomeResponses[keyof GetApiV1ActivitiesByActivityIdIncomeResponses];
 
+export type GetApiV1ActivitiesByActivityIdCheckedInData = {
+  body?: never;
+  path: {
+    /**
+     * 活動 ID
+     */
+    activityId: number;
+  };
+  query?: never;
+  url: "/api/v1/activities/{activityId}/checkedIn";
+};
+
+export type GetApiV1ActivitiesByActivityIdCheckedInErrors = {
+  /**
+   * 格式錯誤
+   */
+  400: ErrorResponse;
+  /**
+   * 未登入
+   */
+  401: ErrorResponse;
+  /**
+   * 無權限，非主辦單位成員
+   */
+  403: ErrorResponse;
+  /**
+   * 活動不存在
+   */
+  404: ErrorResponse;
+};
+
+export type GetApiV1ActivitiesByActivityIdCheckedInError =
+  GetApiV1ActivitiesByActivityIdCheckedInErrors[keyof GetApiV1ActivitiesByActivityIdCheckedInErrors];
+
+export type GetApiV1ActivitiesByActivityIdCheckedInResponses = {
+  /**
+   * 請求成功
+   */
+  200: {
+    message?: string;
+    status?: boolean;
+    data?: GetCheckedInResponse;
+  };
+};
+
+export type GetApiV1ActivitiesByActivityIdCheckedInResponse =
+  GetApiV1ActivitiesByActivityIdCheckedInResponses[keyof GetApiV1ActivitiesByActivityIdCheckedInResponses];
+
 export type GetApiV1ActivitiesByActivityIdData = {
   body?: never;
   path: {
@@ -2189,6 +2311,13 @@ export type PostApiV1OrdersResponses = {
 
 export type PostApiV1OrdersResponse = PostApiV1OrdersResponses[keyof PostApiV1OrdersResponses];
 
+export type PostApiV1OrdersReturnData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/v1/orders/return";
+};
+
 export type GetApiV1OrdersByOrderIdData = {
   body?: never;
   path: {
@@ -2273,6 +2402,97 @@ export type PatchApiV1OrdersByOrderIdCancelResponses = {
 
 export type PatchApiV1OrdersByOrderIdCancelResponse =
   PatchApiV1OrdersByOrderIdCancelResponses[keyof PatchApiV1OrdersByOrderIdCancelResponses];
+
+export type PostApiV1OrdersByOrderIdCheckoutData = {
+  body?: never;
+  path: {
+    orderId: string;
+  };
+  query?: never;
+  url: "/api/v1/orders/{orderId}/checkout";
+};
+
+export type PostApiV1OrdersByOrderIdCheckoutErrors = {
+  /**
+   * 未提供授權令牌
+   */
+  401: ErrorResponse;
+  /**
+   * 訂單不存在
+   */
+  404: ErrorResponse;
+  /**
+   * 只能結帳未付款的訂單
+   */
+  409: ErrorResponse;
+};
+
+export type PostApiV1OrdersByOrderIdCheckoutError =
+  PostApiV1OrdersByOrderIdCheckoutErrors[keyof PostApiV1OrdersByOrderIdCheckoutErrors];
+
+export type PostApiV1OrdersByOrderIdCheckoutResponses = {
+  /**
+   * 回傳 html 的 form 表單，前端需要在原頁開啟來提交
+   */
+  200: string;
+};
+
+export type PostApiV1OrdersByOrderIdCheckoutResponse =
+  PostApiV1OrdersByOrderIdCheckoutResponses[keyof PostApiV1OrdersByOrderIdCheckoutResponses];
+
+export type GetApiV1OrdersByOrderIdCheckoutResultData = {
+  body?: never;
+  path: {
+    orderId: string;
+  };
+  query?: never;
+  url: "/api/v1/orders/{orderId}/checkout/result";
+};
+
+export type GetApiV1OrdersByOrderIdCheckoutResultErrors = {
+  /**
+   * 付款資料格式錯誤，請聯繫管理員
+   */
+  400: ErrorResponse;
+  /**
+   * 未提供授權令牌
+   */
+  401: ErrorResponse;
+  /**
+   * 訂單不存在
+   */
+  404: ErrorResponse;
+  /**
+   * 此訂單尚未進行結帳
+   */
+  409: ErrorResponse;
+};
+
+export type GetApiV1OrdersByOrderIdCheckoutResultError =
+  GetApiV1OrdersByOrderIdCheckoutResultErrors[keyof GetApiV1OrdersByOrderIdCheckoutResultErrors];
+
+export type GetApiV1OrdersByOrderIdCheckoutResultResponses = {
+  /**
+   * 成功獲取付款結果
+   */
+  200: {
+    message?: string;
+    status?: boolean;
+    data?: {
+      /**
+       * true 表示成功，false 表示失敗
+       */
+      result?: boolean;
+      /**
+       * 付款結果的訊息，失敗的訊息是由綠界回傳的，應可直接使用
+       */
+      resultMessage?: string;
+    };
+  };
+};
+
+export type GetApiV1OrdersByOrderIdCheckoutResultResponse =
+  GetApiV1OrdersByOrderIdCheckoutResultResponses[keyof GetApiV1OrdersByOrderIdCheckoutResultResponses];
 
 export type DeleteApiV1OrganizationsData = {
   body: DeleteOrganizationRequest;
