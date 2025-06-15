@@ -4,6 +4,7 @@ import { useState } from "react";
 
 interface QuantityInputProps extends React.HTMLAttributes<HTMLDivElement> {
   defaultValue?: number;
+  value?: number;
   onValueChange?: (value: number) => void;
   min?: number;
   max?: number;
@@ -14,6 +15,7 @@ interface QuantityInputProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function QuantityInput({
   defaultValue = 0,
+  value: controlledValue,
   onValueChange,
   min = 0,
   max = Number.POSITIVE_INFINITY,
@@ -24,19 +26,20 @@ export function QuantityInput({
   ...props
 }: QuantityInputProps) {
   const [value, setValue] = useState(defaultValue);
+  const displayValue = controlledValue !== undefined ? controlledValue : value;
 
   const handleDecrement = () => {
-    if (value > min) {
-      const newValue = value - 1;
-      setValue(newValue);
+    if (displayValue > min) {
+      const newValue = displayValue - 1;
+      if (controlledValue === undefined) setValue(newValue);
       onValueChange?.(newValue);
     }
   };
 
   const handleIncrement = () => {
-    if (value < max) {
-      const newValue = value + 1;
-      setValue(newValue);
+    if (displayValue < max) {
+      const newValue = displayValue + 1;
+      if (controlledValue === undefined) setValue(newValue);
       onValueChange?.(newValue);
     }
   };
@@ -52,7 +55,7 @@ export function QuantityInput({
       className={cn(
         "relative flex flex-col items-center",
         "h-10 transition-[height] duration-300 ease-in-out",
-        value > 0 && "h-[84px]",
+        displayValue > 0 && "h-[84px]",
         className
       )}
       {...props}
@@ -62,7 +65,7 @@ export function QuantityInput({
         onClick={handleIncrement}
         onFocus={onFocus}
         onBlur={onBlur}
-        disabled={disabled || value >= max}
+        disabled={disabled || displayValue >= max}
         className={cn(
           buttonSize,
           "rounded-full bg-primary-500",
@@ -77,7 +80,7 @@ export function QuantityInput({
           "absolute top-0 flex flex-col items-center",
           buttonSize,
           "overflow-hidden transition-all duration-300 ease-in-out",
-          value === 0 ? "h-0 opacity-0" : "h-[84px] opacity-100",
+          displayValue === 0 ? "h-0 opacity-0" : "h-[84px] opacity-100",
           "rounded-full bg-primary-200"
         )}
       >
@@ -88,7 +91,7 @@ export function QuantityInput({
           onClick={handleDecrement}
           onFocus={onFocus}
           onBlur={onBlur}
-          disabled={disabled || value <= min}
+          disabled={disabled || displayValue <= min}
           className={cn(buttonSize, "flex items-center justify-center rounded-full")}
         >
           <span className="text-2xl font-medium leading-none">-</span>
