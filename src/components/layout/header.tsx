@@ -374,7 +374,7 @@ export default function Header() {
             </div>
 
             {isAuthenticated && (
-              <div className="">
+              <div className="flex flex-col gap-4">
                 <div className="border-t border-gray-200 my-8" />
 
                 {mobileUserMenuOpen && (
@@ -438,9 +438,19 @@ export default function Header() {
                     className="flex items-center gap-2 cursor-pointer"
                     onClick={() => setMobileUserMenuOpen(!mobileUserMenuOpen)}
                   >
-                    <div className="bg-neutral-800 p-3 rounded-full flex items-center justify-center">
-                      <User className="w-4 h-4 text-white" />
-                    </div>
+                    {userProfile?.avatar ? (
+                      <Image
+                        src={userProfile.avatar}
+                        alt="User Profile"
+                        width={32}
+                        height={32}
+                        className="rounded-full"
+                      />
+                    ) : (
+                      <div className="bg-neutral-800 p-3 rounded-full flex items-center justify-center">
+                        <User className="w-4 h-4 text-white" />
+                      </div>
+                    )}
                     <span className="text-sm">{userProfile?.displayName || "使用者"}</span>
                   </button>
                   <button
