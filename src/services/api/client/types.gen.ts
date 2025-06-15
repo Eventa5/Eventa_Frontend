@@ -209,6 +209,28 @@ export type CategoriesResponse = {
   image?: string;
 };
 
+export type ChatRequest = {
+  /**
+   * 用戶輸入的問題
+   */
+  message: string;
+};
+
+export type ChatResponse = {
+  /**
+   * AI 回覆的訊息
+   */
+  message?: string;
+  /**
+   * 回覆時間
+   */
+  timestamp?: string;
+  /**
+   * 資料來源
+   */
+  sources?: Array<string>;
+};
+
 export type ErrorResponse = {
   message?: string;
   status?: boolean;
@@ -2161,6 +2183,43 @@ export type GetApiV1CategoriesResponses = {
 
 export type GetApiV1CategoriesResponse =
   GetApiV1CategoriesResponses[keyof GetApiV1CategoriesResponses];
+
+export type PostApiV1ChatData = {
+  body: ChatRequest;
+  path?: never;
+  query?: never;
+  url: "/api/v1/chat";
+};
+
+export type PostApiV1ChatErrors = {
+  /**
+   * 格式錯誤
+   */
+  400: ErrorResponse;
+  /**
+   * 請求過於頻繁
+   */
+  429: ErrorResponse;
+  /**
+   * 系統錯誤
+   */
+  500: ErrorResponse;
+};
+
+export type PostApiV1ChatError = PostApiV1ChatErrors[keyof PostApiV1ChatErrors];
+
+export type PostApiV1ChatResponses = {
+  /**
+   * 成功獲取 AI 回覆
+   */
+  200: {
+    message?: string;
+    status?: boolean;
+    data?: ChatResponse;
+  };
+};
+
+export type PostApiV1ChatResponse = PostApiV1ChatResponses[keyof PostApiV1ChatResponses];
 
 export type GetApiV1CurrenciesData = {
   body?: never;

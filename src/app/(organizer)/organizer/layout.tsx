@@ -2,6 +2,8 @@ import localFont from "next/font/local";
 import "@/styles/globals.css";
 import { Navbar } from "@/components/layout/navbar";
 import { SidebarNav } from "@/components/layout/sidebar-nav";
+import ErrorDialog from "@/components/ui/error-dialog";
+import { Toaster } from "@/components/ui/sonner";
 import { InitOrganizerState } from "@/features/organizer/components/InitOrganizerState";
 import { getApiV1Organizations } from "@/services/api/client/sdk.gen";
 import { redirect } from "next/navigation";
@@ -62,6 +64,8 @@ function OrganizerLayoutContent({ children }: { children: React.ReactNode }) {
         <Navbar />
         <main className="flex-1 lg:p-6 lg:pt-0">{children}</main>
       </div>
+      <ErrorDialog />
+      <Toaster />
     </div>
   );
 }
