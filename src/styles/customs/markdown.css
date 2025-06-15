@@ -1,0 +1,67 @@
+/* Markdown 內容的自定義樣式 */
+.markdown-content {
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.markdown-content p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-content ul:last-child,
+.markdown-content ol:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-content pre {
+  white-space: pre-wrap;
+}
+
+.markdown-content code {
+  word-break: break-all;
+}
+
+.markdown-content table {
+  font-size: 0.875rem;
+}
+
+.markdown-content blockquote {
+  font-style: italic;
+}
+
+.markdown-content a {
+  word-break: break-all;
+}
+
+/* 確保在小尺寸容器中的可讀性 */
+@media (max-width: 640px) {
+  .markdown-content {
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  .markdown-content h1 {
+    font-size: 1rem;
+  }
+
+  .markdown-content h2 {
+    font-size: 0.9375rem;
+  }
+
+  .markdown-content h3 {
+    font-size: 0.875rem;
+  }
+
+  .markdown-content code {
+    font-size: 0.75rem;
+  }
+
+  .markdown-content pre code {
+    font-size: 0.75rem;
+  }
+
+  .markdown-content table {
+    font-size: 0.75rem;
+  }
+}
