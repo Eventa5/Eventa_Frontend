@@ -34,9 +34,9 @@ import {
   getApiV1Activities,
   getApiV1ActivitiesByActivityId,
   getApiV1OrdersByOrderId,
-  getApiV1UsersProfile,
 } from "@/services/api/client/sdk.gen";
 import type { ActivityResponse, OrderDetailResponse } from "@/services/api/client/types.gen";
+import { useSearchStore } from "@/store/search";
 import {
   Calendar,
   CreditCard,
@@ -63,15 +63,7 @@ const activityFetcher = async (activityId: number) => {
   throw new Error(response.error?.message || "無法獲取活動資料");
 };
 
-const profileFetcher = async () => {
-  const response = await getApiV1UsersProfile();
-  if (response.data?.data) {
-    return response.data.data;
-  }
-  throw new Error(response.error?.message || "無法獲取個人資料");
-};
-
-const similarActivitiesFetcher = async (categoryIds: number[]) => {
+const similarActivitiesFetcher = async (categoryIds: number[], currentActivityId: number) => {
   const response = await getApiV1Activities({
     query: {
       categoryId: categoryIds[0],
@@ -80,7 +72,8 @@ const similarActivitiesFetcher = async (categoryIds: number[]) => {
     },
   });
   if (response.data?.data) {
-    return response.data.data;
+    // 過濾掉當前活動
+    return response.data.data.filter((activity) => activity.id !== currentActivityId);
   }
   throw new Error(response.error?.message || "無法獲取相似活動資料");
 };
@@ -106,7 +99,7 @@ export default function OrderDetailPage() {
     cancelTime: string;
   } | null>(null);
   const [showSimilarActivities, setShowSimilarActivities] = useState(false);
-
+  const { setSearchValue } = useSearchStore();
   // 使用 useSWR 獲取訂單資料
   const {
     data: order,
@@ -127,8 +120,16 @@ export default function OrderDetailPage() {
 
   // 使用 useSWR 獲取相似活動資料
   const { data: similarActivities } = useSWR(
-    order?.activity?.categories?.map((cat) => cat.id),
-    similarActivitiesFetcher,
+    order?.activity?.categories?.map((cat) => cat.id) && activity?.id
+      ? [
+          order.activity.categories
+            .map((cat) => cat.id)
+            .filter((id): id is number => id !== undefined),
+          activity.id,
+        ]
+      : null,
+    ([categoryIds, currentActivityId]: [number[], number]) =>
+      similarActivitiesFetcher(categoryIds, currentActivityId),
     {
       revalidateOnFocus: false,
     }
@@ -140,6 +141,7 @@ export default function OrderDetailPage() {
 
   const handleTagClick = (tag: string) => {
     router.push(`/events?search=${encodeURIComponent(tag)}`);
+    setSearchValue(tag);
   };
 
   const handleCategoryClick = (categoryName: string | undefined) => {
@@ -153,8 +155,6 @@ export default function OrderDetailPage() {
     female: "女",
     nonBinary: "其他",
   };
-
-  const mockTags = ["文青最愛", "聽團仔"];
 
   // 退票流程
   const handleRefund = async () => {
