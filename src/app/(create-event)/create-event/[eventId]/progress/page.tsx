@@ -144,7 +144,7 @@ export default function ProgressPage() {
                 </span>
               )}
             </h3>
-          </div>{" "}
+          </div>
           {/* 活動資訊標籤 */}
           <div className="flex items-center flex-wrap gap-y-3">
             {stepOneItems.map((item, index) => (
@@ -174,7 +174,7 @@ export default function ProgressPage() {
                 <CircleCheck className="w-6 h-6" />
               </span>
             )}
-          </h3>{" "}
+          </h3>
           <div className="flex items-center -space-x-2">
             {stepTwoItems.map((item, index) => (
               <StepTag
