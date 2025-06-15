@@ -112,6 +112,9 @@ import type {
   PostApiV1OrdersByOrderIdCheckoutData,
   PostApiV1OrdersByOrderIdCheckoutError,
   PostApiV1OrdersByOrderIdCheckoutResponse,
+  PostApiV1OrdersByOrderIdRefundData,
+  PostApiV1OrdersByOrderIdRefundError,
+  PostApiV1OrdersByOrderIdRefundResponse,
   PostApiV1OrdersData,
   PostApiV1OrdersError,
   PostApiV1OrdersResponse,
@@ -882,8 +885,8 @@ export const getApiV1OrdersByOrderId = <ThrowOnError extends boolean = false>(
 };
 
 /**
- * 獲取付款結果
- * 獲取訂單的付款結果
+ * 取消訂單
+ * 用來手動取消訂單
  */
 export const patchApiV1OrdersByOrderIdCancel = <ThrowOnError extends boolean = false>(
   options: Options<PatchApiV1OrdersByOrderIdCancelData, ThrowOnError>
@@ -946,6 +949,29 @@ export const getApiV1OrdersByOrderIdCheckoutResult = <ThrowOnError extends boole
       },
     ],
     url: "/api/v1/orders/{orderId}/checkout/result",
+    ...options,
+  });
+};
+
+/**
+ * 訂單退款
+ * 用來退款訂單
+ */
+export const postApiV1OrdersByOrderIdRefund = <ThrowOnError extends boolean = false>(
+  options: Options<PostApiV1OrdersByOrderIdRefundData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).post<
+    PostApiV1OrdersByOrderIdRefundResponse,
+    PostApiV1OrdersByOrderIdRefundError,
+    ThrowOnError
+  >({
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/v1/orders/{orderId}/refund",
     ...options,
   });
 };

@@ -2553,6 +2553,46 @@ export type GetApiV1OrdersByOrderIdCheckoutResultResponses = {
 export type GetApiV1OrdersByOrderIdCheckoutResultResponse =
   GetApiV1OrdersByOrderIdCheckoutResultResponses[keyof GetApiV1OrdersByOrderIdCheckoutResultResponses];
 
+export type PostApiV1OrdersByOrderIdRefundData = {
+  body?: never;
+  path: {
+    orderId: string;
+  };
+  query?: never;
+  url: "/api/v1/orders/{orderId}/refund";
+};
+
+export type PostApiV1OrdersByOrderIdRefundErrors = {
+  /**
+   * 未提供授權令牌
+   */
+  401: ErrorResponse;
+  /**
+   * 訂單不存在
+   */
+  404: ErrorResponse;
+  /**
+   * 只能退款已付款的訂單
+   */
+  409: ErrorResponse;
+};
+
+export type PostApiV1OrdersByOrderIdRefundError =
+  PostApiV1OrdersByOrderIdRefundErrors[keyof PostApiV1OrdersByOrderIdRefundErrors];
+
+export type PostApiV1OrdersByOrderIdRefundResponses = {
+  /**
+   * 退款成功
+   */
+  201: {
+    message?: string;
+    status?: boolean;
+  };
+};
+
+export type PostApiV1OrdersByOrderIdRefundResponse =
+  PostApiV1OrdersByOrderIdRefundResponses[keyof PostApiV1OrdersByOrderIdRefundResponses];
+
 export type DeleteApiV1OrganizationsData = {
   body: DeleteOrganizationRequest;
   path?: never;

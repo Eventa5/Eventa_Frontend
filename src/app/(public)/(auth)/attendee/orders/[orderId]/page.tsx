@@ -34,6 +34,7 @@ import {
   getApiV1Activities,
   getApiV1ActivitiesByActivityId,
   getApiV1OrdersByOrderId,
+  postApiV1OrdersByOrderIdRefund,
 } from "@/services/api/client/sdk.gen";
 import type { ActivityResponse, OrderDetailResponse } from "@/services/api/client/types.gen";
 import { useSearchStore } from "@/store/search";
@@ -51,6 +52,7 @@ import {
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 import useSWR from "swr";
 
 const activityFetcher = async (activityId: number) => {
@@ -105,6 +107,7 @@ export default function OrderDetailPage() {
     data: order,
     error: orderError,
     isLoading: orderLoading,
+    mutate: mutateOrder,
   } = useSWR<OrderDetailResponse>(orderId ? `/api/orders/${orderId}` : null, () =>
     orderFetcher(orderId as string)
   );
@@ -160,13 +163,24 @@ export default function OrderDetailPage() {
   const handleRefund = async () => {
     setShowRefundConfirm(false);
     try {
-      // const res = await refundApiCall(orderId); // 實際請求
-      // 假設回傳 { activityName: activity?.title, cancelTime: new Date().toLocaleString() }
-      const res = { activityName: activity?.title ?? "", cancelTime: new Date().toLocaleString() };
-      setRefundResult(res);
-      // setShowRefundSuccess(true);
-      setShowRefundFail(true);
+      const response = await postApiV1OrdersByOrderIdRefund({
+        path: { orderId: orderId as string },
+      });
+
+      if (response.data?.status) {
+        const res = {
+          activityName: activity?.title ?? "",
+          cancelTime: new Date().toLocaleString(),
+        };
+        setRefundResult(res);
+        setShowRefundSuccess(true);
+        // 重新取得訂單詳情
+        await mutateOrder();
+      } else {
+        throw new Error(response.data?.message || "退票失敗");
+      }
     } catch (e) {
+      toast.error("退票失敗");
       setShowRefundFail(true);
     }
   };

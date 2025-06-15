@@ -98,6 +98,7 @@ export const orderStatusMap = {
   expired: "已逾期",
   processing: "付款中",
   failed: "付款失敗",
+  refunded: "已退款",
 };
 
 export const ticketStatusMap = {

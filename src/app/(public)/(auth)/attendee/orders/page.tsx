@@ -55,6 +55,7 @@ export default function OrdersPage() {
     expired: 0,
     processing: 0,
     failed: 0,
+    refunded: 0,
   });
 
   // 取得所有訂單用於計算數量
@@ -79,6 +80,7 @@ export default function OrdersPage() {
         expired: allOrders.filter((o: OrderResponse) => o.status === "expired").length,
         processing: allOrders.filter((o: OrderResponse) => o.status === "processing").length,
         failed: allOrders.filter((o: OrderResponse) => o.status === "failed").length,
+        refunded: allOrders.filter((o: OrderResponse) => o.status === "refunded").length,
       });
     }
   }, [allOrders]);
@@ -258,6 +260,9 @@ export default function OrdersPage() {
           pending: counts.pending || undefined,
           canceled: counts.canceled || undefined,
           expired: counts.expired || undefined,
+          refunded: counts.refunded || undefined,
+          processing: counts.processing || undefined,
+          failed: counts.failed || undefined,
         }}
         className="mb-4 border-b border-neutral-300"
       />

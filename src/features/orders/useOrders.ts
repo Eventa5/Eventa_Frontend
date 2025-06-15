@@ -18,7 +18,7 @@ export interface Order {
   };
 }
 
-export type OrderTabsValue = "all" | "paid" | "pending" | "canceled" | "expired";
+export type OrderTabsValue = "all" | "paid" | "pending" | "canceled" | "expired" | "refunded";
 
 interface OrdersResponse {
   data: OrderResponse[];
