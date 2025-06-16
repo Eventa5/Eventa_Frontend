@@ -11,9 +11,9 @@ import { useSearchStore } from "@/store/search";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef } from "react";
+import { Suspense, useCallback, useEffect, useRef } from "react";
 
-export default function EventsPage() {
+function EventsPageContent() {
   const { activities, fetchOtherActivities, isLoading } = useActivitiesStore();
   const searchValue = useSearchStore((s) => s.searchValue);
   const setSearchValue = useSearchStore((s) => s.setSearchValue);
@@ -181,5 +181,19 @@ export default function EventsPage() {
       {/* 其他活動（搜尋時以外才顯示） */}
       {!isSearchMode && <OtherEventsSection />}
     </main>
+  );
+}
+
+export default function EventsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-primary-50 -mt-10">
+          載入中...
+        </div>
+      }
+    >
+      <EventsPageContent />
+    </Suspense>
   );
 }
