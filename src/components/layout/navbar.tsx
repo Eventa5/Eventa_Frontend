@@ -2,7 +2,8 @@
 
 import SelectOrganizerDialog from "@/features/organizer/components/select-organizer-dialog";
 import { useAuthStore } from "@/store/auth";
-import { Home, LogOut, SwitchCamera, UserRound } from "lucide-react";
+import { useOrganizerStore } from "@/store/organizer";
+import { Home, House, LogOut, SwitchCamera, UserRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -13,6 +14,7 @@ export const Navbar = () => {
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const logout = useAuthStore((s) => s.logout);
+  const currentOrganizerInfo = useOrganizerStore((s) => s.currentOrganizerInfo);
 
   // 處理選擇主辦單位成功
   const handleOrganizerSelected = () => {
@@ -46,17 +48,31 @@ export const Navbar = () => {
             onClick={() => setMenuOpen(!menuOpen)}
             className="flex items-center gap-2 cursor-pointer"
           >
-            <div className="bg-[#262626] p-2 rounded-full">
-              <UserRound className="w-5 h-5 text-white" />
+            <div className="bg-[#262626] rounded-full">
+              {currentOrganizerInfo?.avatar ? (
+                <Image
+                  src={currentOrganizerInfo.avatar}
+                  alt="Organizer Avatar"
+                  width={32}
+                  height={32}
+                  className="rounded-full"
+                />
+              ) : (
+                <UserRound className="w-8 h-8 text-white" />
+              )}
             </div>
-            <span className="text-sm font-normal text-[#262626] hidden lg:block">使用者#001</span>
+            <span className="text-sm font-normal text-[#262626] hidden lg:block">
+              {currentOrganizerInfo?.name || "使用者"}
+            </span>
           </button>
 
           {menuOpen && (
             <>
               <div className="absolute right-0 mt-2 w-56 bg-white shadow-lg rounded-md z-50 border border-gray-100">
                 <div className="p-4 border-b border-gray-100">
-                  <p className="font-medium text-gray-900">您好，使用者</p>
+                  <p className="font-medium text-gray-900">
+                    您好，{currentOrganizerInfo?.name || "使用者"}
+                  </p>
                   <p className="text-xs text-gray-500 mt-1">管理您的活動和平台</p>
                 </div>
                 <ul className="py-2">
@@ -79,6 +95,15 @@ export const Navbar = () => {
                         切換主辦中心
                       </button>
                     </SelectOrganizerDialog>
+                  </li>
+                  <li>
+                    <Link
+                      href="/"
+                      className="flex items-center cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      <House className="w-4 h-4 mr-3 text-gray-500" />
+                      回首頁
+                    </Link>
                   </li>
                   <li className="border-t border-gray-100 mt-1">
                     <button

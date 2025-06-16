@@ -41,9 +41,9 @@ export default function SearchOverlay() {
   };
 
   // 選擇分類
-  const handleCategorySearch = (category: string) => {
+  const handleCategorySearch = (categoryId: string) => {
     toggleSearch();
-    router.push(`/events?category=${encodeURIComponent(category)}`);
+    router.push(`/events?categoryId=${encodeURIComponent(categoryId)}`);
   };
 
   // 如果是手機版或搜尋未開啟且不可見，則不渲染
@@ -99,7 +99,7 @@ export default function SearchOverlay() {
             >
               <div
                 className="flex flex-col items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
-                onClick={() => handleCategorySearch(category.name)}
+                onClick={() => handleCategorySearch(category.id?.toString() ?? "")}
               >
                 <div
                   className="w-[80px] h-[80px] bg-cover bg-center rounded-xl"

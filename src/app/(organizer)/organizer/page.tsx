@@ -23,7 +23,7 @@ export default function OrganizerHomePage() {
   const router = useRouter();
   const { showError } = useDialogStore();
   const { handleError } = useErrorHandler();
-  const { fetchCurrentOrganizerInfo } = useOrganizerStore();
+  const { fetchCurrentOrganizerInfo, currentOrganizerInfo } = useOrganizerStore();
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null);
@@ -71,15 +71,19 @@ export default function OrganizerHomePage() {
       countryCode: `台灣 ${currentOrganizer.countryCode || "+886"}`,
     });
 
-    if (currentOrganizer.avatar) {
-      setAvatarPreview(currentOrganizer.avatar);
-    }
-    if (currentOrganizer.cover) {
-      setCoverImagePreview(currentOrganizer.cover);
-    }
+    setAvatarPreview(currentOrganizer?.avatar || null);
+    setCoverImagePreview(currentOrganizer?.cover || null);
     setIsLoading(false);
   }, [fetchCurrentOrganizerInfo, reset]);
 
+  // 監聽 currentOrganizerInfo 的變更
+  useEffect(() => {
+    if (currentOrganizerInfo?.id) {
+      fetchOrganizerDetail();
+    }
+  }, [currentOrganizerInfo?.id, fetchOrganizerDetail]);
+
+  // 初始載入
   useEffect(() => {
     fetchOrganizerDetail();
   }, [fetchOrganizerDetail]);

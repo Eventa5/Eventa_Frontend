@@ -201,6 +201,12 @@ export default function ProfileForm() {
     resetForm();
   }, [resetForm]);
 
+  useEffect(() => {
+    if (userProfile?.avatar) {
+      setPreviewUrl(userProfile.avatar);
+    }
+  }, [userProfile?.avatar]);
+
   const isDateDisabled = (date: Date) => {
     return !isAfter(date, minBirthDate) || !isBefore(date, maxBirthDate);
   };
@@ -249,10 +255,14 @@ export default function ProfileForm() {
     };
   }, [previewUrl]);
 
+  const handleClearAvatar = () => {
+    setPreviewUrl("");
+  };
+
   async function onSubmit(data: ProfileFormValues) {
     try {
       setIsSubmitting(true);
-      let newAvatarUrl = data.avatar;
+      let newAvatarUrl = previewUrl;
 
       // 如果有選擇新的頭貼，先上傳頭貼
       if (selectedAvatarFile) {
@@ -291,7 +301,7 @@ export default function ProfileForm() {
       if (response.data?.status) {
         await useAuthStore.getState().fetchUserProfile();
         setSelectedAvatarFile(null);
-        setPreviewUrl(""); // 清除預覽 URL
+        setPreviewUrl(newAvatarUrl); // 清除預覽 URL
         toast.success("個人檔案更新成功");
       } else {
         throw new Error(response.error?.message || "更新失敗");
@@ -309,8 +319,6 @@ export default function ProfileForm() {
       setIsSubmitting(false);
     }
   }
-
-  const photoUrl = userProfile?.avatar || "";
 
   return (
     <>
@@ -331,9 +339,9 @@ export default function ProfileForm() {
               className="relative h-24 w-24 overflow-hidden rounded-full bg-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
               onClick={handleAvatarClick}
             >
-              {photoUrl ? (
+              {previewUrl ? (
                 <Image
-                  src={photoUrl}
+                  src={previewUrl}
                   alt="Profile"
                   fill
                   sizes="96px"
@@ -350,6 +358,20 @@ export default function ProfileForm() {
                 </div>
               )}
             </div>
+            {previewUrl && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClearAvatar();
+                }}
+                className="text-xs text-gray-500 hover:text-gray-700"
+              >
+                清除頭貼
+              </Button>
+            )}
             <p className="text-xs text-gray-500">{userProfile?.memberId}</p>
           </div>
 

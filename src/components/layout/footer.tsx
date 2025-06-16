@@ -32,15 +32,15 @@ type FooterLink = {
 };
 
 const exploreLinks: FooterLink[] = [
-  { id: "featured", href: "/events?category=featured", label: "精選活動" },
-  { id: "learning", href: "/events?category=learning", label: "學習活動" },
-  { id: "arts", href: "/events?category=arts", label: "藝文活動" },
-  { id: "experience", href: "/events?category=experience", label: "體驗活動" },
-  {
-    id: "ai-recommended",
-    href: "/events?category=ai-recommended",
-    label: "AI 為您推薦",
-  },
+  { id: "featured", href: "/events", label: "精選活動" },
+  { id: "learning", href: "/events?categoryId=2", label: "學習活動" },
+  { id: "arts", href: "/events?categoryId=10", label: "藝文活動" },
+  { id: "experience", href: "/events?categoryId=1", label: "戶外體驗活動" },
+  // {
+  //   id: "ai-recommended",
+  //   href: "/events?categoryId=ai-recommended",
+  //   label: "AI 為您推薦",
+  // },
   { id: "faq", href: "/faq", label: "常見問題" },
 ];
 

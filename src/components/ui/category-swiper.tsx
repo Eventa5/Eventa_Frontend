@@ -38,7 +38,7 @@ export default function CategorySwiper() {
           className="!h-[219px] md:!h-[310px] xl:first:!w-[411px] !w-[136px] md:!w-[193px] shrink-0"
         >
           <Link
-            href={`/events?category=${category.name}`}
+            href={`/events?categoryId=${category?.id}`}
             className={"relative h-full w-full rounded-[30px] overflow-hidden group block"}
           >
             <Image

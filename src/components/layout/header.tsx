@@ -374,8 +374,8 @@ export default function Header() {
             </div>
 
             {isAuthenticated && (
-              <div className="">
-                <div className="border-t border-gray-200 my-8" />
+              <div className="flex flex-col gap-2">
+                <div className="border-t border-gray-200 mt-4" />
 
                 {mobileUserMenuOpen && (
                   <div className="mb-4 border-b border-gray-200">
@@ -414,20 +414,21 @@ export default function Header() {
                           會員中心
                         </Link>
                       </li>
-                      {/* <li>
+                      <li className="border-t border-gray-100 mt-1">
                         <Link
-                          href="#"
-                          className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setMobileMenuOpen(false);
-                            setMobileUserMenuOpen(false);
-                          }}
+                          href="/organizer"
+                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                         >
-                          <Settings className="w-4 h-4 mr-3 text-gray-500" />
-                          帳號管理
+                          <Image
+                            src="/icons/logo-outline.svg"
+                            alt="Eventa Logo"
+                            width={16}
+                            height={16}
+                            className="w-4 h-4 mr-3"
+                          />
+                          主辦中心
                         </Link>
-                      </li> */}
+                      </li>
                     </ul>
                   </div>
                 )}
@@ -438,9 +439,19 @@ export default function Header() {
                     className="flex items-center gap-2 cursor-pointer"
                     onClick={() => setMobileUserMenuOpen(!mobileUserMenuOpen)}
                   >
-                    <div className="bg-neutral-800 p-3 rounded-full flex items-center justify-center">
-                      <User className="w-4 h-4 text-white" />
-                    </div>
+                    {userProfile?.avatar ? (
+                      <Image
+                        src={userProfile.avatar}
+                        alt="User Profile"
+                        width={32}
+                        height={32}
+                        className="rounded-full"
+                      />
+                    ) : (
+                      <div className="bg-neutral-800 p-3 rounded-full flex items-center justify-center">
+                        <User className="w-4 h-4 text-white" />
+                      </div>
+                    )}
                     <span className="text-sm">{userProfile?.displayName || "使用者"}</span>
                   </button>
                   <button

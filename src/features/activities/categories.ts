@@ -4,6 +4,7 @@ import useSWR from "swr";
 
 // 類別資料的類型定義
 export type FormattedCategory = {
+  id: number;
   name: string;
   imageUrl: string;
 };
@@ -45,11 +46,12 @@ export const formatCategories = (categories: CategoriesResponse[]): FormattedCat
   try {
     return categories.map((category) => {
       // 驗證必要欄位
-      if (!category.name || !category.image) {
+      if (!category.name || !category.image || !category.id) {
         throw new Error(ERROR_MESSAGES.VALIDATION_ERROR);
       }
 
       return {
+        id: category.id,
         name: category.name,
         imageUrl: category.image,
       };
