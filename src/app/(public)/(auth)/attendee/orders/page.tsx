@@ -71,9 +71,6 @@ export default function OrdersPage() {
     refunded: 0,
   });
 
-  // 使用 useState 來管理總數
-  const [totalCount, setTotalCount] = useState(0);
-
   const { data: ordersData, error, isLoading, mutate } = useOrders(queryParams);
   const { data: totalOrdersData } = useOrders(totalQueryParams);
   const [allOrders, setAllOrders] = useState<OrderResponse[]>([]);

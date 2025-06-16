@@ -55,6 +55,12 @@ export const useOrders = (params?: {
           hasPrevPage: false,
         },
       };
+    },
+    {
+      revalidateOnFocus: true,
+      revalidateOnMount: true,
+      revalidateIfStale: true,
+      dedupingInterval: 0,
     }
   );
 
