@@ -2,6 +2,13 @@ import { getApiV1Activities } from "@/services/api/client/sdk.gen";
 import type { ActivitiesResponse } from "@/services/api/client/types.gen";
 import { create } from "zustand";
 
+interface ActivitiesQueryParams {
+  page: number;
+  limit: number;
+  categoryId?: number;
+  keyword?: string;
+}
+
 interface ActivitiesState {
   activities: ActivitiesResponse[];
   isLoading: boolean;
@@ -10,7 +17,7 @@ interface ActivitiesState {
   hasMore: boolean;
   isFirstPageLoaded: boolean;
   isInfiniteScrollEnabled: boolean;
-  fetchOtherActivities: (page?: number) => Promise<void>;
+  fetchOtherActivities: (page?: number, categoryId?: number, keyword?: string) => Promise<void>;
   resetOtherActivities: () => void;
   enableInfiniteScroll: () => void;
 }
@@ -32,21 +39,31 @@ export const useActivitiesStore = create<ActivitiesState>((set, get) => ({
       return;
     }
 
-    // 如果是第一頁且已經載入過，則不重新載入
-    if (page === 1 && currentState.isFirstPageLoaded) {
+    // 如果是第一頁且已經載入過，則不重新載入（除非有分類參數）
+    if (page === 1 && currentState.isFirstPageLoaded && !categoryId && !keyword) {
       return;
     }
 
     try {
       set({ isLoading: true, error: null });
+
+      // 建構 API 查詢參數
+      const queryParams: ActivitiesQueryParams = {
+        page,
+        limit: 8,
+      };
+
+      // 如果有分類 ID，加入 categoryId 參數
+      if (categoryId) {
+        queryParams.categoryId = categoryId;
+      }
+
+      if (keyword) {
+        queryParams.keyword = keyword;
+      }
+
       const response = await getApiV1Activities({
-        query: {
-          page,
-          limit: 8,
-          status: "published",
-          categoryId,
-          keyword,
-        },
+        query: queryParams,
       });
 
       const newActivities = response.data?.data || [];

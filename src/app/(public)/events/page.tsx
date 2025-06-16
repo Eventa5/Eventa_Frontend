@@ -10,157 +10,64 @@ import { useActivitiesStore } from "@/store/activities";
 import { useSearchStore } from "@/store/search";
 import Image from "next/image";
 import Link from "next/link";
-
-const hotEvents = [
-  {
-    id: "1",
-    title: "玩樂本就是人之天性，這樣辦活動真好玩！",
-    location: "高雄市",
-    date: "2025.04.01 (二) 14:00 - 17:00",
-    imageUrl: "/images/hot-event1.jpg",
-  },
-  {
-    id: "2",
-    title: "文化漫遊：探訪古蹟與美食的奇幻旅程",
-    location: "台北市",
-    date: "2025.05.05 (一) 10:00 - 12:00",
-    imageUrl: "/images/hot-event2.jpg",
-  },
-  {
-    id: "3",
-    title: "音樂之夜：搖滾與流行交織的狂歡",
-    location: "台中市",
-    date: "2025.06.15 (日) 16:00 - 19:00",
-    imageUrl: "/images/hot-event3.jpg",
-  },
-  {
-    id: "4",
-    title: "星空下的浪漫：露營與燒烤的夏日派對",
-    location: "新竹縣",
-    date: "2025.07.20 (日) 18:00 - 21:00",
-    imageUrl: "/images/hot-event4.jpg",
-  },
-  {
-    id: "5",
-    title: "戶外運動嘉年華：挑戰極限體能賽",
-    location: "桃園市",
-    date: "2025.08.30 (六) 09:00 - 12:00",
-    imageUrl: "/images/hot-event5.jpg",
-  },
-  {
-    id: "6",
-    title: "藝術市集：創意手作與在地文創展覽",
-    location: "台南市",
-    date: "2025.09.10 (三) 13:00 - 15:00",
-    imageUrl: "/images/hot-event6.jpg",
-  },
-];
-
-const newEvents = [
-  {
-    id: "n1",
-    title: "風格時尚：夏日之最秀",
-    location: "台北市",
-    date: "2025.05.20 (二) 19:00 - 21:30",
-    imageUrl: "/images/carousel-image1.jpg",
-  },
-  {
-    id: "n2",
-    title: "創意工作坊：當代藝術解析",
-    location: "高雄市",
-    date: "2025.06.05 (四) 14:00 - 16:00",
-    imageUrl: "/images/carousel-image2.jpg",
-  },
-  {
-    id: "n3",
-    title: "電影放映會：奧斯卡精選",
-    location: "台南市",
-    date: "2025.05.25 (日) 13:30 - 17:00",
-    imageUrl: "/images/carousel-image3.jpg",
-  },
-  {
-    id: "n4",
-    title: "美食饗宴：世界小吃巡禮",
-    location: "台中市",
-    date: "2025.07.12 (六) 11:00 - 15:00",
-    imageUrl: "/images/carousel-image4.jpg",
-  },
-  {
-    id: "n5",
-    title: "健康生活工作坊：身心平衡之道",
-    location: "新北市",
-    date: "2025.08.18 (日) 09:30 - 12:30",
-    imageUrl: "/images/carousel-image5.jpg",
-  },
-];
-
-const otherEvents = [
-  {
-    id: "o1",
-    title: "大自然的味道 金柑草莓蛋糕裝飾課",
-    location: "台北市",
-    date: "2025.04.10 (四) 14:00 - 16:00",
-    imageUrl: "/images/other-event1.jpg",
-  },
-  {
-    id: "o2",
-    title: "歡樂島音樂大冒險：烏克麗麗 × 手風琴 × 小小DJ",
-    location: "台北市",
-    date: "2025.04.05 (六) 13:00 - 2025.04.06 (日) 17:00",
-    imageUrl: "/images/other-event2.jpg",
-  },
-  {
-    id: "o3",
-    title: "型動美學 | 街頭時尚攝影展覽",
-    location: "新北市",
-    date: "2025.04.05 (六) 13:00 - 2025.04.06 (日) 17:00",
-    imageUrl: "/images/other-event3.jpg",
-  },
-  {
-    id: "o4",
-    title: "春嚐製和菓．品茶會",
-    location: "桃園市",
-    date: "2025.03.29 (六) 14:00 - 2025.04.12 (六) 16:00",
-    imageUrl: "/images/other-event4.jpg",
-  },
-  {
-    id: "o5",
-    title: "復古黑膠派對之夜",
-    location: "台北市",
-    date: "2025.05.10 (六) 20:00 - 23:30",
-    imageUrl: "/images/other-event5.jpg",
-  },
-  {
-    id: "o6",
-    title: "春季野餐派對 Aroma Spring Party",
-    location: "台中市",
-    date: "2025.04.12 (六) 16:00 - 18:00",
-    imageUrl: "/images/other-event6.jpg",
-  },
-  {
-    id: "o7",
-    title: "未來藝術家｜跨界表演藝術節",
-    location: "新北市",
-    date: "2025.05.10 (六) 18:00 - 21:00",
-    imageUrl: "/images/other-event7.jpg",
-  },
-  {
-    id: "o8",
-    title: "魯凱神話藝術村 青葉部落小旅行",
-    location: "屏東縣",
-    date: "2025.06.02 (六) 09:00 - 2025.06.06 (日) 17:00",
-    imageUrl: "/images/other-event8.jpg",
-  },
-];
+import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useRef } from "react";
 
 export default function EventsPage() {
-  const { activities } = useActivitiesStore();
+  const { activities, fetchOtherActivities, isLoading } = useActivitiesStore();
   const searchValue = useSearchStore((s) => s.searchValue);
-  const filteredEvents = searchValue
-    ? activities.filter(
-        (event) => event.title?.includes(searchValue) || event.location?.includes(searchValue)
-      )
-    : activities;
+  const setSearchValue = useSearchStore((s) => s.setSearchValue);
+  const searchParams = useSearchParams();
+  const hasInitialized = useRef(false);
+
+  // Debounced 搜尋函數
+  const debouncedSearch = useCallback(
+    (() => {
+      let timeoutId: NodeJS.Timeout;
+      return (categoryId?: string, keyword?: string) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          if (categoryId || keyword) {
+            fetchOtherActivities(1, Number(categoryId), keyword);
+          }
+        }, 500);
+      };
+    })(),
+    [fetchOtherActivities]
+  );
+
+  // 頁面離開時清空搜尋狀態
+  useEffect(() => {
+    return () => {
+      setSearchValue("");
+      hasInitialized.current = false;
+    };
+  }, [setSearchValue]);
+
+  // 從 URL 參數中讀取搜尋值和分類（只在初始載入時同步一次）
+  useEffect(() => {
+    const urlSearchValue = searchParams.get("search");
+    const urlCategoryId = searchParams.get("categoryId");
+
+    // 只在初始載入時同步 URL 參數到 store
+    if (!hasInitialized.current && urlSearchValue) {
+      setSearchValue(urlSearchValue);
+      hasInitialized.current = true;
+    }
+    debouncedSearch(urlCategoryId || undefined, urlSearchValue || undefined);
+  }, [searchParams, setSearchValue, debouncedSearch]);
+
+  // 當 store 中的搜尋值改變時，也要觸發搜尋
+  useEffect(() => {
+    if (searchValue?.trim() && !searchParams.get("search")) {
+      // 如果 store 有搜尋值但 URL 沒有，執行 debounced 搜尋
+      debouncedSearch(undefined, searchValue);
+    }
+  }, [searchValue, searchParams, debouncedSearch]);
+
+  // 判斷是否為搜尋模式
+  const isSearchMode =
+    searchValue?.trim() || searchParams.get("search") || searchParams.get("categoryId");
 
   return (
     <main className="flex flex-col w-full min-h-screen bg-primary-50 pt-10 -mt-10">
@@ -171,10 +78,12 @@ export default function EventsPage() {
         </div>
       </section>
       {/* 其他活動（搜尋時搬到最上面） */}
-      {searchValue && (
+      {isSearchMode && (
         <section className="py-20 md:py-32 px-4 md:px-8">
           <div className="flex flex-col items-center">
-            {filteredEvents.length > 0 ? (
+            {isLoading ? (
+              <div className="text-gray-400 text-xl py-24">搜尋中...</div>
+            ) : activities.length > 0 ? (
               <>
                 <div className="flex flex-col items-center mb-12">
                   <div className="flex items-end gap-6 mb-6 font-serif-tc">
@@ -190,7 +99,7 @@ export default function EventsPage() {
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-[repeat(2,_302px)] lg:grid-cols-[repeat(3,_302px)] 2xl:grid-cols-[repeat(4,_302px)] gap-6 justify-items-center mx-auto">
-                  {filteredEvents.map((event) => (
+                  {activities.map((event) => (
                     <EventCard
                       key={event.id}
                       id={String(event.id)}
@@ -212,13 +121,17 @@ export default function EventsPage() {
                 </div>
               </>
             ) : (
-              <div className="text-gray-400 text-xl py-24">目前沒有相符的搜尋結果</div>
+              <div className="text-gray-400 text-xl py-24">
+                找不到符合「
+                {searchValue || searchParams.get("search")}
+                」的活動
+              </div>
             )}
           </div>
         </section>
       )}
       {/* 最新強檔（搜尋時隱藏） */}
-      {!searchValue && (
+      {!isSearchMode && (
         <section className="py-20 md:py-32 px-4 md:px-8">
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col items-center mb-3 md:mb-8">
@@ -266,7 +179,7 @@ export default function EventsPage() {
         </div>
       </section>
       {/* 其他活動（搜尋時以外才顯示） */}
-      {!searchValue && <OtherEventsSection />}
+      {!isSearchMode && <OtherEventsSection />}
     </main>
   );
 }
