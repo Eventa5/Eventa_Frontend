@@ -65,7 +65,7 @@ export default function CheckoutResultPage() {
   }, [orderId]);
 
   return (
-    <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center px-4 -mt-10">
+    <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center px-4 pt-20 -mt-10">
       {loading ? (
         <div className="min-h-screen flex items-center justify-center px-4">
           <Loader className="animate-spin w-10 h-10 text-primary-500" />
@@ -145,13 +145,13 @@ export default function CheckoutResultPage() {
         </div>
       ) : (
         // 付款成功頁面
-        <div className="max-w-md w-full text-center">
-          <div className="mb-8">
-            <div className="mx-auto w-32 h-32 bg-primary-500 rounded-full flex items-center justify-center">
+        <div className="max-w-md w-full text-center py-24 md:py-32">
+          <div className="mb-8 md:mb-12">
+            <div className="mx-auto w-32 h-32 md:w-40 md:h-40 bg-primary-500 rounded-full flex items-center justify-center">
               <ThumbsUp className="text-white w-16 h-16" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-8">報名成功！</h1>
+          <h1 className="text-xl font-bold text-gray-800 mb-4 md:text-2xl md:mb-8">報名成功！</h1>
           <Link href={`/attendee/orders/${orderId}`}>
             <Button
               size="lg"
