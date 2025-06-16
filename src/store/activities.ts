@@ -24,7 +24,7 @@ export const useActivitiesStore = create<ActivitiesState>((set, get) => ({
   isFirstPageLoaded: false,
   isInfiniteScrollEnabled: false,
 
-  fetchOtherActivities: async (page = 1) => {
+  fetchOtherActivities: async (page = 1, categoryId?: number, keyword?: string) => {
     const currentState = get();
 
     // 如果正在載入中，不要重複載入
@@ -43,6 +43,9 @@ export const useActivitiesStore = create<ActivitiesState>((set, get) => ({
         query: {
           page,
           limit: 8,
+          status: "published",
+          categoryId,
+          keyword,
         },
       });
 

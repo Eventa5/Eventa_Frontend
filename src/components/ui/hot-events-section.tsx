@@ -3,6 +3,7 @@
 import { formatEventDate } from "@/features/activities/formatEventDate";
 import { getApiV1ActivitiesPopular } from "@/services/api/client/sdk.gen";
 import type { ActivitiesResponse } from "@/services/api/client/types.gen";
+import { useMemo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import useSWR from "swr";
 import { EventCard } from "./event-cards";
@@ -13,6 +14,7 @@ interface Event {
   location: string;
   date: import("./event-cards").EventCardDate;
   imageUrl: string;
+  status: string;
 }
 
 export default function HotEventsSection() {
@@ -29,6 +31,21 @@ export default function HotEventsSection() {
     }
   );
 
+  const events: Event[] = useMemo(
+    () =>
+      (data || [])
+        .filter((activity: ActivitiesResponse) => activity.status === "published")
+        .map((activity: ActivitiesResponse) => ({
+          id: String(activity.id || 0),
+          title: activity.title || "",
+          location: activity.location || "",
+          date: formatEventDate(activity.startTime || "", activity.endTime || ""),
+          imageUrl: activity.cover || "",
+          status: activity.status || "",
+        })),
+    [data]
+  );
+
   if (isLoading) {
     return <div className="w-full h-[400px] flex items-center justify-center">載入中...</div>;
   }
@@ -36,14 +53,6 @@ export default function HotEventsSection() {
   if (error) {
     return <div className="w-full h-[400px] flex items-center justify-center">載入失敗</div>;
   }
-
-  const events: Event[] = (data || []).map((activity: ActivitiesResponse) => ({
-    id: String(activity.id || 0),
-    title: activity.title || "",
-    location: activity.location || "",
-    date: formatEventDate(activity.startTime || "", activity.endTime || ""),
-    imageUrl: activity.cover || "",
-  }));
 
   return (
     <>
