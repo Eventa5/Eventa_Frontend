@@ -2,10 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/useMediaQuery";
+import { postApiV1Chat } from "@/services/api/client/sdk.gen";
 import { useChatbotStore } from "@/store/chatbot";
 import { BotMessageSquare, Send, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { MarkdownMessage } from "./markdown-message";
 
 export default function Chatbot() {
   const isChatOpen = useChatbotStore((s) => s.isChatOpen);
@@ -15,6 +17,7 @@ export default function Chatbot() {
   const isMobile = useIsMobile();
   const [message, setMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const messageEndRef = useRef<HTMLDivElement>(null);
 
   // 自動滾動到最新消息
@@ -25,9 +28,9 @@ export default function Chatbot() {
   }, [messages]);
 
   // 送出訊息
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!message.trim()) return;
+    if (!message.trim() || isLoading) return;
 
     const userMessage = message.trim();
 
@@ -37,37 +40,72 @@ export default function Chatbot() {
     // 清空輸入框
     setMessage("");
 
-    // 顯示打字指示器
+    // 顯示打字和加載狀態
     setIsTyping(true);
+    setIsLoading(true);
 
-    setTimeout(() => {
-      // 添加機器人回應
-      addMessage("謝謝您的訊息！我們將盡快回覆您。", false);
+    try {
+      // 調用聊天 API
+      const response = await postApiV1Chat({
+        body: {
+          message: userMessage,
+        },
+      });
 
-      // 關閉打字指示器
+      if (response.data?.data?.message) {
+        // 添加 AI 回應
+        addMessage(response.data.data.message, false);
+      } else {
+        // 如果沒有收到有效回應，顯示預設訊息
+        addMessage("抱歉，我現在無法回答您的問題。請稍後再試。", false);
+      }
+    } catch (error) {
+      // 根據錯誤類型提供不同的回應
+      let errorMessage = "抱歉，發生了一些技術問題。請稍後再試。";
+
+      if (error && typeof error === "object" && "status" in error) {
+        switch (error.status) {
+          case 429:
+            errorMessage = "您的請求過於頻繁，請稍後再試。";
+            break;
+          case 400:
+            errorMessage = "請檢查您的輸入格式。";
+            break;
+          case 500:
+            errorMessage = "系統暫時無法處理您的請求，請稍後再試。";
+            break;
+        }
+      }
+
+      addMessage(errorMessage, false);
+    } finally {
+      // 關閉打字和加載狀態
       setIsTyping(false);
-    }, 800);
+      setIsLoading(false);
+    }
   };
 
   // 渲染聊天按鈕
   const renderChatButton = () => (
-    <Button
-      onClick={toggleChat}
-      className="w-12 h-12 md:w-16 md:h-16 bg-[#FFD56B] rounded-full flex items-center justify-center shadow-lg hover:bg-[#FFCA28] transition-colors cursor-pointer"
-      aria-label="開啟聊天機器人"
-    >
-      {isChatOpen ? (
-        <X
-          className="!w-6 !h-6 md:!w-8 md:!h-8"
-          strokeWidth={2}
-        />
-      ) : (
-        <BotMessageSquare
-          className="!w-6 !h-6 md:!w-8 md:!h-8"
-          strokeWidth={1.5}
-        />
-      )}
-    </Button>
+    <div className="fixed bottom-8 right-8 z-50">
+      <Button
+        onClick={toggleChat}
+        className="w-12 h-12 md:w-16 md:h-16 bg-[#FFD56B] rounded-full flex items-center justify-center shadow-lg hover:bg-[#FFCA28] transition-colors cursor-pointer relative z-50"
+        aria-label="開啟聊天機器人"
+      >
+        {isChatOpen ? (
+          <X
+            className="!w-6 !h-6 md:!w-8 md:!h-8"
+            strokeWidth={2}
+          />
+        ) : (
+          <BotMessageSquare
+            className="!w-6 !h-6 md:!w-8 md:!h-8"
+            strokeWidth={1.5}
+          />
+        )}
+      </Button>
+    </div>
   );
 
   // 渲染手機版全屏對話視窗
@@ -75,7 +113,7 @@ export default function Chatbot() {
     if (!isChatOpen || !isMobile) return null;
 
     return (
-      <div className="fixed top-0 inset-0 bg-white z-50 flex flex-col">
+      <div className="fixed top-0 inset-0 bg-white z-[1000] flex flex-col">
         {/* 頂部導航 */}
         <div className="w-full px-4 py-2 h-[56px] flex justify-between items-center relative">
           <Button
@@ -129,7 +167,7 @@ export default function Chatbot() {
                 <div className="flex flex-col max-w-[80%]">
                   <span className="text-xs text-gray-400">Eventa</span>
                   <div className="bg-[#E5E5E5] rounded-lg px-4 py-2 mt-1">
-                    <p>{msg.content}</p>
+                    <MarkdownMessage content={msg.content} />
                   </div>
                 </div>
               </div>
@@ -177,13 +215,14 @@ export default function Chatbot() {
               type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="輸入您的訊息..."
+              placeholder={isLoading ? "正在處理中..." : "輸入您的訊息..."}
               className="flex-1 outline-none text-gray-600 text-sm"
+              disabled={isLoading}
             />
             <Button
               type="submit"
               className="p-2 bg-[#FFD56B] rounded-full ml-2 cursor-pointer"
-              disabled={!message.trim()}
+              disabled={!message.trim() || isLoading}
             >
               <Send
                 className="w-5 h-5"
@@ -201,7 +240,7 @@ export default function Chatbot() {
     if (!isChatOpen || isMobile) return null;
 
     return (
-      <div className="fixed bottom-26 right-8 z-50 w-[411px] h-[344px] bg-white rounded-[20px] shadow-md overflow-hidden flex flex-col">
+      <div className="fixed bottom-26 right-8 z-[1000] w-[411px] h-[344px] bg-white rounded-[20px] shadow-md overflow-hidden flex flex-col">
         {/* 聊天窗口標題 */}
         <div className="flex items-center bg-[#262626] text-white py-2 px-6">
           <h2 className="font-bold">Eventa 小幫手</h2>
@@ -235,7 +274,7 @@ export default function Chatbot() {
                 <div className="flex flex-col max-w-[80%]">
                   <span className="text-xs text-gray-400">Eventa</span>
                   <div className="bg-[#E5E5E5] rounded-lg px-4 py-2 mt-1">
-                    <p>{msg.content}</p>
+                    <MarkdownMessage content={msg.content} />
                   </div>
                 </div>
               </div>
@@ -283,12 +322,14 @@ export default function Chatbot() {
               type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="輸入您的訊息..."
+              placeholder={isLoading ? "正在處理中..." : "輸入您的訊息..."}
               className="flex-1 outline-none text-gray-600 text-sm"
+              disabled={isLoading}
             />
             <Button
               type="submit"
               className="p-2 bg-[#FFD56B] rounded-full ml-2 cursor-pointer"
+              disabled={!message.trim() || isLoading}
             >
               <Send
                 className="w-5 h-5"
@@ -302,10 +343,10 @@ export default function Chatbot() {
   };
 
   return (
-    <div className="fixed bottom-8 right-8 z-[999]">
+    <>
       {renderChatButton()}
       {renderMobileChat()}
       {renderDesktopChat()}
-    </div>
+    </>
   );
 }

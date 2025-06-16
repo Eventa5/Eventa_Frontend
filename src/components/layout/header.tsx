@@ -153,7 +153,7 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full bg-[#FFFCF5] px-4 sm:px-8 py-6 flex flex-col items-center z-50 relative mb-10">
+    <header className="w-full bg-[#FFFCF5] px-4 sm:px-8 py-6 flex flex-col items-center z-[100] relative mb-10">
       <div className="w-full max-w-6xl flex items-center justify-between">
         {/* 左側選單 */}
         <div className="hidden md:flex flex-1 items-center">
