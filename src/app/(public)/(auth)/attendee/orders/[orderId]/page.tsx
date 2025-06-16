@@ -144,9 +144,9 @@ export default function OrderDetailPage() {
     setSearchValue(tag);
   };
 
-  const handleCategoryClick = (categoryName: string | undefined) => {
-    if (categoryName) {
-      router.push(`/events?category=${categoryName}`);
+  const handleCategoryClick = (categoryId: string | undefined) => {
+    if (categoryId) {
+      router.push(`/events?categoryId=${categoryId}`);
     }
   };
 
@@ -280,7 +280,7 @@ export default function OrderDetailPage() {
                   <span
                     key={category.id}
                     className="bg-secondary-100 text-secondary-500 px-4 md:px-6 py-1 md:py-2 rounded-lg text-sm md:text-lg font-semibold cursor-pointer hover:bg-secondary-200 transition-colors"
-                    onClick={() => handleCategoryClick(category.name)}
+                    onClick={() => handleCategoryClick(category.id?.toString())}
                   >
                     {category.name}
                   </span>

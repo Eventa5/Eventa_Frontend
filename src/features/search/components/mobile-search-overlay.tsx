@@ -56,7 +56,7 @@ export default function MobileSearchOverlay() {
   // 選擇分類
   const handleCategorySearch = (category: string) => {
     toggleSearch();
-    router.push(`/events?category=${encodeURIComponent(category)}`);
+    router.push(`/events?categoryId=${encodeURIComponent(category)}`);
   };
 
   if (!isMobile || (!isSearchOpen && !isVisible)) return null;
