@@ -103,6 +103,9 @@ import type {
   PostApiV1ActivitiesData,
   PostApiV1ActivitiesError,
   PostApiV1ActivitiesResponse,
+  PostApiV1ChatData,
+  PostApiV1ChatError,
+  PostApiV1ChatResponse,
   PostApiV1CurrenciesData,
   PostApiV1CurrenciesError,
   PostApiV1CurrenciesResponse,
@@ -713,6 +716,33 @@ export const getApiV1Categories = <ThrowOnError extends boolean = false>(
 };
 
 /**
+ * 發送聊天訊息
+ * 用戶可以發送問題，AI 會根據數據庫信息回答
+ */
+export const postApiV1Chat = <ThrowOnError extends boolean = false>(
+  options: Options<PostApiV1ChatData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).post<
+    PostApiV1ChatResponse,
+    PostApiV1ChatError,
+    ThrowOnError
+  >({
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/v1/chat",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+  });
+};
+
+/**
  * 取得所有幣別清單
  */
 export const getApiV1Currencies = <ThrowOnError extends boolean = false>(
@@ -852,8 +882,8 @@ export const getApiV1OrdersByOrderId = <ThrowOnError extends boolean = false>(
 };
 
 /**
- * 取消訂單
- * 用來手動取消訂單
+ * 獲取付款結果
+ * 獲取訂單的付款結果
  */
 export const patchApiV1OrdersByOrderIdCancel = <ThrowOnError extends boolean = false>(
   options: Options<PatchApiV1OrdersByOrderIdCancelData, ThrowOnError>

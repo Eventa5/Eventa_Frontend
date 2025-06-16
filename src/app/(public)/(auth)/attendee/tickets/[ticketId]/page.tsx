@@ -1,10 +1,21 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import { formatEventDate } from "@/features/activities/formatEventDate";
+import { getApiV1TicketsByTicketId, getApiV1UsersProfile } from "@/services/api/client/sdk.gen";
+import type { TicketDetailResponse } from "@/services/api/client/types.gen";
 import { format } from "date-fns";
 import { zhTW } from "date-fns/locale";
 import {
@@ -14,6 +25,7 @@ import {
   ChevronUp,
   Clock,
   Link as LinkIcon,
+  Loader,
   Mail,
   MapPin,
   Phone,
@@ -22,49 +34,29 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { QRCodeSVG } from "qrcode.react";
 import { useState } from "react";
+import useSWR from "swr";
 
 export default function TicketDetailPage() {
   const { ticketId } = useParams();
-  // 假資料
-  const ticket = {
-    id: "12312313123878",
-    name: "一般票",
-    price: 1000,
-    status: "已分票",
-    assignedUserId: 2,
-    assignedEmail: "test@gmail.com",
-    assignedName: "test",
-    refundDeadline: "2025-09-02 13:00",
-    startTime: "2025-09-10 13:00",
-    endTime: "2025-09-10 15:00",
-    order: {
-      id: "2307281011564244710900",
-      method: "信用卡",
-      status: "已付款",
-      paidAt: "2025-04-20 18:00",
-    },
-    activity: {
-      id: 1456789,
-      title: "藝術市集：創意手作與在地文創展覽",
-      summary: "全台最盛大的戶外音樂祭！結合親子、野餐、星空與搖滾，讓你在仲夏夜盡情狂歡！",
-      location: "苗栗縣大埔鄉東正路121巷8弄20號",
-      link: "https://www.google.com",
-      startTime: "2025-04-19T14:30:00+08:00",
-      endTime: "2025-05-10T20:30:00+08:00",
-      notes:
-        "導航至「心靈山水藝術保護區」，當日以接駁車前往！由於園區內停車位有限，建議大家「共乘入園」，感謝配合。",
-    },
-    organizer: {
-      id: 123,
-      name: "Eventa官方",
-      phoneNumber: "07-3123444",
-      countryCode: "+886",
-      ext: "2513",
-      email: "eventa.official@eventa.com",
-      officialSiteUrl: "http://www.eventa.com",
-    },
+  const {
+    data: ticketData,
+    error,
+    isLoading,
+  } = useSWR(ticketId ? `/api/v1/tickets/${ticketId}` : null, () =>
+    getApiV1TicketsByTicketId({ path: { ticketId: ticketId as string } })
+  );
+
+  const profileFetcher = async () => {
+    const response = await getApiV1UsersProfile();
+    if (response.data?.data) {
+      return response.data.data;
+    }
+    throw new Error(response.error?.message || "無法獲取個人資料");
   };
+  const { data: userProfile } = useSWR("/api/v1/users/profile", profileFetcher);
+
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
 
   const toggleSection = (sectionId: string) => {
@@ -74,8 +66,106 @@ export default function TicketDetailPage() {
     }));
   };
 
+  if (isLoading) {
+    return (
+      <div className="container max-w-6xl mx-auto p-4 py-16 md:pb-[200px]">
+        <div className="mx-auto max-w-2xl">
+          <Card className="shadow-xl border-0 overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-neutral-100 to-neutral-50 text-neutral-900 p-6">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-8 w-64" />
+                <Skeleton className="h-8 w-24" />
+              </div>
+            </CardHeader>
+            <CardContent className="p-6 space-y-6">
+              <div className="sm:flex items-start gap-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center mb-2 sm:mb-0">
+                  <Calendar className="h-5 w-5 md:h-6 md:w-6 text-neutral-600" />
+                </div>
+                <div className="flex-1">
+                  <Skeleton className="h-6 w-32 mb-2" />
+                  <Skeleton className="h-4 w-48" />
+                </div>
+              </div>
+              <div className="sm:flex items-start gap-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center mb-2 sm:mb-0">
+                  <Clock className="h-5 w-5 md:h-6 md:w-6 text-neutral-600" />
+                </div>
+                <div className="flex-1">
+                  <Skeleton className="h-6 w-32 mb-2" />
+                  <Skeleton className="h-4 w-48" />
+                </div>
+              </div>
+              <div className="sm:flex items-start gap-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center mb-2 sm:mb-0">
+                  <MapPin className="h-5 w-5 md:h-6 md:w-6 text-neutral-600" />
+                </div>
+                <div className="flex-1">
+                  <Skeleton className="h-6 w-32 mb-2" />
+                  <Skeleton className="h-4 w-48" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+  if (ticketData?.error || !ticketData?.data) {
+    return (
+      <div className="container max-w-6xl mx-auto p-4 py-16 md:pb-[200px]">
+        <div className="mx-auto max-w-2xl">
+          <Card className="shadow-xl border-0 overflow-hidden">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-center text-red-500">
+                <AlertCircle className="h-6 w-6 mr-2" />
+                <span>{ticketData?.error?.message ?? "載入失敗，請稍後再試"}</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  const ticket = ticketData.data.data as TicketDetailResponse;
+
+  if (!ticket) {
+    return (
+      <div className="container max-w-6xl mx-auto p-4 py-16 md:pb-[200px]">
+        <div className="mx-auto max-w-2xl">
+          <Card className="shadow-xl border-0 overflow-hidden">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-center text-red-500">
+                <AlertCircle className="h-6 w-6 mr-2" />
+                <span>找不到票券資料</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="container max-w-6xl mx-auto p-4 py-16 md:pb-[200px]">
+    <div className="container max-w-6xl mx-auto p-4 pb-16 pt-10 md:pb-[200px]">
+      <Breadcrumb className="mb-6">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/attendee/orders">訂單管理</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink
+              href={`/attendee/orders/${ticket.order?.id}`}
+            >{`訂單詳情（${ticket.order?.id}）`}</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{`票券詳情（${ticket.id}）`}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
       <div className="mx-auto max-w-2xl">
         {/* Main Ticket Card */}
         <Card className="shadow-xl border-0 overflow-hidden">
@@ -83,11 +173,11 @@ export default function TicketDetailPage() {
           <CardHeader className="bg-gradient-to-r from-neutral-100 to-neutral-50 text-neutral-900 p-6">
             <div className="flex items-center gap-2">
               <h1 className="text-lg md:text-3xl font-bold leading-tight">
-                {ticket.activity.title}
+                {ticket.activity?.title}
               </h1>
 
               <Badge className="text-neutral-900 w-fit text-lg md:text-2xl font-bold md:py-1">
-                一般票
+                {ticket.name}
               </Badge>
             </div>
           </CardHeader>
@@ -103,24 +193,33 @@ export default function TicketDetailPage() {
                 <div className="flex-1">
                   <h3 className="font-semibold text-gray-900 mb-1 md:text-lg">活動日期</h3>
                   <p className="text-gray-700 md:text-lg">
-                    {format(new Date(ticket.activity.startTime), "yyyy.MM.dd")}（
-                    {format(new Date(ticket.activity.startTime), "EEEE", { locale: zhTW }).replace(
-                      "星期",
-                      ""
+                    {ticket?.activity?.startTime && ticket?.activity?.endTime && (
+                      <span className="whitespace-pre-line">
+                        {(() => {
+                          const date = formatEventDate(
+                            ticket.activity.startTime,
+                            ticket.activity.endTime
+                          );
+                          return date.isSameDay ? (
+                            <>
+                              {date.startDateString} <br className="sm:hidden" />
+                              {date.timeString}
+                            </>
+                          ) : (
+                            <>
+                              {date.startDateString} - <br className="sm:hidden" />
+                              {date.endDateString}
+                            </>
+                          );
+                        })()}
+                      </span>
                     )}
-                    ）{format(new Date(ticket.activity.startTime), "HH:mm")} -{" "}
-                    {format(new Date(ticket.activity.endTime), "yyyy.MM.dd")}（
-                    {format(new Date(ticket.activity.endTime), "EEEE", { locale: zhTW }).replace(
-                      "星期",
-                      ""
-                    )}
-                    ）{format(new Date(ticket.activity.endTime), "HH:mm")} (GMT+8)
                   </p>
                 </div>
               </div>
 
               {/* Location */}
-              {ticket.activity.location && (
+              {ticket.activity?.location && (
                 <div className="sm:flex items-start gap-4">
                   <div className="flex-shrink-0 w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center mb-2 sm:mb-0">
                     <MapPin className="h-5 w-5 md:h-6 md:w-6 text-neutral-600" />
@@ -128,16 +227,18 @@ export default function TicketDetailPage() {
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-900 mb-1 md:text-lg">活動地點</h3>
                     <p className="text-gray-700 md:text-lg mb-2">{ticket.activity.location}</p>
-                    <div className="bg-secondary-50 border border-secondary-200 rounded-lg p-3">
-                      <p className="text-secondary-800 text-sm leading-relaxed">
-                        {ticket.activity.notes}
-                      </p>
-                    </div>
+                    {ticket.activity.notes && (
+                      <div className="bg-secondary-50 border border-secondary-200 rounded-lg p-3">
+                        <p className="text-secondary-800 text-sm leading-relaxed whitespace-pre-line">
+                          {ticket.activity.notes}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
               {/* Activity Link */}
-              {ticket.activity.link && (
+              {ticket.activity?.livestreamUrl && (
                 <div className="sm:flex items-start gap-4">
                   <div className="flex-shrink-0 w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center mb-2 sm:mb-0">
                     <LinkIcon className="h-5 w-5 md:h-6 md:w-6 text-neutral-600" />
@@ -145,12 +246,12 @@ export default function TicketDetailPage() {
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-900 mb-1 md:text-lg">活動連結</h3>
                     <Link
-                      href={ticket.activity.link}
+                      href={ticket.activity.livestreamUrl}
                       className="text-neutral-800 hover:text-neutral-600 underline break-all"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      {ticket.activity.link}
+                      {ticket.activity.livestreamUrl}
                     </Link>
                   </div>
                 </div>
@@ -167,10 +268,10 @@ export default function TicketDetailPage() {
                     <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6">
                       <div className="text-center">
                         <div className="text-2xl md:text-3xl font-bold text-neutral-600">
-                          {format(new Date(ticket.activity.startTime), "HH:mm")}
+                          {ticket.startTime && format(new Date(ticket.startTime), "HH:mm")}
                         </div>
                         <div className="text-xs md:text-sm font-bold text-neutral-400">
-                          {format(new Date(ticket.activity.startTime), "yyyy-MM-dd")}
+                          {ticket.startTime && format(new Date(ticket.startTime), "yyyy-MM-dd")}
                         </div>
                         <div className="text-xs md:text-sm text-gray-600 mt-1">開始</div>
                       </div>
@@ -181,10 +282,10 @@ export default function TicketDetailPage() {
                       </div>
                       <div className="text-center">
                         <div className="text-2xl md:text-3xl font-bold text-neutral-600">
-                          {format(new Date(ticket.activity.endTime), "HH:mm")}
+                          {ticket.endTime && format(new Date(ticket.endTime), "HH:mm")}
                         </div>
                         <div className="text-xs md:text-sm font-bold text-neutral-400">
-                          {format(new Date(ticket.activity.endTime), "yyyy-MM-dd")}
+                          {ticket.endTime && format(new Date(ticket.endTime), "yyyy-MM-dd")}
                         </div>
                         <div className="text-xs md:text-sm text-gray-600 mt-1">結束</div>
                       </div>
@@ -197,37 +298,43 @@ export default function TicketDetailPage() {
             <Separator />
 
             {/* QR Code Section */}
-            <div className="p-6 bg-gray-50">
-              <div className="text-center space-y-4">
-                <div className="flex items-center justify-center gap-2 text-gray-700">
-                  <QrCode className="h-5 w-5" />
-                  <span className="font-semibold md:text-lg">入場憑證</span>
-                </div>
+            {ticket.qrCodeToken && (
+              <div className="p-6 bg-gray-50">
+                <div className="text-center space-y-4">
+                  <div className="flex items-center justify-center gap-2 text-gray-700">
+                    <QrCode className="h-5 w-5" />
+                    <span className="font-semibold md:text-lg">入場憑證</span>
+                  </div>
 
-                <div className="flex justify-center">
-                  <div className="bg-white p-6 rounded-2xl shadow-sm border-2 border-dashed border-gray-200">
-                    <div className="w-40 h-40 bg-gray-100 rounded-xl flex items-center justify-center">
-                      <QrCode className="h-20 w-20 text-gray-400" />
+                  <div className="flex justify-center">
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border-2 border-dashed border-gray-200">
+                      <div className="w-40 h-40 bg-white rounded-xl flex items-center justify-center">
+                        <QRCodeSVG
+                          value={ticket.qrCodeToken}
+                          size={160}
+                          level="H"
+                          className="w-full h-full p-2"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-500 text-center">僅供活動工作人員確認入場</p>
+
+                  <div className="space-y-2 bg-white rounded-lg p-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-neutral-800 md:text-lg">參加者</span>
+                      <span className="font-semibold text-neutral-800 md:text-lg">
+                        {ticket.assignedName}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-neutral-800 md:text-lg">票券編號</span>
+                      <span className="font-semibold text-neutral-800 md:text-lg">{ticketId}</span>
                     </div>
                   </div>
                 </div>
-                <Button className="w-full py-6 text-base md:text-lg">報到</Button>
-                <p className="text-sm text-gray-500 text-center">僅供活動工作人員確認入場</p>
-
-                <div className="space-y-2 bg-white rounded-lg p-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-neutral-800 md:text-lg">參加者</span>
-                    <span className="font-semibold text-neutral-800 md:text-lg">
-                      {ticket.assignedName}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-neutral-800 md:text-lg">票券編號</span>
-                    <span className="font-semibold text-neutral-800 md:text-lg">{ticketId}</span>
-                  </div>
-                </div>
               </div>
-            </div>
+            )}
 
             <Separator />
 
@@ -263,19 +370,21 @@ export default function TicketDetailPage() {
                           NT$ {ticket.price}
                         </span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-neutral-800 md:text-lg">訂票時間</span>
-                        <span className="font-semibold text-neutral-800 md:text-lg">
-                          {format(new Date(ticket.order.paidAt), "yyyy-MM-dd HH:mm")}
-                        </span>
-                      </div>
+                      {ticket.order?.paidAt && (
+                        <div className="flex justify-between">
+                          <span className="text-neutral-800 md:text-lg">訂票時間</span>
+                          <span className="font-semibold text-neutral-800 md:text-lg">
+                            {format(new Date(ticket.order.paidAt), "yyyy-MM-dd HH:mm")}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </CollapsibleContent>
               </Collapsible>
 
               {/* Participant Info */}
-              <Collapsible
+              {/* <Collapsible
                 open={expandedSections.participant}
                 onOpenChange={() => toggleSection("participant")}
               >
@@ -295,26 +404,28 @@ export default function TicketDetailPage() {
                       <div className="flex justify-between">
                         <span className="text-neutral-800 md:text-lg">姓名</span>
                         <span className="font-semibold text-neutral-800 md:text-lg">
-                          {ticket.assignedName}
+                          {ticket.assignedName || userProfile?.name}
                         </span>
                       </div>
-                      {/* <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3">
                         <Phone className="h-5 w-5 md:h-6 md:w-6 text-neutral-500" />
                         <div>
                           <div className="text-xs text-neutral-800">聯絡電話</div>
-                          <div className="font-medium text-neutral-800 text-lg">{ticket.organizer.phoneNumber}</div>
+                          <div className="font-medium text-neutral-800 text-lg">
+                            {ticket.assignedPhoneNumber || userProfile?.phoneNumber}
+                          </div>
                         </div>
-                      </div> */}
+                      </div>
                       <div className="flex justify-between">
                         <span className="text-neutral-800 md:text-lg">電子郵件</span>
                         <span className="font-semibold text-neutral-800 md:text-lg">
-                          {ticket.assignedEmail}
+                          {ticket.assignedEmail || userProfile?.email}
                         </span>
                       </div>
                     </div>
                   </div>
                 </CollapsibleContent>
-              </Collapsible>
+              </Collapsible> */}
 
               {/* Contact Organizer */}
               <Collapsible
@@ -337,34 +448,34 @@ export default function TicketDetailPage() {
                       <div className="flex justify-between">
                         <span className="text-neutral-800 md:text-lg">主辦單位</span>
                         <span className="font-semibold text-neutral-800 md:text-lg">
-                          {ticket.organizer.name}
+                          {ticket.organization?.name}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-neutral-800 md:text-lg">聯絡電話</span>
                         <Link
-                          href={`tel:${ticket.organizer.phoneNumber}`}
+                          href={`tel:${ticket.organization?.phoneNumber}`}
                           className="font-semibold text-neutral-800 md:text-lg"
                         >
-                          {ticket.organizer.phoneNumber}
+                          {ticket.organization?.phoneNumber || "無"}
                         </Link>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-neutral-800 md:text-lg">電子郵件</span>
                         <Link
-                          href={`mailto:${ticket.organizer.email}`}
+                          href={`mailto:${ticket.organization?.email}`}
                           className="font-semibold text-neutral-800 md:text-lg"
                         >
-                          {ticket.organizer.email}
+                          {ticket.organization?.email}
                         </Link>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-neutral-800 md:text-lg">網站</span>
                         <Link
-                          href={ticket.organizer.officialSiteUrl}
+                          href={ticket.organization?.officialSiteUrl ?? ""}
                           className="font-semibold text-neutral-800 md:text-lg"
                         >
-                          {ticket.organizer.officialSiteUrl}
+                          {ticket.organization?.officialSiteUrl || "無"}
                         </Link>
                       </div>
                     </div>
@@ -404,7 +515,7 @@ export default function TicketDetailPage() {
                           <div className="w-1.5 h-1.5 bg-neutral-400 rounded-full flex-shrink-0" />
                           <span>請於活動當日攜帶此票券入場</span>
                         </li>
-                        {ticket.activity.location && (
+                        {ticket.activity?.location && (
                           <li className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 bg-neutral-400 rounded-full flex-shrink-0" />
                             <span>線下活動如遇天候不佳將另行通知</span>
