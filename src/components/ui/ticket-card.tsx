@@ -3,15 +3,20 @@ import { QuantityInput } from "@/components/ui/quantity-input";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/utils/transformer";
+import { format } from "date-fns";
+import { zhTW } from "date-fns/locale";
 import { useState } from "react";
 
 interface TicketCardProps {
-  ticketTitle: string;
-  price: number;
-  booking_time: string;
-  available_time: string;
-  description?: string;
-  isSoldOut?: boolean;
+  name?: string;
+  price?: number;
+  saleStartAt?: string | null;
+  saleEndAt?: string | null;
+  startTime?: string | null;
+  endTime?: string | null;
+  description?: string | null;
+  remainingQuantity?: number;
+  isActive?: boolean;
   isFocused?: boolean;
   onQuantityFocus?: () => void;
   onQuantityBlur?: () => void;
@@ -19,18 +24,23 @@ interface TicketCardProps {
 }
 
 export function TicketCard({
-  ticketTitle,
+  name,
   price,
-  booking_time,
-  available_time,
+  saleStartAt,
+  saleEndAt,
+  startTime,
+  endTime,
   description,
-  isSoldOut = false,
+  remainingQuantity,
+  isActive = true,
   isFocused = false,
   onQuantityFocus,
   onQuantityBlur,
   onQuantityChange,
 }: TicketCardProps) {
   const [quantity, setQuantity] = useState(0);
+
+  const isAvailable = isActive && (remainingQuantity ?? 0) !== 0;
 
   const handleQuantityChange = (value: number) => {
     setQuantity(value);
@@ -41,7 +51,7 @@ export function TicketCard({
     <div
       className={cn(
         "relative flex items-stretch border border-gray-200 rounded-sm overflow-hidden",
-        isSoldOut && "bg-[var(--color-neutral-100)]",
+        !isAvailable && "bg-[var(--color-neutral-100)]",
         isFocused && quantity > 0 && "border-l-8 border-l-primary-500 bg-[#FDFBF6]"
       )}
     >
@@ -49,11 +59,11 @@ export function TicketCard({
       <div className="flex-1 px-6 py-6 flex flex-col justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <span className="font-bold text-lg tracking-wide">{ticketTitle}</span>
-            {isSoldOut && <span className="text-sm font-semibold text-neutral-400">已售完</span>}
+            <span className="font-bold text-lg tracking-wide">{name}</span>
+            {!isAvailable && <span className="text-sm font-semibold text-neutral-400">已售完</span>}
           </div>
           <div className="mt-2 flex items-center gap-2">
-            <span className="font-bold text-xl tracking-wide">NT$ {price.toLocaleString()}</span>
+            <span className="font-bold text-xl tracking-wide">NT$ {price?.toLocaleString()}</span>
             {quantity > 0 && <span className="text-[#C9A13B] font-bold text-xl">x {quantity}</span>}
           </div>
         </div>
@@ -61,11 +71,30 @@ export function TicketCard({
           <div className="space-y-4 pt-2">
             <div className="space-y-2">
               <p className="text-sm font-medium">售票時間</p>
-              <p className="text-sm text-muted-foreground">{booking_time}</p>
+              <p className="text-sm text-muted-foreground">
+                {saleStartAt
+                  ? format(saleStartAt, "yyyy.MM.dd (EEE) HH:mm", {
+                      locale: zhTW,
+                    })
+                  : "--"}{" "}
+                -{" "}
+                {saleEndAt
+                  ? format(saleEndAt, "MM.dd (EEE) HH:mm", {
+                      locale: zhTW,
+                    })
+                  : "--"}
+              </p>
             </div>
             <div className="space-y-2">
               <p className="text-sm font-medium">票券可使用時間</p>
-              <p className="text-sm text-muted-foreground">{available_time}</p>
+              <p className="text-sm text-muted-foreground">
+                {startTime
+                  ? format(startTime, "yyyy.MM.dd (EEE) HH:mm", {
+                      locale: zhTW,
+                    })
+                  : "--"}{" "}
+                - {endTime ? format(endTime, "MM.dd (EEE) HH:mm", { locale: zhTW }) : "--"}
+              </p>
             </div>
             {description && (
               <div className="space-y-2">
@@ -75,7 +104,7 @@ export function TicketCard({
             )}
           </div>
         </Collapse>
-        {isSoldOut && (
+        {!isAvailable && (
           <>
             <Separator className="my-4" />
             <div className="flex items-center justify-between">
@@ -91,14 +120,15 @@ export function TicketCard({
         )}
       </div>
       {/* 右側數量調整 */}
-      {!isSoldOut && (
+      {isAvailable && (
         <div className={cn("flex flex-col justify-center items-center px-6")}>
           <QuantityInput
             defaultValue={0}
             onValueChange={handleQuantityChange}
-            disabled={isSoldOut}
+            disabled={!isAvailable}
             onFocus={onQuantityFocus}
             onBlur={onQuantityBlur}
+            max={remainingQuantity ?? undefined}
           />
         </div>
       )}
