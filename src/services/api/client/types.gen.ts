@@ -1009,6 +1009,14 @@ export type TicketTypeRequestSchema = {
    */
   endTime: string;
   /**
+   * 特殊開賣時間，格式為 ISO 8601
+   */
+  saleStartAt?: string | null;
+  /**
+   * 特殊開賣結束時間，格式為 ISO 8601
+   */
+  saleEndAt?: string | null;
+  /**
    * 是否為活動中
    */
   isActive?: boolean;
@@ -1375,7 +1383,7 @@ export type PostApiV1ActivitiesByActivityIdTicketTypesData = {
 
 export type PostApiV1ActivitiesByActivityIdTicketTypesErrors = {
   /**
-   * 格式錯誤
+   * 格式錯誤、新增票種的名稱不能重複、第 x 個新增票種的名稱已存在，請使用其他名稱、第 x 個新增票種的銷售開始時間不可晚於活動結束時間、第 x 個新增票種的銷售結束時間不可晚於活動結束時間
    */
   400: ErrorResponse;
   /**
@@ -1484,7 +1492,7 @@ export type PutApiV1ActivitiesByActivityIdTicketTypesByTicketTypeIdData = {
 
 export type PutApiV1ActivitiesByActivityIdTicketTypesByTicketTypeIdErrors = {
   /**
-   * 格式錯誤
+   * 格式錯誤、票種名稱已存在，請使用其他名稱、票種的銷售開始時間不可晚於活動結束時間、票種的銷售結束時間不可晚於活動結束時間
    */
   400: ErrorResponse;
   /**
