@@ -65,9 +65,9 @@ export default function CheckoutResultPage() {
   }, [orderId]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 -mt-10">
+    <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center px-4 -mt-10">
       {loading ? (
-        <div className="min-h-screen bg-primary-50 flex items-center justify-center px-4 -mt-10">
+        <div className="min-h-screen flex items-center justify-center px-4">
           <Loader className="animate-spin w-10 h-10 text-primary-500" />
         </div>
       ) : error ? (
