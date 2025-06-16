@@ -115,7 +115,7 @@ export default function SignUpForm({ onSuccess, onSwitchTab, isMobile = false }:
             htmlFor="terms"
             className="text-sm text-gray-600"
           >
-            我已詳閱並同意{" "}
+            我已詳閱並同意
             <a
               href="/privacy-policy"
               className="underline font-bold"

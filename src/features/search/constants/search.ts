@@ -14,10 +14,10 @@ export interface CategoryItem {
 
 // 熱門搜尋關鍵詞
 export const POPULAR_SEARCHES: PopularSearchItem[] = [
-  { term: "戶外電影院", bgColor: "bg-[#E5E5E5]", hoverColor: "hover:bg-gray-300" },
-  { term: "春日野餐季", bgColor: "bg-[#FFE6A6]", hoverColor: "hover:bg-[#ffd452]" },
-  { term: "時尚前線", bgColor: "bg-[#E5E5E5]", hoverColor: "hover:bg-gray-300" },
-  { term: "沙灘音樂節", bgColor: "bg-[#E5E5E5]", hoverColor: "hover:bg-gray-300" },
+  { term: "戶外電影院", bgColor: "bg-[#E5E5E5]", hoverColor: "hover:bg-primary-300" },
+  { term: "春日野餐季", bgColor: "bg-[#E5E5E5]", hoverColor: "hover:bg-primary-300" },
+  { term: "時尚前線", bgColor: "bg-[#E5E5E5]", hoverColor: "hover:bg-primary-300" },
+  { term: "沙灘音樂節", bgColor: "bg-[#E5E5E5]", hoverColor: "hover:bg-primary-300" },
 ];
 
 // 分類項目

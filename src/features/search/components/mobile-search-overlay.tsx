@@ -2,12 +2,17 @@
 
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/useMediaQuery";
+import { useCategoriesStore } from "@/store/categories";
 import { useSearchStore } from "@/store/search";
 import { Search, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useState } from "react";
-import { CATEGORIES, POPULAR_SEARCHES } from "../constants/search";
+import { FreeMode } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { POPULAR_SEARCHES } from "../constants/search";
+import "swiper/css";
+import "swiper/css/free-mode";
 
 export default function MobileSearchOverlay() {
   const isSearchOpen = useSearchStore((s) => s.isSearchOpen);
@@ -17,6 +22,7 @@ export default function MobileSearchOverlay() {
   const [isVisible, setIsVisible] = useState(false);
   const router = useRouter();
   const isMobile = useIsMobile();
+  const { categories, isLoading, error } = useCategoriesStore();
 
   // 控制顯示狀態，增加過渡動畫效果
   useEffect(() => {
@@ -139,21 +145,35 @@ export default function MobileSearchOverlay() {
           {/* 分類搜尋 */}
           <div className="flex flex-col gap-4">
             <h3 className="font-bold text-[#262626]">想找哪一類的活動 ?</h3>
-            <div className="flex flex-wrap gap-4">
-              {CATEGORIES.map((category) => (
-                <div
-                  key={category.id}
-                  className="flex flex-col items-center gap-2"
-                  onClick={() => handleCategorySearch(category.id)}
-                >
-                  <div
-                    className="w-[80px] h-[80px] bg-cover bg-center rounded-xl"
-                    style={{ backgroundImage: `url('${category.imagePath}')` }}
-                  />
-                  <span className="text-sm">{category.name}</span>
-                </div>
-              ))}
-            </div>
+            {isLoading ? (
+              <div className="w-full text-center text-gray-500">載入中...</div>
+            ) : error ? (
+              <div className="w-full text-center text-red-500">{error}</div>
+            ) : (
+              <Swiper
+                slidesPerView="auto"
+                spaceBetween={16}
+                freeMode={true}
+                modules={[FreeMode]}
+                className="w-full"
+              >
+                {categories.map((category) => (
+                  <SwiperSlide
+                    key={category.name}
+                    className="!w-auto"
+                    onClick={() => handleCategorySearch(category.name)}
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <div
+                        className="w-[80px] h-[80px] bg-cover bg-center rounded-xl"
+                        style={{ backgroundImage: `url('${category.imageUrl}')` }}
+                      />
+                      <span className="text-sm">{category.name}</span>
+                    </div>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            )}
           </div>
         </div>
       </div>

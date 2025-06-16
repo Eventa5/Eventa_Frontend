@@ -1,21 +1,50 @@
 "use client";
 
+import { formatEventDate } from "@/features/activities/formatEventDate";
+import { getApiV1ActivitiesPopular } from "@/services/api/client/sdk.gen";
+import type { ActivitiesResponse } from "@/services/api/client/types.gen";
 import { Swiper, SwiperSlide } from "swiper/react";
+import useSWR from "swr";
 import { EventCard } from "./event-cards";
 
 interface Event {
   id: string;
   title: string;
   location: string;
-  date: string;
+  date: import("./event-cards").EventCardDate;
   imageUrl: string;
 }
 
-interface HotEventsSectionProps {
-  events: Event[];
-}
+export default function HotEventsSection() {
+  const { data, error, isLoading } = useSWR(
+    "popular-activities",
+    async () => {
+      const response = await getApiV1ActivitiesPopular({ query: { recent: "0" } });
+      return response.data?.data || [];
+    },
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 60000, // 1分鐘內不會重複請求
+    }
+  );
 
-export default function HotEventsSection({ events }: HotEventsSectionProps) {
+  if (isLoading) {
+    return <div className="w-full h-[400px] flex items-center justify-center">載入中...</div>;
+  }
+
+  if (error) {
+    return <div className="w-full h-[400px] flex items-center justify-center">載入失敗</div>;
+  }
+
+  const events: Event[] = (data || []).map((activity: ActivitiesResponse) => ({
+    id: String(activity.id || 0),
+    title: activity.title || "",
+    location: activity.location || "",
+    date: formatEventDate(activity.startTime || "", activity.endTime || ""),
+    imageUrl: activity.cover || "",
+  }));
+
   return (
     <>
       {/* 手機版使用 Swiper */}
@@ -29,7 +58,7 @@ export default function HotEventsSection({ events }: HotEventsSectionProps) {
           {events.map((event) => (
             <SwiperSlide
               key={event.id}
-              className="!w-[253px] shrink-0"
+              className="!w-[253px] !h-[340px] shrink-0"
             >
               <EventCard {...event} />
             </SwiperSlide>

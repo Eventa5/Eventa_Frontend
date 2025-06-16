@@ -1,25 +1,38 @@
-name: 構建與部署
+name: 構建與部署（正式／測試機）
 
 on:
   push:
-    branches: [develop]
-
-env:
-  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/eventa-frontend
-  NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL }}
+    branches: [main, develop]
 
 jobs:
   build-and-deploy:
     name: 多架構建構與部署
     runs-on: ubuntu-latest
 
+    # 自動綁定環境，GitHub 會使用該 environment 的 secret / vars
+    environment: ${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
+
     steps:
       - name: 檢出程式碼
         uses: actions/checkout@v4
 
-      - name: 安裝依賴並執行建構
+      # 設定 API Base URL（從 GitHub environment 變數注入）
+      - name: 匯入 API base URL
+        run: echo "NEXT_PUBLIC_API_BASE_URL=${{ vars.NEXT_PUBLIC_API_BASE_URL }}" >> $GITHUB_ENV
+
+      # 動態設定映像名稱（根據分支）
+      - name: 設定映像名稱
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "IMAGE_NAME=${{ secrets.DOCKERHUB_USERNAME }}/eventa-frontend-prod" >> $GITHUB_ENV
+          else
+            echo "IMAGE_NAME=${{ secrets.DOCKERHUB_USERNAME }}/eventa-frontend" >> $GITHUB_ENV
+          fi
+
+      - name: 安裝依賴、生成 API 客戶端代碼、執行建構
         run: |
           npm ci
+          npm run generate:api
           npm run build
 
       - name: 將建構的檔案複製到上下文目錄
@@ -55,5 +68,11 @@ jobs:
           cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:buildcache,ignore-error=true
           cache-to: type=registry,ref=${{ env.IMAGE_NAME }}:buildcache,mode=max
 
+      # 根據分支選擇對應的 Render webhook
       - name: 觸發 Render 自動部署
-        run: curl -X GET "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            curl -X GET "${{ secrets.RENDER_DEPLOY_PROD_HOOK_URL }}"
+          else
+            curl -X GET "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+          fi
