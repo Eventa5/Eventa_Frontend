@@ -126,9 +126,9 @@ export default function CheckoutPage() {
   ) : (
     <div className="container mx-auto px-4 py-12">
       <div className="max-w-[1180px] mx-auto">
-        <div className="flex flex-col md:flex-row gap-12 justify-center">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 xl:gap-12 justify-center">
           {/* 活動資訊 */}
-          <div className="w-full md:w-[440px] space-y-6 shrink-0">
+          <div className="w-full lg:flex-1 lg:max-w-[400px] xl:w-[440px] xl:flex-none space-y-6 shrink-0">
             <div className="relative h-[280px] w-full overflow-hidden rounded-lg">
               <Image
                 src={eventData?.cover ? eventData.cover : "/images/no_single_activity_cover.png"}
@@ -193,7 +193,11 @@ export default function CheckoutPage() {
           </div>
 
           {/* 訂單確認 */}
-          <div className={`w-full md:w-[640px] space-y-6 shrink-0 ${orderCreated ? "" : "hidden"}`}>
+          <div
+            className={`w-full lg:flex-1 lg:max-w-[500px] xl:w-[640px] xl:flex-none space-y-6 shrink-0 ${
+              orderCreated ? "" : "hidden"
+            }`}
+          >
             {/* 訂單明細表格 */}
             <div className="mt-6 border rounded-sm  border-gray-200 overflow-hidden">
               <table className="w-full text-center">
@@ -293,7 +297,11 @@ export default function CheckoutPage() {
             </div>
           </div>
           {/* 票券選擇 */}
-          <div className={`w-full md:w-[640px] space-y-6 shrink-0 ${orderCreated ? "hidden" : ""}`}>
+          <div
+            className={`w-full lg:flex-1 lg:max-w-[500px] xl:w-[640px] xl:flex-none space-y-6 shrink-0 ${
+              orderCreated ? "hidden" : ""
+            }`}
+          >
             <div className="text-md font-bold">請選擇票券</div>
             {ticketTypes.map((ticket) => {
               const ticketId = ticket.id?.toString() ?? "";
