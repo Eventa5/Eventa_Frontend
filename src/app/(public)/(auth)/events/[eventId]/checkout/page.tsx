@@ -194,52 +194,98 @@ export default function CheckoutPage() {
 
           {/* 訂單確認 */}
           <div
-            className={`w-full lg:flex-1 lg:max-w-[500px] xl:w-[640px] xl:flex-none space-y-6 shrink-0 ${
-              orderCreated ? "" : "hidden"
-            }`}
+            className={`w-full lg:flex-1 lg:max-w-[500px] xl:w-[640px] xl:flex-none space-y-6 shrink-0
+              ${orderCreated ? "" : "hidden"}
+              `}
           >
             {/* 訂單明細表格 */}
-            <div className="mt-6 border rounded-sm  border-gray-200 overflow-hidden">
-              <table className="w-full text-center">
-                <thead className="bg-neutral-700 text-white">
-                  <tr>
-                    <th className="py-3 font-bold">項目</th>
-                    <th className="py-3 font-bold">數量</th>
-                    <th className="py-3 font-bold">價格</th>
-                    <th className="py-3 font-bold">小計</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orderData?.orderItems?.map((ticket) => (
-                    <tr
-                      key={`${ticket.ticketType?.name}-${ticket.ticketType?.price}-${ticket.quantity}`}
-                      className="border-t border-gray-200"
-                    >
-                      <td className="py-4 font-bold text-left pl-6">
-                        {ticket.ticketType?.name}
-                        <div className="text-xs text-neutral-400 font-normal mt-1">
-                          票券可用時間
-                          <br />
-                          {format(ticket.ticketType?.startTime ?? "", "yyyy.MM.dd (EEE) HH:mm", {
-                            locale: zhTW,
-                          }).replace("週", "")}
-                          -
-                          {format(ticket.ticketType?.endTime ?? "", "MM.dd (EEE) HH:mm", {
-                            locale: zhTW,
-                          }).replace("週", "")}
-                          (GMT+8)
-                        </div>
-                      </td>
-                      <td className="py-4">{ticket.quantity}</td>
-                      <td className="py-4">NT${ticket.ticketType?.price?.toLocaleString()}</td>
-                      <td className="py-4">
+            <div className="mt-6">
+              {/* 手機版 - 垂直卡片顯示 */}
+              <div className="md:hidden space-y-4">
+                {orderData?.orderItems?.map((ticket) => (
+                  <div
+                    key={`${ticket.ticketType?.name}-${ticket.ticketType?.price}-${ticket.quantity}`}
+                    className="bg-white border border-gray-200 rounded-lg p-4 space-y-3"
+                  >
+                    <div className="font-bold text-left">
+                      {ticket.ticketType?.name}
+                      <div className="text-xs text-neutral-400 font-normal mt-1">
+                        票券可用時間
+                        <br />
+                        {format(ticket.ticketType?.startTime ?? "", "yyyy.MM.dd (EEE) HH:mm", {
+                          locale: zhTW,
+                        }).replace("週", "")}
+                        -
+                        {format(ticket.ticketType?.endTime ?? "", "MM.dd (EEE) HH:mm", {
+                          locale: zhTW,
+                        }).replace("週", "")}
+                        (GMT+8)
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+                      <span className="text-sm text-gray-600">數量</span>
+                      <span className="font-medium">{ticket.quantity}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">單價</span>
+                      <span className="font-medium">
+                        NT${ticket.ticketType?.price?.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">小計</span>
+                      <span className="font-bold text-lg">
                         NT$
                         {(ticket.ticketType?.price ?? 0) * (ticket?.quantity ?? 0)}
-                      </td>
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* 桌面版 - 表格顯示 */}
+              <div className="hidden md:block border rounded-sm border-gray-200 overflow-hidden">
+                <table className="w-full text-center">
+                  <thead className="bg-neutral-700 text-white">
+                    <tr>
+                      <th className="py-3 font-bold">項目</th>
+                      <th className="py-3 font-bold">數量</th>
+                      <th className="py-3 font-bold">價格</th>
+                      <th className="py-3 font-bold">小計</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {orderData?.orderItems?.map((ticket) => (
+                      <tr
+                        key={`${ticket.ticketType?.name}-${ticket.ticketType?.price}-${ticket.quantity}`}
+                        className="border-t border-gray-200"
+                      >
+                        <td className="py-4 font-bold text-left pl-6">
+                          {ticket.ticketType?.name}
+                          <div className="text-xs text-neutral-400 font-normal mt-1">
+                            票券可用時間
+                            <br />
+                            {format(ticket.ticketType?.startTime ?? "", "yyyy.MM.dd (EEE) HH:mm", {
+                              locale: zhTW,
+                            }).replace("週", "")}
+                            -
+                            {format(ticket.ticketType?.endTime ?? "", "MM.dd (EEE) HH:mm", {
+                              locale: zhTW,
+                            }).replace("週", "")}
+                            (GMT+8)
+                          </div>
+                        </td>
+                        <td className="py-4">{ticket.quantity}</td>
+                        <td className="py-4">NT${ticket.ticketType?.price?.toLocaleString()}</td>
+                        <td className="py-4">
+                          NT$
+                          {(ticket.ticketType?.price ?? 0) * (ticket?.quantity ?? 0)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
             <div className="flex-1 py-4 flex flex-col items-end">
               <div className="flex items-end">
@@ -251,14 +297,14 @@ export default function CheckoutPage() {
               {totalPrice > 0 && !!orderData?.paidExpiredAt && (
                 <div className="text-sm text-neutral-700 mt-1">
                   付款期限：
-                  {format(new Date(orderData.paidExpiredAt as string), "yyyy.MM.dd  HH:mm")}
+                  {format(new Date(orderData?.paidExpiredAt as string), "yyyy.MM.dd  HH:mm")}
                 </div>
               )}
             </div>
-            <div className="flex gap-8 mt-8">
+            <div className="flex flex-col md:flex-row gap-4 md:gap-8 mt-8">
               <Button
                 variant="outline"
-                className="flex-1 font-semibold"
+                className="w-full md:flex-1 font-semibold"
                 onClick={() => {
                   setShowCancelOrderDialog(true);
                 }}
@@ -279,7 +325,7 @@ export default function CheckoutPage() {
               />
               {totalPrice > 0 ? (
                 <Button
-                  className="flex-1 font-semibold bg-neutral-700 text-white hover:bg-neutral-800"
+                  className="w-full md:flex-1 font-semibold bg-neutral-700 text-white hover:bg-neutral-800"
                   onClick={() => {
                     handleCheckout(orderData?.id ?? "");
                   }}
@@ -289,7 +335,7 @@ export default function CheckoutPage() {
               ) : (
                 <Link
                   href={`/attendee/orders/${orderData?.id}`}
-                  className="flex-1 font-semibold bg-neutral-700 text-white hover:bg-neutral-800 rounded-md py-2 px-4 text-center text-sm"
+                  className="w-full md:flex-1 font-semibold bg-neutral-700 text-white hover:bg-neutral-800 rounded-md py-2 px-4 text-center text-sm"
                 >
                   前往訂單管理查看票券
                 </Link>
