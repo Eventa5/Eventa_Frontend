@@ -324,7 +324,7 @@ export const SidebarNav = () => {
             建立活動
           </Link>
 
-          <div className="w-full flex items-center justify-between px-4 py-4 mt-6 border-t border-gray-200">
+          {/* <div className="w-full flex items-center justify-between px-4 py-4 mt-6 border-t border-gray-200">
             <div className="flex items-center gap-2">
               <div className="bg-neutral-800 p-3 rounded-full flex items-center justify-center">
                 <User className="w-4 h-4 text-white" />
@@ -341,7 +341,7 @@ export const SidebarNav = () => {
             >
               登出帳號
             </button>
-          </div>
+          </div> */}
         </div>
       )}
     </>
