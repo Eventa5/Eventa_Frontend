@@ -1009,6 +1009,14 @@ export type TicketTypeRequestSchema = {
    */
   endTime: string;
   /**
+   * 特殊開賣時間，格式為 ISO 8601
+   */
+  saleStartAt?: string | null;
+  /**
+   * 特殊開賣結束時間，格式為 ISO 8601
+   */
+  saleEndAt?: string | null;
+  /**
    * 是否為活動中
    */
   isActive?: boolean;
@@ -1375,7 +1383,7 @@ export type PostApiV1ActivitiesByActivityIdTicketTypesData = {
 
 export type PostApiV1ActivitiesByActivityIdTicketTypesErrors = {
   /**
-   * 格式錯誤
+   * 格式錯誤、新增票種的名稱不能重複、第 x 個新增票種的名稱已存在，請使用其他名稱、第 x 個新增票種的銷售開始時間不可晚於活動結束時間、第 x 個新增票種的銷售結束時間不可晚於活動結束時間
    */
   400: ErrorResponse;
   /**
@@ -1484,7 +1492,7 @@ export type PutApiV1ActivitiesByActivityIdTicketTypesByTicketTypeIdData = {
 
 export type PutApiV1ActivitiesByActivityIdTicketTypesByTicketTypeIdErrors = {
   /**
-   * 格式錯誤
+   * 格式錯誤、票種名稱已存在，請使用其他名稱、票種的銷售開始時間不可晚於活動結束時間、票種的銷售結束時間不可晚於活動結束時間
    */
   400: ErrorResponse;
   /**
@@ -2552,6 +2560,46 @@ export type GetApiV1OrdersByOrderIdCheckoutResultResponses = {
 
 export type GetApiV1OrdersByOrderIdCheckoutResultResponse =
   GetApiV1OrdersByOrderIdCheckoutResultResponses[keyof GetApiV1OrdersByOrderIdCheckoutResultResponses];
+
+export type PostApiV1OrdersByOrderIdRefundData = {
+  body?: never;
+  path: {
+    orderId: string;
+  };
+  query?: never;
+  url: "/api/v1/orders/{orderId}/refund";
+};
+
+export type PostApiV1OrdersByOrderIdRefundErrors = {
+  /**
+   * 未提供授權令牌
+   */
+  401: ErrorResponse;
+  /**
+   * 訂單不存在
+   */
+  404: ErrorResponse;
+  /**
+   * 只能退款已付款的訂單
+   */
+  409: ErrorResponse;
+};
+
+export type PostApiV1OrdersByOrderIdRefundError =
+  PostApiV1OrdersByOrderIdRefundErrors[keyof PostApiV1OrdersByOrderIdRefundErrors];
+
+export type PostApiV1OrdersByOrderIdRefundResponses = {
+  /**
+   * 退款成功
+   */
+  201: {
+    message?: string;
+    status?: boolean;
+  };
+};
+
+export type PostApiV1OrdersByOrderIdRefundResponse =
+  PostApiV1OrdersByOrderIdRefundResponses[keyof PostApiV1OrdersByOrderIdRefundResponses];
 
 export type DeleteApiV1OrganizationsData = {
   body: DeleteOrganizationRequest;

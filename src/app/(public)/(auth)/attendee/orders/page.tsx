@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useCallback, useState, useRef } from "react";
+import React, { useEffect, useCallback, useState, useRef, useMemo } from "react";
 
 import { CalendarIcon, Search } from "lucide-react";
 import type { DateRange } from "react-day-picker";
@@ -44,7 +44,20 @@ export default function OrdersPage() {
     to: undefined as string | undefined,
     status: undefined as string | undefined,
   });
+
+  // 新增一個狀態來追蹤總數查詢參數
+  const [totalQueryParams, setTotalQueryParams] = useState({
+    page: 1,
+    limit: 8,
+    title: undefined as string | undefined,
+    from: undefined as string | undefined,
+    to: undefined as string | undefined,
+    status: undefined as string | undefined,
+  });
+
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const isLoadingMoreRef = useRef(false);
+  const isMounted = useRef(false);
 
   // 使用 useState 來管理計數
   const [counts, setCounts] = useState({
@@ -55,36 +68,79 @@ export default function OrdersPage() {
     expired: 0,
     processing: 0,
     failed: 0,
+    refunded: 0,
   });
 
-  // 取得所有訂單用於計算數量
-  const allOrdersParams = { limit: 100 };
+  const { data: ordersData, error, isLoading, mutate } = useOrders(queryParams);
+  const { data: totalOrdersData } = useOrders(totalQueryParams);
   const [allOrders, setAllOrders] = useState<OrderResponse[]>([]);
-  const { data: allOrdersData } = useOrders(allOrdersParams);
+  const [expandedMonths, setExpandedMonths] = useState<string[]>([]);
 
+  // 當 ordersData 更新時，追加新資料到 allOrders
   useEffect(() => {
-    if (allOrdersData?.data) {
-      setAllOrders(allOrdersData.data);
+    if (ordersData?.data) {
+      if (queryParams.page === 1) {
+        setAllOrders(ordersData.data);
+        // 重置展開狀態
+        setExpandedMonths([]);
+      } else {
+        setAllOrders((prev) => [...prev, ...ordersData.data]);
+      }
     }
-  }, [allOrdersData?.data]);
+  }, [ordersData?.data, queryParams.page]);
 
-  // 當所有訂單資料載入時，計算各狀態數量
+  // 當 allOrders 更新時，更新計數
   useEffect(() => {
     if (allOrders.length > 0) {
-      setCounts({
-        all: allOrders.length,
+      // 計算各狀態的數量
+      const newCounts = {
+        all: totalOrdersData?.pagination?.totalItems || 0,
         paid: allOrders.filter((o: OrderResponse) => o.status === "paid").length,
         pending: allOrders.filter((o: OrderResponse) => o.status === "pending").length,
         canceled: allOrders.filter((o: OrderResponse) => o.status === "canceled").length,
         expired: allOrders.filter((o: OrderResponse) => o.status === "expired").length,
         processing: allOrders.filter((o: OrderResponse) => o.status === "processing").length,
         failed: allOrders.filter((o: OrderResponse) => o.status === "failed").length,
+        refunded: allOrders.filter((o: OrderResponse) => o.status === "refunded").length,
+      };
+      setCounts(newCounts);
+    }
+  }, [allOrders, totalOrdersData?.pagination?.totalItems]);
+
+  // 使用 useMemo 來計算過濾後的訂單和分組
+  const { filteredOrders, grouped, sortedYears } = useMemo(() => {
+    const filtered =
+      tab === "all" ? allOrders : allOrders.filter((o: OrderResponse) => o.status === tab);
+
+    const grouped = groupOrdersByYearAndMonth(filtered);
+    const sortedYears = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
+
+    return { filteredOrders: filtered, grouped, sortedYears };
+  }, [allOrders, tab]);
+
+  // 當 allOrders 更新時，更新展開狀態
+  useEffect(() => {
+    if (allOrders.length > 0) {
+      const newExpandedMonths = Object.entries(grouped).flatMap(([year, months]) =>
+        Object.keys(months).map((month) => `${year}-${month}`)
+      );
+
+      setExpandedMonths((prev) => {
+        // 如果是第一頁，則使用新的展開狀態
+        if (queryParams.page === 1) {
+          return newExpandedMonths;
+        }
+        // 如果是載入更多，則合併現有和新增加的月份
+        const uniqueMonths = new Set([...prev, ...newExpandedMonths]);
+        return Array.from(uniqueMonths);
       });
     }
-  }, [allOrders]);
+  }, [allOrders, queryParams.page, grouped]);
 
-  const { data: ordersData, error, isLoading, mutate } = useOrders(queryParams);
-  const orders = ordersData?.data || [];
+  // 處理 Accordion 的展開狀態變更
+  const handleAccordionChange = useCallback((value: string[]) => {
+    setExpandedMonths(value);
+  }, []);
 
   // 格式化日期為指定格式並使用台灣時區
   const formatDate = useCallback((date: Date) => {
@@ -148,6 +204,12 @@ export default function OrdersPage() {
     }
 
     setQueryParams(newParams);
+    setTotalQueryParams((prev) => ({
+      ...prev,
+      title: searchValue || undefined,
+      from: newParams.from,
+      to: newParams.to,
+    }));
   }, [searchDate, tab, formatDate]);
 
   // 處理 tab 變更
@@ -160,49 +222,45 @@ export default function OrdersPage() {
     }));
   }, []);
 
-  const [visibleCount, setVisibleCount] = React.useState(8);
   const [isLoadingMore, setIsLoadingMore] = React.useState(false);
 
   // 處理載入更多
   const handleLoadMore = useCallback(async () => {
-    if (isLoadingMore) return;
+    if (isLoadingMoreRef.current) return;
 
-    setIsLoadingMore(true);
+    isLoadingMoreRef.current = true;
     try {
-      const nextPage = Math.ceil(visibleCount / queryParams.limit) + 1;
+      const nextPage = queryParams.page + 1;
       const newParams = {
         ...queryParams,
         page: nextPage,
       };
 
       await mutate(newParams as any);
-      setVisibleCount((prev) => prev + 8); // 假設每頁固定載入 8 筆資料
+      setQueryParams((prev) => ({
+        ...prev,
+        page: nextPage,
+      }));
     } catch (error) {
       console.error("載入更多訂單時發生錯誤:", error);
     } finally {
-      setIsLoadingMore(false);
+      isLoadingMoreRef.current = false;
     }
-  }, [isLoadingMore, queryParams, mutate, visibleCount]);
+  }, [queryParams, mutate]);
 
-  // 依年月分組
-  function groupOrdersByYearAndMonth(orders: OrderResponse[]) {
-    return orders.reduce(
-      (acc, order) => {
-        if (!order.activity?.startTime) return acc;
-        const [year, month] = order.activity.startTime.split("-");
-        if (!acc[year]) acc[year] = {};
-        if (!acc[year][month]) acc[year][month] = [];
-        acc[year][month].push(order);
-        return acc;
-      },
-      {} as Record<string, Record<string, OrderResponse[]>>
-    );
-  }
-  // // 依 tab 狀態過濾訂單
-  // const tabFilteredOrders =
-  //   tab === "all"
-  //     ? filteredOrders
-  //     : filteredOrders.filter((o) => o.status && statusMap[tab].includes(o.status));
+  // 只在組件首次掛載時載入第一頁
+  useEffect(() => {
+    if (!isMounted.current) {
+      isMounted.current = true;
+      setQueryParams((prev) => ({
+        ...prev,
+        page: 1,
+      }));
+    }
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   const monthMap = {
     "01": { zh: "一月", en: "January" },
@@ -219,9 +277,6 @@ export default function OrdersPage() {
     "12": { zh: "十二月", en: "December" },
   };
 
-  const grouped = groupOrdersByYearAndMonth(orders);
-  const sortedYears = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
-
   // 處理分頁變更
   const handlePageChange = (page: number) => {
     setQueryParams((prev) => ({
@@ -236,14 +291,21 @@ export default function OrdersPage() {
       searchInputRef.current.value = "";
     }
     setSearchDate({ from: undefined, to: undefined });
-    setQueryParams({
+    const newParams = {
       page: 1,
       limit: 8,
       title: undefined,
       from: undefined,
       to: undefined,
       status: tab === "all" ? undefined : tab,
-    });
+    };
+    setQueryParams(newParams);
+    setTotalQueryParams((prev) => ({
+      ...prev,
+      title: undefined,
+      from: undefined,
+      to: undefined,
+    }));
   }, [tab]);
 
   return (
@@ -253,11 +315,14 @@ export default function OrdersPage() {
         value={tab}
         onValueChange={handleTabChange}
         counts={{
-          all: counts.all || undefined,
+          all: totalOrdersData?.pagination?.totalItems || undefined,
           paid: counts.paid || undefined,
           pending: counts.pending || undefined,
           canceled: counts.canceled || undefined,
           expired: counts.expired || undefined,
+          refunded: counts.refunded || undefined,
+          processing: counts.processing || undefined,
+          failed: counts.failed || undefined,
         }}
         className="mb-4 border-b border-neutral-300"
       />
@@ -362,110 +427,100 @@ export default function OrdersPage() {
               <div className="space-y-4">
                 {[...Array(2)].map((_, j) => (
                   <div
-                    key={`skeleton-card-${Date.now()}-${i}-${j}`}
-                    className="border border-neutral-200 rounded-lg p-6"
-                  >
-                    <div className="flex flex-col md:flex-row justify-between gap-4">
-                      <div className="space-y-3 flex-1">
-                        <Skeleton className="h-6 w-3/4" />
-                        <Skeleton className="h-4 w-1/2" />
-                        <div className="flex gap-2">
-                          <Skeleton className="h-6 w-20" />
-                          <Skeleton className="h-6 w-20" />
-                        </div>
-                      </div>
-                      <div className="flex flex-col items-end gap-2">
-                        <Skeleton className="h-6 w-24" />
-                        <Skeleton className="h-10 w-32" />
-                      </div>
-                    </div>
-                  </div>
+                    key={`skeleton-order-${Date.now()}-${i}-${j}`}
+                    className="h-12 bg-neutral-200 rounded-md"
+                  />
                 ))}
               </div>
             </div>
           ))}
         </div>
+      ) : allOrders.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-12 space-y-4">
+          <p className="text-lg text-neutral-600">目前無符合訂單</p>
+          {tab === "all" && (
+            <Button
+              onClick={() => router.push("/event")}
+              className="bg-primary-500 hover:bg-primary-600 text-white"
+            >
+              前往報名活動
+            </Button>
+          )}
+        </div>
       ) : (
-        (() => {
-          if (orders.length === 0) {
+        <div className="space-y-6">
+          {sortedYears.map((year) => {
+            const openMonths = Object.keys(grouped[year]);
             return (
-              <div className="flex flex-col items-center justify-center py-16 space-y-6">
-                <p className="text-lg text-neutral-400">目前尚無訂單</p>
-                <Button
-                  onClick={() => router.push("/events")}
-                  className="px-6 py-2 rounded-lg md:text-lg h-auto"
+              <div key={year}>
+                <div className="text-lg font-bold text-gray-400 mb-2">{year}</div>
+                <Accordion
+                  type="multiple"
+                  value={expandedMonths.filter((month) => month.startsWith(year))}
+                  onValueChange={handleAccordionChange}
                 >
-                  探索活動
-                </Button>
+                  {openMonths
+                    .sort((a, b) => b.localeCompare(a))
+                    .map((month) => (
+                      <AccordionItem
+                        key={month}
+                        value={`${year}-${month}`}
+                        className="border-none mb-2 md:mb-6"
+                      >
+                        <AccordionTrigger className="flex items-center px-1 py-2 pb-4 group hover:no-underline">
+                          <span className="flex items-center gap-2">
+                            <span className="text-2xl font-bold leading-none">
+                              {monthMap[month as keyof typeof monthMap].zh}
+                            </span>
+                            <span className="text-lg font-bold leading-none">
+                              {monthMap[month as keyof typeof monthMap].en}
+                            </span>
+                          </span>
+                        </AccordionTrigger>
+                        <AccordionContent className="pb-0">
+                          {grouped[year][month].map((order: OrderResponse, index: number) => (
+                            <OrderCard
+                              key={`${order.id}-${order.activity?.startTime || ""}-${order.status}-${index}`}
+                              order={order}
+                            />
+                          ))}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                </Accordion>
               </div>
             );
-          }
-          if (orders.length === 0) {
-            return (
-              <div className="text-center text-neutral-400 py-12 text-lg">無符合條件的訂單</div>
-            );
-          }
-          return (
-            <>
-              {sortedYears.map((year) => {
-                const openMonths = Object.keys(grouped[year]);
-                return (
-                  <div key={year}>
-                    <div className="text-lg font-bold text-gray-400 mb-2">{year}</div>
-                    <Accordion
-                      type="multiple"
-                      defaultValue={openMonths}
-                    >
-                      {openMonths
-                        .sort((a, b) => b.localeCompare(a))
-                        .map((month) => (
-                          <AccordionItem
-                            key={month}
-                            value={month}
-                            className="border-none mb-2 md:mb-6"
-                          >
-                            <AccordionTrigger className="flex items-center px-1 py-2 pb-4 group hover:no-underline">
-                              <span className="flex items-center gap-2">
-                                <span className="text-2xl font-bold leading-none">
-                                  {monthMap[month as keyof typeof monthMap].zh}
-                                </span>
-                                <span className="text-lg font-bold leading-none">
-                                  {monthMap[month as keyof typeof monthMap].en}
-                                </span>
-                              </span>
-                            </AccordionTrigger>
-                            <AccordionContent className="pb-0">
-                              {grouped[year][month].map((order: OrderResponse) => (
-                                <OrderCard
-                                  key={order.id}
-                                  order={order}
-                                />
-                              ))}
-                            </AccordionContent>
-                          </AccordionItem>
-                        ))}
-                    </Accordion>
-                  </div>
-                );
-              })}
-              {/* 查看更多按鈕 */}
-              {orders.length > visibleCount && (
-                <div className="flex justify-center pt-6">
-                  <Button
-                    onClick={handleLoadMore}
-                    type="button"
-                    variant="outline"
-                    className="border-neutral-600 text-neutral-600 hover:cursor-pointer px-15 py-3"
-                    disabled={isLoadingMore}
-                  >
-                    {isLoadingMore ? "載入中..." : "查看更多"}
-                  </Button>
-                </div>
-              )}
-            </>
-          );
-        })()
+          })}
+          {/* 查看更多按鈕 */}
+          {ordersData?.pagination?.hasNextPage && (
+            <div className="flex justify-center pt-6">
+              <Button
+                onClick={handleLoadMore}
+                type="button"
+                variant="outline"
+                className="border-neutral-600 text-neutral-600 hover:cursor-pointer px-15 py-3"
+                disabled={isLoadingMoreRef.current}
+              >
+                {isLoadingMoreRef.current ? "載入中..." : "查看更多"}
+              </Button>
+            </div>
+          )}
+        </div>
       )}
     </div>
+  );
+}
+
+function groupOrdersByYearAndMonth(orders: OrderResponse[]) {
+  return orders.reduce(
+    (acc, order) => {
+      if (!order.activity?.startTime) return acc;
+      const [year, month] = order.activity.startTime.split("-");
+      if (!acc[year]) acc[year] = {};
+      if (!acc[year][month]) acc[year][month] = [];
+      acc[year][month].push(order);
+      return acc;
+    },
+    {} as Record<string, Record<string, OrderResponse[]>>
   );
 }
