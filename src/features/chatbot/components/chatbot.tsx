@@ -87,23 +87,25 @@ export default function Chatbot() {
 
   // 渲染聊天按鈕
   const renderChatButton = () => (
-    <Button
-      onClick={toggleChat}
-      className="w-12 h-12 md:w-16 md:h-16 bg-[#FFD56B] rounded-full flex items-center justify-center shadow-lg hover:bg-[#FFCA28] transition-colors cursor-pointer"
-      aria-label="開啟聊天機器人"
-    >
-      {isChatOpen ? (
-        <X
-          className="!w-6 !h-6 md:!w-8 md:!h-8"
-          strokeWidth={2}
-        />
-      ) : (
-        <BotMessageSquare
-          className="!w-6 !h-6 md:!w-8 md:!h-8"
-          strokeWidth={1.5}
-        />
-      )}
-    </Button>
+    <div className="fixed bottom-8 right-8 z-50">
+      <Button
+        onClick={toggleChat}
+        className="w-12 h-12 md:w-16 md:h-16 bg-[#FFD56B] rounded-full flex items-center justify-center shadow-lg hover:bg-[#FFCA28] transition-colors cursor-pointer relative z-50"
+        aria-label="開啟聊天機器人"
+      >
+        {isChatOpen ? (
+          <X
+            className="!w-6 !h-6 md:!w-8 md:!h-8"
+            strokeWidth={2}
+          />
+        ) : (
+          <BotMessageSquare
+            className="!w-6 !h-6 md:!w-8 md:!h-8"
+            strokeWidth={1.5}
+          />
+        )}
+      </Button>
+    </div>
   );
 
   // 渲染手機版全屏對話視窗
@@ -111,7 +113,7 @@ export default function Chatbot() {
     if (!isChatOpen || !isMobile) return null;
 
     return (
-      <div className="fixed top-0 inset-0 bg-white z-50 flex flex-col">
+      <div className="fixed top-0 inset-0 bg-white z-[1000] flex flex-col">
         {/* 頂部導航 */}
         <div className="w-full px-4 py-2 h-[56px] flex justify-between items-center relative">
           <Button
@@ -238,7 +240,7 @@ export default function Chatbot() {
     if (!isChatOpen || isMobile) return null;
 
     return (
-      <div className="fixed bottom-26 right-8 z-50 w-[411px] h-[344px] bg-white rounded-[20px] shadow-md overflow-hidden flex flex-col">
+      <div className="fixed bottom-26 right-8 z-[1000] w-[411px] h-[344px] bg-white rounded-[20px] shadow-md overflow-hidden flex flex-col">
         {/* 聊天窗口標題 */}
         <div className="flex items-center bg-[#262626] text-white py-2 px-6">
           <h2 className="font-bold">Eventa 小幫手</h2>
@@ -341,10 +343,10 @@ export default function Chatbot() {
   };
 
   return (
-    <div className="fixed bottom-8 right-8 z-[999]">
+    <>
       {renderChatButton()}
       {renderMobileChat()}
       {renderDesktopChat()}
-    </div>
+    </>
   );
 }
