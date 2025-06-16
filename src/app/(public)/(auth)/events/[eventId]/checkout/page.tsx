@@ -21,7 +21,7 @@ import { zhTW } from "date-fns/locale";
 import { Loader } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -33,6 +33,8 @@ interface TicketState {
 export default function CheckoutPage() {
   const params = useParams();
   const eventId = params?.eventId;
+  const searchParams = useSearchParams();
+  const orderId = searchParams?.get("orderId");
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const [focusedTicketId, setFocusedTicketId] = useState<string | null>(null);
   const [ticketStates, setTicketStates] = useState<Record<string, TicketState>>({});
@@ -77,34 +79,32 @@ export default function CheckoutPage() {
       }
     });
   };
-
   useEffect(() => {
     if (!eventId) return;
+    if (orderId) setOrderCreated(true);
+    fetchEventDetails();
+    fetchTicketTypes();
+  }, [eventId]);
+
+  const fetchEventDetails = () => {
     setLoading(true);
     setError(null);
-    getApiV1ActivitiesByActivityId({
-      path: { activityId: Number(eventId) },
-    })
+    getApiV1ActivitiesByActivityId({ path: { activityId: Number(eventId) } })
       .then((res) => {
         setEventData(res.data?.data ?? null);
         if (!res.data?.data) setError("查無此活動");
       })
       .catch(() => setError("載入活動資料失敗"))
       .finally(() => setLoading(false));
-  }, [eventId]);
+  };
 
-  useEffect(() => {
-    if (!eventId) return;
+  const fetchTicketTypes = () => {
     getApiV1ActivitiesByActivityIdTicketTypes({
       path: { activityId: Number(eventId) },
     })
-      .then((res) => {
-        setTicketTypes(res.data?.data ?? []);
-      })
-      .catch(() => {
-        setTicketTypes([]);
-      });
-  }, [eventId]);
+      .then((res) => setTicketTypes(res.data?.data ?? []))
+      .catch(() => setTicketTypes([]));
+  };
   if (!isAuthenticated) return null;
 
   return loading ? (
