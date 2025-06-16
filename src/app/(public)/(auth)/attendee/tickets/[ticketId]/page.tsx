@@ -176,8 +176,11 @@ export default function TicketDetailPage() {
                 {ticket.activity?.title}
               </h1>
 
-              <Badge className="text-neutral-900 w-fit text-lg md:text-2xl font-bold md:py-1">
-                {ticket.name}
+              <Badge
+                className="text-neutral-900 w-fit text-lg md:text-2xl font-bold md:py-1"
+                variant={ticket.status === "used" ? "outline" : "default"}
+              >
+                {ticket.status === "used" ? "已使用" : ticket.name}
               </Badge>
             </div>
           </CardHeader>

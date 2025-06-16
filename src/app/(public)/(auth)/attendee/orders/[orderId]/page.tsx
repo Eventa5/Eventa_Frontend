@@ -180,7 +180,6 @@ export default function OrderDetailPage() {
         throw new Error(response.data?.message || "退票失敗");
       }
     } catch (e) {
-      toast.error("退票失敗");
       setShowRefundFail(true);
     }
   };
@@ -545,7 +544,7 @@ export default function OrderDetailPage() {
                             </span>
                           )}
                           {/* 狀態按鈕區塊 */}
-                          {!["已取消", "已逾期", "已使用"].includes(ticket.status || "") ? (
+                          {ticket.status !== "canceled" && ticket.status !== "overdue" ? (
                             <div className="flex md:flex-col items-center md:items-stretch gap-2">
                               <Button
                                 type="button"

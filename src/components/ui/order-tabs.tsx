@@ -6,6 +6,7 @@ import {
   ClipboardList,
   ClipboardX,
   Loader2,
+  TicketX,
   WalletCards,
   X,
 } from "lucide-react";
@@ -94,7 +95,7 @@ const tabConfig = [
   {
     value: "refunded",
     label: "已退款",
-    icon: WalletCards,
+    icon: TicketX,
     iconClass: "text-gray-400",
     labelClass: "group-hover:text-gray-400 group-data-[state=active]:text-gray-400",
     badge:
