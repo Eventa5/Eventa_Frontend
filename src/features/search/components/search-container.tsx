@@ -21,7 +21,7 @@ export default function SearchContainer({ showBorder = false }: SearchContainerP
   const isSearchOpen = useSearchStore((s) => s.isSearchOpen);
   const setIsSearchOpen = useSearchStore((s) => s.setIsSearchOpen);
   const isMobile = useIsMobile();
-  const { categories } = useCategoriesStore();
+  const { categories, isLoading } = useCategoriesStore();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -67,7 +67,18 @@ export default function SearchContainer({ showBorder = false }: SearchContainerP
       >
         {showCategoryTitle && (
           <div className="text-xl md:text-2xl text-center font-bold font-serif-tc mb-4 lg:mb-6 text-neutral-700">
-            {`類別：${categories.find((category) => category.id === Number(hasCategoryId))?.name}`}
+            {(() => {
+              if (isLoading || categories.length === 0) {
+                return "類別載入中...";
+              }
+              const categoryName = categories.find(
+                (category) => category.id === Number(hasCategoryId)
+              )?.name;
+              if (categoryName) {
+                return `類別：${categoryName}`;
+              }
+              return `類別不存在 (ID: ${hasCategoryId})`;
+            })()}
           </div>
         )}
         {!isMobile && <SearchInput showBorder={showBorder} />}
