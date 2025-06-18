@@ -3,7 +3,7 @@
 import { useIsMobile } from "@/hooks/useMediaQuery";
 import { useSearchStore } from "@/store/search";
 import { Search } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useRef } from "react";
 
 interface SearchInputProps {
@@ -19,6 +19,7 @@ export default function SearchInput({ className = "", showBorder = false }: Sear
   const toggleSearch = useSearchStore((s) => s.toggleSearch);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const isMobile = useIsMobile();
 
   const handleInputChange = useCallback(
@@ -26,12 +27,15 @@ export default function SearchInput({ className = "", showBorder = false }: Sear
       const value = e.target.value;
       setSearchValue(value);
 
-      // 如果輸入框被清空，也清空 URL 參數
+      // 如果輸入框被清空，也清空 URL search 參數
       if (value.trim() === "") {
-        router.replace("/events", { scroll: false });
+        const params = new URLSearchParams(searchParams);
+        params.delete("search");
+        const newUrl = params.toString() ? `/events?${params.toString()}` : "/events";
+        router.replace(newUrl, { scroll: false });
       }
     },
-    [setSearchValue, router]
+    [setSearchValue, router, searchParams]
   );
 
   // 處理輸入框獲得焦點
