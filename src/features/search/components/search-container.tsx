@@ -4,7 +4,8 @@ import CategoriesProvider from "@/features/activities/categories-provider";
 import { useIsMobile } from "@/hooks/useMediaQuery";
 import { useCategoriesStore } from "@/store/categories";
 import { useSearchStore } from "@/store/search";
-import { usePathname, useSearchParams } from "next/navigation";
+import { X } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import MobileSearchOverlay from "./mobile-search-overlay";
 import SearchButton from "./search-button";
@@ -23,11 +24,21 @@ export default function SearchContainer({ showBorder = false }: SearchContainerP
   const { categories } = useCategoriesStore();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   // 判斷是否在 events 頁面且有 categoryId 參數
   const isEventsPage = pathname === "/events";
   const hasCategoryId = searchParams.get("categoryId");
   const showCategoryTitle = isEventsPage && hasCategoryId;
+
+  // 清除分類參數但保留其他參數
+  const handleClearCategory = () => {
+    const params = new URLSearchParams(searchParams);
+    params.delete("categoryId");
+
+    const newUrl = params.toString() ? `/events?${params.toString()}` : "/events";
+    router.push(newUrl);
+  };
 
   // 處理點擊外部區域關閉搜尋區塊
   useEffect(() => {
@@ -61,6 +72,18 @@ export default function SearchContainer({ showBorder = false }: SearchContainerP
         )}
         {!isMobile && <SearchInput showBorder={showBorder} />}
         {isMobile && <SearchButton showBorder={showBorder} />}
+        {showCategoryTitle && (
+          <div className="w-full flex justify-end">
+            <button
+              type="button"
+              className="flex items-center gap-2 text-sm text-neutral-400 py-2 cursor-pointer"
+              onClick={handleClearCategory}
+            >
+              <X className="w-4 h-4" />
+              清除搜尋類別
+            </button>
+          </div>
+        )}
         <SearchOverlay />
         <MobileSearchOverlay />
       </div>
