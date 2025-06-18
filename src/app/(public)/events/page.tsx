@@ -6,19 +6,52 @@ import { NewEventCarousel } from "@/features/activities/components/new-event-car
 import OtherEventsSection from "@/features/activities/components/other-events-section";
 import { formatEventDate } from "@/features/activities/formatEventDate";
 import SearchContainer from "@/features/search/components/search-container";
-import { useActivitiesStore } from "@/store/activities";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useSearchStore } from "@/store/search";
+import { useSearchActivitiesStore } from "@/store/searchActivities";
 import Image from "next/image";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useRef } from "react";
 
 function EventsPageContent() {
-  const { activities, fetchOtherActivities, isLoading } = useActivitiesStore();
+  const {
+    activities,
+    fetchSearchActivities,
+    isLoading,
+    hasMore,
+    page,
+    isFirstPageLoaded,
+    isInfiniteScrollEnabled,
+    enableInfiniteScroll,
+    resetSearchActivities,
+  } = useSearchActivitiesStore();
   const searchValue = useSearchStore((s) => s.searchValue);
   const setSearchValue = useSearchStore((s) => s.setSearchValue);
   const searchParams = useSearchParams();
   const hasInitialized = useRef(false);
+
+  // 包裝 fetchSearchActivities 為適合 hook 的格式
+  const fetchData = useCallback(
+    (pageNumber: number) => {
+      const categoryId = searchParams.get("categoryId");
+      const keyword = searchValue || searchParams.get("search");
+      return fetchSearchActivities(
+        pageNumber,
+        Number(categoryId) || undefined,
+        keyword || undefined
+      );
+    },
+    [fetchSearchActivities, searchParams, searchValue]
+  );
+
+  const { ref, handleLoadMore } = useInfiniteScroll({
+    hasMore,
+    isLoading,
+    isInfiniteScrollEnabled,
+    page,
+    fetchData,
+    enableInfiniteScroll,
+  });
 
   // Debounced 搜尋函數
   const debouncedSearch = useCallback(
@@ -28,12 +61,12 @@ function EventsPageContent() {
         clearTimeout(timeoutId);
         timeoutId = setTimeout(() => {
           if (categoryId || keyword) {
-            fetchOtherActivities(1, Number(categoryId), keyword);
+            fetchSearchActivities(1, Number(categoryId) || undefined, keyword);
           }
         }, 500);
       };
     })(),
-    [fetchOtherActivities]
+    [fetchSearchActivities]
   );
 
   // 頁面離開時清空搜尋狀態
@@ -41,8 +74,9 @@ function EventsPageContent() {
     return () => {
       setSearchValue("");
       hasInitialized.current = false;
+      resetSearchActivities();
     };
-  }, [setSearchValue]);
+  }, [setSearchValue, resetSearchActivities]);
 
   // 從 URL 參數中讀取搜尋值和分類（只在初始載入時同步一次）
   useEffect(() => {
@@ -81,7 +115,7 @@ function EventsPageContent() {
       {isSearchMode && (
         <section className="py-20 md:py-32 px-4 md:px-8">
           <div className="flex flex-col items-center">
-            {isLoading ? (
+            {isLoading && !isFirstPageLoaded ? (
               <div className="text-gray-400 text-xl py-24">搜尋中...</div>
             ) : activities.length > 0 ? (
               <>
@@ -111,13 +145,25 @@ function EventsPageContent() {
                     />
                   ))}
                 </div>
+                {/* 無限滾動按鈕或區域 */}
                 <div className="mt-12 flex justify-center">
-                  <Link
-                    href="/events"
-                    className="px-8 py-3 border border-[#525252] rounded-xl text-[#525252] hover:bg-[#F5F5F5] transition-colors"
-                  >
-                    查看更多
-                  </Link>
+                  {hasMore && !isInfiniteScrollEnabled ? (
+                    <button
+                      type="button"
+                      onClick={handleLoadMore}
+                      className="px-8 py-3 border border-[#525252] rounded-xl text-[#525252] hover:bg-[#F5F5F5] transition-colors"
+                    >
+                      查看更多
+                    </button>
+                  ) : isInfiniteScrollEnabled && hasMore ? (
+                    // 啟用無限滾動後，顯示觸發區域
+                    <div
+                      ref={ref}
+                      className="h-10"
+                    >
+                      {isLoading && <div className="text-[#525252]">載入更多活動中...</div>}
+                    </div>
+                  ) : null}
                 </div>
               </>
             ) : (
