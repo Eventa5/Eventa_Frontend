@@ -167,11 +167,7 @@ function EventsPageContent() {
                 </div>
               </>
             ) : (
-              <div className="text-gray-400 text-xl py-24">
-                找不到符合「
-                {searchValue || searchParams.get("search")}
-                」的活動
-              </div>
+              <div className="text-gray-400 text-xl py-24">找不到符合的活動</div>
             )}
           </div>
         </section>
