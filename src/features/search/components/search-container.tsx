@@ -1,5 +1,6 @@
 "use client";
 
+import CategoriesProvider from "@/features/activities/categories-provider";
 import { useIsMobile } from "@/hooks/useMediaQuery";
 import { useSearchStore } from "@/store/search";
 import { useEffect, useRef } from "react";
@@ -38,14 +39,16 @@ export default function SearchContainer({ showBorder = false }: SearchContainerP
   }, [isMobile, isSearchOpen, setIsSearchOpen]);
 
   return (
-    <div
-      className="relative w-full"
-      ref={containerRef}
-    >
-      {!isMobile && <SearchInput showBorder={showBorder} />}
-      {isMobile && <SearchButton showBorder={showBorder} />}
-      <SearchOverlay />
-      <MobileSearchOverlay />
-    </div>
+    <CategoriesProvider>
+      <div
+        className="relative w-full"
+        ref={containerRef}
+      >
+        {!isMobile && <SearchInput showBorder={showBorder} />}
+        {isMobile && <SearchButton showBorder={showBorder} />}
+        <SearchOverlay />
+        <MobileSearchOverlay />
+      </div>
+    </CategoriesProvider>
   );
 }
