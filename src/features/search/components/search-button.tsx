@@ -2,11 +2,16 @@
 
 import { useSearchStore } from "@/store/search";
 import { Search } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+
 interface SearchButtonProps {
   showBorder?: boolean;
 }
+
 export default function SearchButton({ showBorder = false }: SearchButtonProps) {
   const toggleSearch = useSearchStore((s) => s.toggleSearch);
+  const searchParams = useSearchParams();
+  const searchKeyword = searchParams.get("search");
 
   return (
     <button
@@ -21,7 +26,7 @@ export default function SearchButton({ showBorder = false }: SearchButtonProps) 
         size={20}
         className="text-[#525252]"
       />
-      <span className="text-left text-[#525252] text-sm">找活動</span>
+      <span className="text-left text-[#525252] text-sm">{searchKeyword ?? "找活動"}</span>
     </button>
   );
 }
