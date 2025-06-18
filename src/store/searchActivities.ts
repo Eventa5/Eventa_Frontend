@@ -7,6 +7,7 @@ interface SearchActivitiesQueryParams {
   limit: number;
   categoryId?: number;
   keyword?: string;
+  status?: string;
 }
 
 interface SearchActivitiesState {
@@ -68,6 +69,7 @@ export const useSearchActivitiesStore = create<SearchActivitiesState>((set, get)
       const queryParams: SearchActivitiesQueryParams = {
         page,
         limit: 8,
+        status: "published",
       };
 
       // 如果有分類 ID，加入 categoryId 參數

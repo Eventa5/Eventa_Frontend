@@ -7,6 +7,7 @@ interface ActivitiesQueryParams {
   limit: number;
   categoryId?: number;
   keyword?: string;
+  status?: string;
 }
 
 interface ActivitiesState {
@@ -17,7 +18,7 @@ interface ActivitiesState {
   hasMore: boolean;
   isFirstPageLoaded: boolean;
   isInfiniteScrollEnabled: boolean;
-  fetchOtherActivities: (page?: number, categoryId?: number, keyword?: string) => Promise<void>;
+  fetchOtherActivities: (page?: number, status?: string) => Promise<void>;
   resetOtherActivities: () => void;
   enableInfiniteScroll: () => void;
 }
@@ -31,7 +32,7 @@ export const useActivitiesStore = create<ActivitiesState>((set, get) => ({
   isFirstPageLoaded: false,
   isInfiniteScrollEnabled: false,
 
-  fetchOtherActivities: async (page = 1, categoryId?: number, keyword?: string) => {
+  fetchOtherActivities: async (page = 1, status?: string) => {
     const currentState = get();
 
     // 如果正在載入中，不要重複載入
@@ -39,8 +40,8 @@ export const useActivitiesStore = create<ActivitiesState>((set, get) => ({
       return;
     }
 
-    // 如果是第一頁且已經載入過，則不重新載入（除非有分類參數）
-    if (page === 1 && currentState.isFirstPageLoaded && !categoryId && !keyword) {
+    // 如果是第一頁且已經載入過，則不重新載入
+    if (page === 1 && currentState.isFirstPageLoaded) {
       return;
     }
 
@@ -51,16 +52,8 @@ export const useActivitiesStore = create<ActivitiesState>((set, get) => ({
       const queryParams: ActivitiesQueryParams = {
         page,
         limit: 8,
+        status: "published",
       };
-
-      // 如果有分類 ID，加入 categoryId 參數
-      if (categoryId) {
-        queryParams.categoryId = categoryId;
-      }
-
-      if (keyword) {
-        queryParams.keyword = keyword;
-      }
 
       const response = await getApiV1Activities({
         query: queryParams,
