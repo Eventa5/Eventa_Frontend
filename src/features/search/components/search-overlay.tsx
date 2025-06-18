@@ -5,13 +5,13 @@ import { useIsMobile } from "@/hooks/useMediaQuery";
 import { useCategoriesStore } from "@/store/categories";
 import { useSearchStore } from "@/store/search";
 import { X } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { POPULAR_SEARCHES } from "../constants/search";
 import "swiper/css";
 
-export default function SearchOverlay() {
+function SearchOverlayContent() {
   const isSearchOpen = useSearchStore((s) => s.isSearchOpen);
   const toggleSearch = useSearchStore((s) => s.toggleSearch);
   const setSearchValue = useSearchStore((s) => s.setSearchValue);
@@ -20,6 +20,7 @@ export default function SearchOverlay() {
   const overlayRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const isMobile = useIsMobile();
+  const searchParams = useSearchParams();
 
   // 控制顯示狀態，增加過渡動畫效果
   useEffect(() => {
@@ -37,13 +38,17 @@ export default function SearchOverlay() {
   const handlePopularSearch = (term: string) => {
     setSearchValue(term);
     toggleSearch();
-    router.push(`/events?search=${encodeURIComponent(term)}`);
+    const params = new URLSearchParams(searchParams);
+    params.set("search", term);
+    router.push(`/events?${params.toString()}`);
   };
 
   // 選擇分類
   const handleCategorySearch = (categoryId: string) => {
     toggleSearch();
-    router.push(`/events?categoryId=${encodeURIComponent(categoryId)}`);
+    const params = new URLSearchParams(searchParams);
+    params.set("categoryId", categoryId);
+    router.push(`/events?${params.toString()}`);
   };
 
   // 如果是手機版或搜尋未開啟且不可見，則不渲染
@@ -112,5 +117,13 @@ export default function SearchOverlay() {
         </Swiper>
       </div>
     </div>
+  );
+}
+
+export default function SearchOverlay() {
+  return (
+    <Suspense fallback={null}>
+      <SearchOverlayContent />
+    </Suspense>
   );
 }

@@ -6,15 +6,15 @@ import { useCategoriesStore } from "@/store/categories";
 import { useSearchStore } from "@/store/search";
 import { Search, X } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { type FormEvent, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { type FormEvent, Suspense, useCallback, useEffect, useState } from "react";
 import { FreeMode } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { POPULAR_SEARCHES } from "../constants/search";
 import "swiper/css";
 import "swiper/css/free-mode";
 
-export default function MobileSearchOverlay() {
+function MobileSearchOverlayContent() {
   const isSearchOpen = useSearchStore((s) => s.isSearchOpen);
   const toggleSearch = useSearchStore((s) => s.toggleSearch);
   const searchValue = useSearchStore((s) => s.searchValue);
@@ -23,6 +23,7 @@ export default function MobileSearchOverlay() {
   const router = useRouter();
   const isMobile = useIsMobile();
   const { categories, isLoading, error } = useCategoriesStore();
+  const searchParams = useSearchParams();
 
   // 控制顯示狀態，增加過渡動畫效果
   useEffect(() => {
@@ -43,21 +44,48 @@ export default function MobileSearchOverlay() {
 
     // 關閉搜尋並導航到搜尋結果頁面
     toggleSearch();
-    router.push(`/events?search=${encodeURIComponent(searchValue.trim())}`);
+    const params = new URLSearchParams(searchParams);
+    params.set("search", searchValue.trim());
+    router.push(`/events?${params.toString()}`);
   };
 
   // 選擇熱門搜尋
   const handlePopularSearch = (term: string) => {
     setSearchValue(term);
     toggleSearch();
-    router.push(`/events?search=${encodeURIComponent(term)}`);
+    const params = new URLSearchParams(searchParams);
+    params.set("search", term);
+    router.push(`/events?${params.toString()}`);
   };
 
   // 選擇分類
   const handleCategorySearch = (categoryId: string) => {
     toggleSearch();
-    router.push(`/events?categoryId=${encodeURIComponent(categoryId)}`);
+    const params = new URLSearchParams(searchParams);
+    params.set("categoryId", categoryId);
+    router.push(`/events?${params.toString()}`);
   };
+
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setSearchValue(value);
+
+      const params = new URLSearchParams(searchParams);
+
+      if (value.trim() === "") {
+        // 如果輸入框被清空，移除 search 參數
+        params.delete("search");
+      } else {
+        // 如果有值，設置 search 參數
+        params.set("search", value.trim());
+      }
+
+      const newUrl = params.toString() ? `/events?${params.toString()}` : "/events";
+      router.replace(newUrl, { scroll: false });
+    },
+    [setSearchValue, router, searchParams]
+  );
 
   if (!isMobile || (!isSearchOpen && !isVisible)) return null;
 
@@ -109,7 +137,7 @@ export default function MobileSearchOverlay() {
             <input
               type="text"
               value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
+              onChange={handleInputChange}
               placeholder="輸入關鍵字搜尋..."
               className="flex-1 outline-none text-[#525252] text-sm"
               autoFocus
@@ -180,5 +208,13 @@ export default function MobileSearchOverlay() {
         </div>
       </div>
     </>
+  );
+}
+
+export default function MobileSearchOverlay() {
+  return (
+    <Suspense fallback={null}>
+      <MobileSearchOverlayContent />
+    </Suspense>
   );
 }

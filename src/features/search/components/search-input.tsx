@@ -22,21 +22,23 @@ export default function SearchInput({ className = "", showBorder = false }: Sear
   const searchParams = useSearchParams();
   const isMobile = useIsMobile();
 
-  const handleInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      setSearchValue(value);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchValue(value);
 
-      // 如果輸入框被清空，也清空 URL search 參數
-      if (value.trim() === "") {
-        const params = new URLSearchParams(searchParams);
-        params.delete("search");
-        const newUrl = params.toString() ? `/events?${params.toString()}` : "/events";
-        router.replace(newUrl, { scroll: false });
-      }
-    },
-    [setSearchValue, router, searchParams]
-  );
+    const params = new URLSearchParams(searchParams);
+
+    if (value.trim() === "") {
+      // 如果輸入框被清空，移除 search 參數
+      params.delete("search");
+    } else {
+      // 如果有值，設置 search 參數
+      params.set("search", value.trim());
+    }
+
+    const newUrl = params.toString() ? `/events?${params.toString()}` : "/events";
+    router.replace(newUrl, { scroll: false });
+  };
 
   // 處理輸入框獲得焦點
   const handleFocus = () => {
@@ -59,7 +61,9 @@ export default function SearchInput({ className = "", showBorder = false }: Sear
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && searchValue.trim()) {
       setIsSearchOpen(false);
-      router.push(`/events?search=${encodeURIComponent(searchValue.trim())}`);
+      const params = new URLSearchParams(searchParams);
+      params.set("search", searchValue.trim());
+      router.push(`/events?${params.toString()}`);
     }
   };
 
