@@ -54,9 +54,9 @@ export default function MobileSearchOverlay() {
   };
 
   // 選擇分類
-  const handleCategorySearch = (category: string) => {
+  const handleCategorySearch = (categoryId: string) => {
     toggleSearch();
-    router.push(`/events?categoryId=${encodeURIComponent(category)}`);
+    router.push(`/events?categoryId=${encodeURIComponent(categoryId)}`);
   };
 
   if (!isMobile || (!isSearchOpen && !isVisible)) return null;
@@ -161,7 +161,7 @@ export default function MobileSearchOverlay() {
                   <SwiperSlide
                     key={category.name}
                     className="!w-auto"
-                    onClick={() => handleCategorySearch(category.name)}
+                    onClick={() => handleCategorySearch(category.id.toString())}
                   >
                     <div className="flex flex-col items-center gap-2">
                       <div
