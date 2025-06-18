@@ -83,10 +83,10 @@ function SearchContainerContent({ showBorder = false }: SearchContainerProps) {
       {!isMobile && <SearchInput showBorder={showBorder} />}
       {isMobile && <SearchButton showBorder={showBorder} />}
       {showCategoryTitle && (
-        <div className="w-full flex justify-end">
+        <div className="w-full flex justify-center sm:justify-end">
           <button
             type="button"
-            className="flex items-center gap-2 text-sm text-neutral-400 py-2 cursor-pointer"
+            className="flex items-center gap-2 text-sm text-neutral-400 mt-4 sm:mt-2 cursor-pointer"
             onClick={handleClearCategory}
           >
             <X className="w-4 h-4" />
