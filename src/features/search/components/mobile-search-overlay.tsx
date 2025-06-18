@@ -163,10 +163,12 @@ export default function MobileSearchOverlay() {
                     className="!w-auto"
                     onClick={() => handleCategorySearch(category.id.toString())}
                   >
-                    <div className="flex flex-col items-center gap-2">
+                    <div className="flex flex-col items-center gap-2 cursor-pointer  hover:opacity-80 transition-opacity">
                       <div
                         className="w-[80px] h-[80px] bg-cover bg-center rounded-xl"
-                        style={{ backgroundImage: `url('${category.imageUrl}')` }}
+                        style={{
+                          backgroundImage: `url('${category.imageUrl}')`,
+                        }}
                       />
                       <span className="text-sm">{category.name}</span>
                     </div>
