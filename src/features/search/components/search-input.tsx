@@ -4,7 +4,7 @@ import { useIsMobile } from "@/hooks/useMediaQuery";
 import { useSearchStore } from "@/store/search";
 import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
 
 interface SearchInputProps {
   className?: string;
@@ -20,6 +20,19 @@ export default function SearchInput({ className = "", showBorder = false }: Sear
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const isMobile = useIsMobile();
+
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setSearchValue(value);
+
+      // 如果輸入框被清空，也清空 URL 參數
+      if (value.trim() === "") {
+        router.replace("/events", { scroll: false });
+      }
+    },
+    [setSearchValue, router]
+  );
 
   // 處理輸入框獲得焦點
   const handleFocus = () => {
@@ -59,7 +72,7 @@ export default function SearchInput({ className = "", showBorder = false }: Sear
           placeholder="輸入關鍵字搜尋..."
           className="flex-1 outline-none text-[#525252] text-sm"
           value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
+          onChange={handleInputChange}
           onFocus={handleFocus}
           onKeyDown={handleKeyDown}
         />
