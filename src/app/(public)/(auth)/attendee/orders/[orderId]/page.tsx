@@ -569,7 +569,7 @@ export default function OrderDetailPage() {
         open={showSimilarActivities}
         onOpenChange={setShowSimilarActivities}
       >
-        <DialogContent className="max-w-3xl border-neutral-300 bg-primary-50">
+        <DialogContent className="md:max-w-3xl border-neutral-300 bg-primary-50">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">
               <DialogDescription>推薦活動</DialogDescription>
