@@ -367,30 +367,20 @@ export default function OrderDetailPage() {
                           </span>
                           <div>
                             {order.status === "pending" && (
-                              <>
-                                <Button
-                                  type="button"
-                                  className="py-2 md:py-2.5 rounded mr-2 font-semibold h-auto w-[120px] mb-2 sm:mb-0"
-                                  onClick={() => {
-                                    const activityId = (order.activity as { id?: number })?.id;
-                                    if (activityId) {
-                                      router.push(
-                                        `/events/${activityId}/checkout?orderId=${order.id}`
-                                      );
-                                    }
-                                  }}
-                                >
-                                  前往付款
-                                </Button>
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  className="border-neutral-300 text-neutral-600 py-2 md:py-2.5 rounded hover:bg-neutral-400 hover:text-white w-[120px] h-auto"
-                                  onClick={() => setShowRefundConfirm(true)}
-                                >
-                                  退票
-                                </Button>
-                              </>
+                              <Button
+                                type="button"
+                                className="py-2 md:py-2.5 rounded mr-2 font-semibold h-auto w-[120px] mb-2 sm:mb-0"
+                                onClick={() => {
+                                  const activityId = (order.activity as { id?: number })?.id;
+                                  if (activityId) {
+                                    router.push(
+                                      `/events/${activityId}/checkout?orderId=${order.id}`
+                                    );
+                                  }
+                                }}
+                              >
+                                前往付款
+                              </Button>
                             )}
                             {order.status === "paid" && (
                               <Button
