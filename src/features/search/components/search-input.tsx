@@ -76,7 +76,7 @@ export default function SearchInput({ className = "", showBorder = false }: Sear
       <div className="w-full bg-white rounded-xl px-6 py-3 flex items-center gap-2">
         <input
           ref={inputRef}
-          type="text"
+          type="search"
           placeholder="輸入關鍵字搜尋..."
           className="flex-1 outline-none text-[#525252] text-sm"
           value={searchValue}
