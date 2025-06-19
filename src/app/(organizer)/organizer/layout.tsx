@@ -6,8 +6,15 @@ import ErrorDialog from "@/components/ui/error-dialog";
 import { Toaster } from "@/components/ui/sonner";
 import { InitOrganizerState } from "@/features/organizer/components/InitOrganizerState";
 import { getApiV1Organizations } from "@/services/api/client/sdk.gen";
+import type { Viewport } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
 
 export const dynamic = "force-dynamic";
 

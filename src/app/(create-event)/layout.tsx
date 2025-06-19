@@ -3,7 +3,14 @@ import "@/styles/globals.css";
 import CreateEventFooter from "@/components/layout/create-event-footer";
 import CreateEventHeader from "@/components/layout/create-event-header";
 import ErrorDialog from "@/components/ui/error-dialog";
+import type { Viewport } from "next";
 import type { ReactNode } from "react";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
 
 const notoSansTC = localFont({
   src: [
