@@ -52,7 +52,6 @@ import {
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { toast } from "sonner";
 import useSWR from "swr";
 
 const activityFetcher = async (activityId: number) => {
@@ -298,15 +297,9 @@ export default function OrderDetailPage() {
                     {category.name}
                   </span>
                 ))}
-                {/* <span
-                  className="bg-secondary-100 text-secondary-500 px-4 md:px-6 py-1 md:py-2 rounded-lg text-sm md:text-lg font-semibold cursor-pointer hover:bg-secondary-200 transition-colors"
-                  onClick={() => handleCategoryClick(activity?.isOnline ? "線上活動" : "線下活動")}
-                >
-                  {activity?.isOnline ? "線上活動" : "線下活動"}
-                </span> */}
               </div>
               <div className="md:flex mb-4 items-center gap-4">
-                <h2 className="text-3xl md:text-5xl font-extrabold mb-2 font-serif-tc">
+                <h2 className="text-3xl md:text-5xl font-extrabold mb-4 md:mb-2 font-serif-tc">
                   {order?.activity?.title}
                 </h2>
                 {similarActivities && similarActivities.length > 0 && (
@@ -319,7 +312,7 @@ export default function OrderDetailPage() {
                   </Button>
                 )}
               </div>
-              <div className="flex items-center gap-2 mb-6 md:mb-16">
+              <div className="flex items-center gap-2 mb-6 md:mb-16 flex-wrap">
                 {order?.activity?.tags?.split(",").map((tag: string) => (
                   <Badge
                     variant="outline"
