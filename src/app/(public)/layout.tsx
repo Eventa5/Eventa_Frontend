@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "@/styles/globals.css";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
@@ -60,6 +60,12 @@ export const metadata: Metadata = {
   },
   description:
     "Eventa 是一個完整的票務管理平台，讓參與者能輕鬆搜尋、購買與管理活動票券，主辦方也能快速建立活動、管理票種與查看銷售情況，系統支援帳號整合登入、即時票務管理、QR Code 報到、AI 客服問答功能，打造流暢的活動體驗。",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({

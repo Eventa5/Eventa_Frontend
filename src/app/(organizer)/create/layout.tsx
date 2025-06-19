@@ -1,9 +1,16 @@
 import localFont from "next/font/local";
 import "@/styles/globals.css";
 import ErrorDialog from "@/components/ui/error-dialog";
+import type { Viewport } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
 
 const notoSansTC = localFont({
   src: [
