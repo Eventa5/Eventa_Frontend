@@ -379,6 +379,7 @@ export default function OrdersPage() {
                 onSelect={handleDateSelect}
                 numberOfMonths={2}
                 classNames={{
+                  months: "flex flex-col md:flex-row",
                   selected: "bg-accent",
                   range_start:
                     "rounded-l-md bg-primary-500 hover:bg-primary-500 custom-range-start",
