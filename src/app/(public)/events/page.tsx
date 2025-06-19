@@ -34,14 +34,14 @@ function EventsPageContent() {
   const fetchData = useCallback(
     (pageNumber: number) => {
       const categoryId = searchParams.get("categoryId");
-      const keyword = searchValue || searchParams.get("search");
+      const keyword = searchParams.get("search");
       return fetchSearchActivities(
         pageNumber,
         Number(categoryId) || undefined,
         keyword || undefined
       );
     },
-    [fetchSearchActivities, searchParams, searchValue]
+    [fetchSearchActivities, searchParams]
   );
 
   const { ref, handleLoadMore } = useInfiniteScroll({
@@ -53,22 +53,6 @@ function EventsPageContent() {
     enableInfiniteScroll,
   });
 
-  // Debounced 搜尋函數
-  const debouncedSearch = useCallback(
-    (() => {
-      let timeoutId: NodeJS.Timeout;
-      return (categoryId?: string, keyword?: string) => {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-          if (categoryId || keyword) {
-            fetchSearchActivities(1, Number(categoryId) || undefined, keyword);
-          }
-        }, 500);
-      };
-    })(),
-    [fetchSearchActivities]
-  );
-
   // 頁面離開時清空搜尋狀態
   useEffect(() => {
     return () => {
@@ -78,7 +62,7 @@ function EventsPageContent() {
     };
   }, [setSearchValue, resetSearchActivities]);
 
-  // 從 URL 參數中讀取搜尋值和分類（只在初始載入時同步一次）
+  // 從 URL 參數中讀取搜尋值和分類，並執行搜尋
   useEffect(() => {
     const urlSearchValue = searchParams.get("search");
     const urlCategoryId = searchParams.get("categoryId");
@@ -88,20 +72,15 @@ function EventsPageContent() {
       setSearchValue(urlSearchValue);
       hasInitialized.current = true;
     }
-    debouncedSearch(urlCategoryId || undefined, urlSearchValue || undefined);
-  }, [searchParams, setSearchValue, debouncedSearch]);
 
-  // 當 store 中的搜尋值改變時，也要觸發搜尋
-  useEffect(() => {
-    if (searchValue?.trim() && !searchParams.get("search")) {
-      // 如果 store 有搜尋值但 URL 沒有，執行 debounced 搜尋
-      debouncedSearch(undefined, searchValue);
+    // 如果有任何搜尋參數，直接執行搜尋
+    if (urlSearchValue || urlCategoryId) {
+      fetchSearchActivities(1, Number(urlCategoryId) || undefined, urlSearchValue || undefined);
     }
-  }, [searchValue, searchParams, debouncedSearch]);
+  }, [searchParams, setSearchValue, fetchSearchActivities]);
 
   // 判斷是否為搜尋模式
-  const isSearchMode =
-    searchValue?.trim() || searchParams.get("search") || searchParams.get("categoryId");
+  const isSearchMode = searchParams.get("search") || searchParams.get("categoryId");
 
   return (
     <main className="flex flex-col w-full min-h-screen bg-primary-50 pt-10 -mt-10">
