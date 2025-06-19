@@ -63,13 +63,16 @@ export const useAuthStore = create<AuthState>()((set) => ({
         set({ isAuthenticated: authStatus });
         // 如果已認證，獲取使用者資料
         if (authStatus) {
-          const response = await getApiV1UsersProfile();
+          const response = await getApiV1UsersProfile<true>({ throwOnError: true });
           if (response.data?.data) {
             set({ userProfile: response.data.data });
           }
         }
-      } catch (error) {
-        console.error("初始化認證狀態失敗:", error);
+      } catch (error: any) {
+        if (error.status === false && error.message === "無效的令牌") {
+          // 執行登出操作
+          await useAuthStore.getState().logout();
+        }
         set({ isAuthenticated: false, userProfile: null });
       }
     }
@@ -78,12 +81,15 @@ export const useAuthStore = create<AuthState>()((set) => ({
   // 獲取使用者資料的方法
   fetchUserProfile: async () => {
     try {
-      const response = await getApiV1UsersProfile();
+      const response = await getApiV1UsersProfile<true>({ throwOnError: true });
       if (response.data?.data) {
         set({ userProfile: response.data.data });
       }
-    } catch (error) {
-      console.error("獲取使用者資料失敗:", error);
+    } catch (error: any) {
+      if (error.status === false && error.message === "無效的令牌") {
+        // 執行登出操作
+        await useAuthStore.getState().logout();
+      }
       set({ userProfile: null });
     }
   },
