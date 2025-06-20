@@ -88,10 +88,7 @@ export default async function OrganizerLayout({
         suppressHydrationWarning
       >
         <Suspense fallback={<div>Loading...</div>}>
-          <InitOrganizerState
-            orgId={defaultOrg.id || -1}
-            orgName={defaultOrg.name || ""}
-          >
+          <InitOrganizerState orgId={defaultOrg.id || -1}>
             <OrganizerLayoutContent>{children}</OrganizerLayoutContent>
           </InitOrganizerState>
         </Suspense>

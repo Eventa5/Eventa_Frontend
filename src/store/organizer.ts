@@ -4,44 +4,39 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 interface OrganizerState {
+  // 當前主辦單位的 ID
+  currentId: number | null;
   // 當前主辦單位的基本資訊
   currentOrganizerInfo: OrganizationResponse | null;
 
   // Actions
-  setCurrentOrganizer: (id: number, name: string) => void;
+  setCurrentOrganizerId: (id: number) => void;
   clearCurrentOrganizer: () => void;
-  getCurrentOrganizerId: () => number | null;
-  getCurrentOrganizerInfo: () => OrganizationResponse | null;
   fetchCurrentOrganizerInfo: () => Promise<OrganizationResponse | null>;
 }
 
 export const useOrganizerStore = create<OrganizerState>()(
   persist(
     (set, get) => ({
+      currentId: null,
+
       currentOrganizerInfo: null,
 
-      setCurrentOrganizer: (id: number, name: string) => {
+      setCurrentOrganizerId: (id: number) => {
         set({
-          currentOrganizerInfo: { id, name },
+          currentId: id,
         });
       },
 
       clearCurrentOrganizer: () => {
         set({
+          currentId: null,
           currentOrganizerInfo: null,
         });
       },
 
-      getCurrentOrganizerId: () => {
-        return get().currentOrganizerInfo?.id ?? null;
-      },
-
-      getCurrentOrganizerInfo: () => {
-        return get().currentOrganizerInfo;
-      },
-
       fetchCurrentOrganizerInfo: async () => {
-        const currentId = get().getCurrentOrganizerId();
+        const currentId = get().currentId;
         if (!currentId) return null;
 
         try {
@@ -67,6 +62,7 @@ export const useOrganizerStore = create<OrganizerState>()(
     {
       name: "organizer-store", // localStorage key
       partialize: (state) => ({
+        currentId: state.currentId,
         currentOrganizerInfo: state.currentOrganizerInfo,
       }),
     }
