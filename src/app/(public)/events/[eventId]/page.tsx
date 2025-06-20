@@ -4,10 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import TicketGuideDialog from "@/features/activities/components/ticket-guide-dialog";
 import {
+  deleteApiV1ActivitiesByActivityIdFavorite,
   getApiV1ActivitiesByActivityId,
   getApiV1OrganizationsByOrganizationId,
+  postApiV1ActivitiesByActivityIdFavorite,
 } from "@/services/api/client/sdk.gen";
-import type { ActivityResponse, OrganizationResponse } from "@/services/api/client/types.gen";
+import type {
+  ActivityResponse,
+  FavoriteActivityResponse,
+  OrganizationResponse,
+} from "@/services/api/client/types.gen";
 import { useAuthStore } from "@/store/auth";
 import { useDialogStore } from "@/store/dialog";
 import { useSearchStore } from "@/store/search";
@@ -48,6 +54,7 @@ export default function EventDetailPage() {
   const setSearchValue = useSearchStore((s) => s.setSearchValue);
   const [showTicketGuide, setShowTicketGuide] = useState(false);
   const [liked, setLiked] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
 
   useEffect(() => {
     if (!eventId) return;
@@ -83,6 +90,41 @@ export default function EventDetailPage() {
       setLoginTab("signin");
       setLoginDialogOpen(true);
       toast.error("請先登入才能購票");
+    }
+  };
+
+  // 處理收藏/取消收藏
+  const handleToggleFavorite = async () => {
+    if (!isAuthenticated) {
+      setLoginTab("signin");
+      setLoginDialogOpen(true);
+      toast.error("請先登入才能收藏活動");
+      return;
+    }
+
+    if (!eventId) return;
+
+    setFavoriteLoading(true);
+    try {
+      if (liked) {
+        // 取消收藏
+        await deleteApiV1ActivitiesByActivityIdFavorite({
+          path: { activityId: Number(eventId) },
+        });
+        setLiked(false);
+        toast.success("已取消收藏");
+      } else {
+        // 新增收藏
+        await postApiV1ActivitiesByActivityIdFavorite({
+          path: { activityId: Number(eventId) },
+        });
+        setLiked(true);
+        toast.success("已加入收藏");
+      }
+    } catch (error) {
+      toast.error(liked ? "取消收藏失敗" : "收藏失敗");
+    } finally {
+      setFavoriteLoading(false);
     }
   };
 
@@ -288,13 +330,18 @@ export default function EventDetailPage() {
                   <div className="flex gap-10 mt-2">
                     <button
                       type="button"
-                      className="text-white cursor-pointer"
-                      onClick={() => setLiked((prev) => !prev)}
+                      className={`text-white cursor-pointer ${favoriteLoading ? "opacity-50 pointer-events-none" : ""}`}
+                      onClick={handleToggleFavorite}
+                      disabled={favoriteLoading}
                     >
-                      <HeartIcon
-                        fill={liked ? "currentColor" : "none"}
-                        className={`${liked ? "text-red-500" : ""}`}
-                      />
+                      {favoriteLoading ? (
+                        <Loader className="w-5 h-5 animate-spin" />
+                      ) : (
+                        <HeartIcon
+                          fill={liked ? "currentColor" : "none"}
+                          className={`${liked ? "text-red-500" : ""}`}
+                        />
+                      )}
                     </button>
                     <a
                       href={organization?.officialSiteUrl ? organization.officialSiteUrl : "#"}
@@ -502,13 +549,18 @@ export default function EventDetailPage() {
             <div className="flex gap-10 mt-2">
               <button
                 type="button"
-                className="text-white cursor-pointer"
-                onClick={() => setLiked((prev) => !prev)}
+                className={`text-white cursor-pointer ${favoriteLoading ? "opacity-50 pointer-events-none" : ""}`}
+                onClick={handleToggleFavorite}
+                disabled={favoriteLoading}
               >
-                <HeartIcon
-                  fill={liked ? "currentColor" : "none"}
-                  className={`${liked ? "text-red-500" : ""}`}
-                />
+                {favoriteLoading ? (
+                  <Loader className="w-5 h-5 animate-spin" />
+                ) : (
+                  <HeartIcon
+                    fill={liked ? "currentColor" : "none"}
+                    className={`${liked ? "text-red-500" : ""}`}
+                  />
+                )}
               </button>
               <a
                 href={organization?.officialSiteUrl ? organization.officialSiteUrl : "#"}
