@@ -85,10 +85,12 @@ export const EventCard = ({
       <div className={contentClassName}>
         {/* 地點標籤 */}
         <div
-          className={`inline-flex rounded-lg py-1 px-2 w-fit ${location ? "bg-[#FDF1ED]" : "bg-primary-300"}`}
+          className={`inline-flex rounded-lg py-1 px-2 ${location ? "bg-[#FDF1ED]" : "bg-primary-300"} w-fit`}
         >
           <span
-            className={`${location ? "text-[#F07348]" : "text-center text-primary-900"} text-sm tracking-wider`}
+            className={`${
+              location ? "text-[#F07348]" : "text-center text-primary-900"
+            } text-sm tracking-wider max-w-[120px] md:max-w-fit truncate md:truncate-none`}
           >
             {location ? location : "線上活動"}
           </span>
