@@ -65,13 +65,13 @@ export default function CheckoutResultPage() {
   }, [orderId]);
 
   return (
-    <div className="min-h-screen bg-primary-50 flex flex-col items-center justify-center px-4 pt-20 -mt-10">
+    <main className="flex flex-col w-full min-h-screen bg-primary-50 pt-10 -mt-10">
       {loading ? (
         <div className="min-h-screen flex items-center justify-center px-4">
           <Loader className="animate-spin w-10 h-10 text-primary-500" />
         </div>
       ) : error ? (
-        <div className="max-w-md w-full text-center py-10 mt-16">
+        <div className="max-w-md w-full mx-auto text-center py-10 mt-16">
           <h1 className="text-2xl font-bold text-neutral-700 mb-4">
             {resultData?.data?.result ? "報名成功" : "報名失敗"}
           </h1>
@@ -95,7 +95,7 @@ export default function CheckoutResultPage() {
         </div>
       ) : !resultData?.data?.result ? (
         // 付款失敗，顯示取消頁面
-        <div className="max-w-lg w-full text-center bg-white rounded-lg shadow-sm p-8">
+        <div className="max-w-lg w-full mx-auto text-center bg-white rounded-lg shadow-sm p-8">
           <h1 className="text-2xl font-bold text-gray-800 mb-8">此訂單已取消，請重新報名</h1>
           {/* 錯誤訊息 */}
           {resultData?.data?.resultMessage && (
@@ -145,7 +145,7 @@ export default function CheckoutResultPage() {
         </div>
       ) : (
         // 付款成功頁面
-        <div className="max-w-md w-full text-center py-24 md:py-32">
+        <div className="max-w-md w-full mx-auto text-center py-24 md:py-32">
           <div className="mb-8 md:mb-12">
             <div className="mx-auto w-32 h-32 md:w-40 md:h-40 bg-primary-500 rounded-full flex items-center justify-center">
               <ThumbsUp className="text-white w-16 h-16" />
@@ -163,7 +163,7 @@ export default function CheckoutResultPage() {
         </div>
       )}
       {/* 熱門活動 */}
-      <section className="pt-[116px] pb-[116px] md:pt-[120px] md:pb-[173px] px-4 md:px-8 bg-hot-activity">
+      <section className="pt-[116px] pb-[116px] md:pt-[200px] md:pb-[173px] px-4 md:px-8 bg-hot-activity">
         <div className="flex flex-col items-center">
           <div className="flex flex-col items-center mb-8 md:mb-[64px]">
             <div className="flex items-center gap-6 mb-6 font-serif-tc">
@@ -186,6 +186,6 @@ export default function CheckoutResultPage() {
           <HotEventsSection />
         </div>
       </section>
-    </div>
+    </main>
   );
 }

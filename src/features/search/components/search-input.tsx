@@ -3,7 +3,7 @@
 import { useIsMobile } from "@/hooks/useMediaQuery";
 import { useSearchStore } from "@/store/search";
 import { Search } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useRef } from "react";
 
 interface SearchInputProps {
@@ -19,7 +19,22 @@ export default function SearchInput({ className = "", showBorder = false }: Sear
   const toggleSearch = useSearchStore((s) => s.toggleSearch);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const params = new URLSearchParams(searchParams);
   const isMobile = useIsMobile();
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchValue(value);
+    const isEventsPage = pathname === "/events";
+
+    if (value.trim() === "" && isEventsPage) {
+      params.delete("search");
+      const newUrl = params.toString() ? `/events?${params.toString()}` : "/events";
+      router.replace(newUrl, { scroll: false });
+    }
+  };
 
   // 處理輸入框獲得焦點
   const handleFocus = () => {
@@ -35,6 +50,11 @@ export default function SearchInput({ className = "", showBorder = false }: Sear
       if (!isSearchOpen && inputRef.current) {
         inputRef.current.focus();
       }
+      if (searchValue.trim()) {
+        setIsSearchOpen(false);
+        params.set("search", searchValue.trim());
+        router.push(`/events?${params.toString()}`);
+      }
     }
   };
 
@@ -42,7 +62,8 @@ export default function SearchInput({ className = "", showBorder = false }: Sear
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && searchValue.trim()) {
       setIsSearchOpen(false);
-      router.push(`/events?search=${encodeURIComponent(searchValue.trim())}`);
+      params.set("search", searchValue.trim());
+      router.push(`/events?${params.toString()}`);
     }
   };
 
@@ -55,11 +76,11 @@ export default function SearchInput({ className = "", showBorder = false }: Sear
       <div className="w-full bg-white rounded-xl px-6 py-3 flex items-center gap-2">
         <input
           ref={inputRef}
-          type="text"
+          type="search"
           placeholder="輸入關鍵字搜尋..."
           className="flex-1 outline-none text-[#525252] text-sm"
           value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
+          onChange={handleInputChange}
           onFocus={handleFocus}
           onKeyDown={handleKeyDown}
         />

@@ -2,7 +2,7 @@ import { getApiV1Activities } from "@/services/api/client/sdk.gen";
 import type { ActivitiesResponse } from "@/services/api/client/types.gen";
 import { create } from "zustand";
 
-interface ActivitiesQueryParams {
+interface SearchActivitiesQueryParams {
   page: number;
   limit: number;
   categoryId?: number;
@@ -10,7 +10,7 @@ interface ActivitiesQueryParams {
   status?: string;
 }
 
-interface ActivitiesState {
+interface SearchActivitiesState {
   activities: ActivitiesResponse[];
   isLoading: boolean;
   error: Error | null;
@@ -18,12 +18,14 @@ interface ActivitiesState {
   hasMore: boolean;
   isFirstPageLoaded: boolean;
   isInfiniteScrollEnabled: boolean;
-  fetchOtherActivities: (page?: number, status?: string) => Promise<void>;
-  resetOtherActivities: () => void;
+  currentCategoryId?: number;
+  currentKeyword?: string;
+  fetchSearchActivities: (page?: number, categoryId?: number, keyword?: string) => Promise<void>;
+  resetSearchActivities: () => void;
   enableInfiniteScroll: () => void;
 }
 
-export const useActivitiesStore = create<ActivitiesState>((set, get) => ({
+export const useSearchActivitiesStore = create<SearchActivitiesState>((set, get) => ({
   activities: [],
   isLoading: false,
   error: null,
@@ -31,8 +33,10 @@ export const useActivitiesStore = create<ActivitiesState>((set, get) => ({
   hasMore: true,
   isFirstPageLoaded: false,
   isInfiniteScrollEnabled: false,
+  currentCategoryId: undefined,
+  currentKeyword: undefined,
 
-  fetchOtherActivities: async (page = 1, status?: string) => {
+  fetchSearchActivities: async (page = 1, categoryId?: number, keyword?: string) => {
     const currentState = get();
 
     // 如果正在載入中，不要重複載入
@@ -40,20 +44,42 @@ export const useActivitiesStore = create<ActivitiesState>((set, get) => ({
       return;
     }
 
-    // 如果是第一頁且已經載入過，則不重新載入
-    if (page === 1 && currentState.isFirstPageLoaded) {
-      return;
-    }
+    // 檢查是否為新的搜尋條件
+    const isNewSearch =
+      page === 1 &&
+      (categoryId !== currentState.currentCategoryId || keyword !== currentState.currentKeyword);
 
     try {
       set({ isLoading: true, error: null });
 
+      // 如果是新的搜尋條件，重置狀態
+      if (isNewSearch) {
+        set({
+          activities: [],
+          page: 1,
+          hasMore: true,
+          isFirstPageLoaded: false,
+          isInfiniteScrollEnabled: false,
+          currentCategoryId: categoryId,
+          currentKeyword: keyword,
+        });
+      }
+
       // 建構 API 查詢參數
-      const queryParams: ActivitiesQueryParams = {
+      const queryParams: SearchActivitiesQueryParams = {
         page,
         limit: 8,
         status: "published",
       };
+
+      // 如果有分類 ID，加入 categoryId 參數
+      if (categoryId) {
+        queryParams.categoryId = categoryId;
+      }
+
+      if (keyword) {
+        queryParams.keyword = keyword;
+      }
 
       const response = await getApiV1Activities({
         query: queryParams,
@@ -67,13 +93,15 @@ export const useActivitiesStore = create<ActivitiesState>((set, get) => ({
         hasMore: newActivities.length === 8,
         isLoading: false,
         isFirstPageLoaded: page === 1 ? true : state.isFirstPageLoaded,
+        currentCategoryId: categoryId,
+        currentKeyword: keyword,
       }));
     } catch (error) {
       set({ error: error as Error, isLoading: false });
     }
   },
 
-  resetOtherActivities: () => {
+  resetSearchActivities: () => {
     set({
       activities: [],
       page: 1,
@@ -81,6 +109,8 @@ export const useActivitiesStore = create<ActivitiesState>((set, get) => ({
       error: null,
       isFirstPageLoaded: false,
       isInfiniteScrollEnabled: false,
+      currentCategoryId: undefined,
+      currentKeyword: undefined,
     });
   },
 
