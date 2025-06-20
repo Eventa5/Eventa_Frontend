@@ -298,11 +298,25 @@ export default function EventDetailPage() {
               </div>
               <Separator />
               <div className="flex flex-col lg:flex-row items-start gap-3 pl-0 lg:pl-8">
-                <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg lg:text-base">
-                  <MapPin className="w-5 h-5" />
-                  活動地點
-                </span>
-                <span className="text-neutral-800">{eventLocation}</span>
+                {eventData?.isOnline && !eventLocation ? (
+                  <>
+                    <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg lg:text-base">
+                      <VideoIcon className="w-5 h-5" />
+                      線上活動
+                    </span>
+                    <span className="text-neutral-800">
+                      此活動為線上活動，購票後可於票券頁進入直播連結
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg lg:text-base">
+                      <MapPin className="w-5 h-5" />
+                      活動地點
+                    </span>
+                    <span className="text-neutral-800">{eventLocation}</span>
+                  </>
+                )}
               </div>
               <Separator />
               <div className="flex flex-col lg:flex-row items-start gap-3 pl-0 lg:pl-8">
@@ -404,7 +418,7 @@ export default function EventDetailPage() {
                   </span>
                   <span className="text-neutral-500 text-sm">
                     {eventData?.isOnline
-                      ? "本課程使用Zoom進行，報名後會於課前收到課程的Zoom連結，請留意您的Email信箱"
+                      ? "購票後可於票券頁進入直播連結"
                       : "實際入場相關規定以活動主辦方為主"}
                   </span>
                 </div>
