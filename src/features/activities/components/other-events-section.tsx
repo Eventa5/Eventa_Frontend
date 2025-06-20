@@ -1,14 +1,12 @@
 "use client";
 import { EventCard } from "@/components/ui/event-cards";
 import { formatEventDate } from "@/features/activities/formatEventDate";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useActivitiesStore } from "@/store/activities";
 import Image from "next/image";
 import { useCallback, useEffect, useRef } from "react";
-import { useInView } from "react-intersection-observer";
 
 export default function OtherEventsSection() {
-  const { ref, inView } = useInView();
-  const isLoadingSecondPage = useRef(false);
   const isMounted = useRef(false);
   const {
     activities,
@@ -23,6 +21,21 @@ export default function OtherEventsSection() {
     enableInfiniteScroll,
   } = useActivitiesStore();
 
+  // 包裝 fetchOtherActivities 為適合 hook 的格式
+  const fetchData = useCallback(
+    (pageNumber: number) => fetchOtherActivities(pageNumber),
+    [fetchOtherActivities]
+  );
+
+  const { ref, handleLoadMore } = useInfiniteScroll({
+    hasMore,
+    isLoading,
+    isInfiniteScrollEnabled,
+    page,
+    fetchData,
+    enableInfiniteScroll,
+  });
+
   // 只在組件首次掛載時載入第一頁
   useEffect(() => {
     if (!isMounted.current) {
@@ -34,33 +47,6 @@ export default function OtherEventsSection() {
       isMounted.current = false;
     };
   }, [fetchOtherActivities, resetOtherActivities]);
-
-  // 處理無限滾動
-  useEffect(() => {
-    if (
-      inView &&
-      hasMore &&
-      !isLoading &&
-      isInfiniteScrollEnabled &&
-      !isLoadingSecondPage.current
-    ) {
-      fetchOtherActivities(page + 1);
-    }
-  }, [inView, hasMore, isLoading, page, fetchOtherActivities, isInfiniteScrollEnabled]);
-
-  const handleLoadMore = useCallback(() => {
-    if (!isInfiniteScrollEnabled) {
-      isLoadingSecondPage.current = true;
-      // 立即載入第二頁
-      fetchOtherActivities(2).then(() => {
-        // 等待第二頁載入完成後，再啟用無限滾動
-        setTimeout(() => {
-          enableInfiniteScroll();
-          isLoadingSecondPage.current = false;
-        }, 100);
-      });
-    }
-  }, [fetchOtherActivities, isInfiniteScrollEnabled, enableInfiniteScroll]);
 
   if (isLoading && !isFirstPageLoaded) {
     return (
