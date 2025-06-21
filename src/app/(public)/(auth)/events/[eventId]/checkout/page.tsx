@@ -6,6 +6,7 @@ import CancelOrderDialog from "@/features/orders/components/cancel-order-dialog"
 import {
   getApiV1ActivitiesByActivityId,
   getApiV1ActivitiesByActivityIdTicketTypes,
+  getApiV1OrdersByOrderId,
   patchApiV1OrdersByOrderIdCancel,
   postApiV1Orders,
   postApiV1OrdersByOrderIdCheckout,
@@ -13,6 +14,7 @@ import {
 import type {
   ActivityResponse,
   CreateOrderResponse,
+  OrderDetailResponse,
   TicketTypeResponse,
 } from "@/services/api/client/types.gen";
 import { useAuthStore } from "@/store/auth";
@@ -22,7 +24,7 @@ import { Loader } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 // 定義票券資料類型
@@ -44,7 +46,9 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [orderCreated, setOrderCreated] = useState(false);
-  const [orderData, setOrderData] = useState<CreateOrderResponse | null>(null);
+  const [orderData, setOrderData] = useState<CreateOrderResponse | OrderDetailResponse | null>(
+    null
+  );
   const [showCancelOrderDialog, setShowCancelOrderDialog] = useState(false);
 
   const totalQuantity = Object.values(ticketStates).reduce((sum, state) => sum + state.quantity, 0);
@@ -81,10 +85,30 @@ export default function CheckoutPage() {
   };
   useEffect(() => {
     if (!eventId) return;
-    if (orderId) setOrderCreated(true);
+
+    // 如果有 orderId 參數，表示要查看現有訂單
+    if (orderId) {
+      setOrderCreated(true);
+      // 取得訂單資料
+      getApiV1OrdersByOrderId({
+        path: { orderId: orderId },
+      })
+        .then((res) => {
+          setOrderData(res?.data?.data ?? null);
+        })
+        .catch((error) => {
+          console.error("取得訂單資料失敗:", error);
+          toast.error("取得訂單資料失敗");
+        });
+    } else {
+      // 沒有 orderId，表示是從購票區塊跳過來的，維持原本流程
+      setOrderCreated(false);
+      setOrderData(null);
+    }
+
     fetchEventDetails();
     fetchTicketTypes();
-  }, [eventId]);
+  }, [eventId, orderId]);
 
   const fetchEventDetails = () => {
     setLoading(true);
@@ -105,6 +129,70 @@ export default function CheckoutPage() {
       .then((res) => setTicketTypes(res.data?.data ?? []))
       .catch(() => setTicketTypes([]));
   };
+
+  // 取得訂單項目資料
+  const orderItems = useMemo(() => {
+    if (!orderData) return [];
+
+    // 如果是 CreateOrderResponse 格式
+    if ("orderItems" in orderData) {
+      return orderData.orderItems || [];
+    }
+
+    // 如果是 OrderDetailResponse 格式，將 tickets 轉換為 orderItems 格式
+    if ("tickets" in orderData && orderData.tickets) {
+      // 將 tickets 按 ticketType 分組並計算數量
+      const ticketGroups = orderData.tickets.reduce(
+        (groups, ticket) => {
+          const ticketTypeId = ticket.ticketType?.id?.toString() || "";
+          if (!groups[ticketTypeId]) {
+            groups[ticketTypeId] = {
+              ticketType: ticket.ticketType,
+              quantity: 0,
+            };
+          }
+          groups[ticketTypeId].quantity += 1;
+          return groups;
+        },
+        {} as Record<string, { ticketType: any; quantity: number }>
+      );
+
+      // 轉換為 orderItems 格式
+      return Object.values(ticketGroups);
+    }
+
+    return [];
+  }, [orderData]);
+
+  // 取得付款金額
+  const paidAmount = useMemo(() => {
+    if (!orderData) return 0;
+
+    // 如果是 CreateOrderResponse 格式
+    if ("payment" in orderData && orderData.payment?.paidAmount) {
+      return orderData.payment.paidAmount;
+    }
+
+    // 如果是 OrderDetailResponse 格式
+    if ("payment" in orderData && orderData.payment?.paidAmount) {
+      return orderData.payment.paidAmount;
+    }
+
+    return 0;
+  }, [orderData]);
+
+  // 取得付款過期時間
+  const paidExpiredAt = useMemo(() => {
+    if (!orderData) return null;
+
+    // 確保 paidExpiredAt 是字串型別
+    if (typeof orderData.paidExpiredAt === "string") {
+      return orderData.paidExpiredAt;
+    }
+
+    return null;
+  }, [orderData]);
+
   if (!isAuthenticated) return null;
 
   return loading ? (
@@ -202,9 +290,9 @@ export default function CheckoutPage() {
             <div className="mt-6">
               {/* 手機版 - 垂直卡片顯示 */}
               <div className="md:hidden space-y-4">
-                {orderData?.orderItems?.map((ticket) => (
+                {orderItems.map((ticket, index) => (
                   <div
-                    key={`${ticket.ticketType?.name}-${ticket.ticketType?.price}-${ticket.quantity}`}
+                    key={`${ticket.ticketType?.name}-${ticket.ticketType?.price}-${ticket.quantity}-${index}`}
                     className="bg-white border border-gray-200 rounded-lg p-4 space-y-3"
                   >
                     <div className="font-bold text-left">
@@ -212,13 +300,21 @@ export default function CheckoutPage() {
                       <div className="text-xs text-neutral-400 font-normal mt-1">
                         票券可用時間
                         <br />
-                        {format(ticket.ticketType?.startTime ?? "", "yyyy.MM.dd (EEE) HH:mm", {
-                          locale: zhTW,
-                        }).replace("週", "")}
+                        {ticket.ticketType?.startTime
+                          ? format(
+                              new Date(ticket.ticketType.startTime),
+                              "yyyy.MM.dd (EEE) HH:mm",
+                              {
+                                locale: zhTW,
+                              }
+                            ).replace("週", "")
+                          : "--"}
                         -
-                        {format(ticket.ticketType?.endTime ?? "", "MM.dd (EEE) HH:mm", {
-                          locale: zhTW,
-                        }).replace("週", "")}
+                        {ticket.ticketType?.endTime
+                          ? format(new Date(ticket.ticketType.endTime), "MM.dd (EEE) HH:mm", {
+                              locale: zhTW,
+                            }).replace("週", "")
+                          : "--"}
                         (GMT+8)
                       </div>
                     </div>
@@ -255,9 +351,9 @@ export default function CheckoutPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {orderData?.orderItems?.map((ticket) => (
+                    {orderItems.map((ticket, index) => (
                       <tr
-                        key={`${ticket.ticketType?.name}-${ticket.ticketType?.price}-${ticket.quantity}`}
+                        key={`${ticket.ticketType?.name}-${ticket.ticketType?.price}-${ticket.quantity}-${index}`}
                         className="border-t border-gray-200"
                       >
                         <td className="py-4 font-bold text-left pl-6">
@@ -265,13 +361,21 @@ export default function CheckoutPage() {
                           <div className="text-xs text-neutral-400 font-normal mt-1">
                             票券可用時間
                             <br />
-                            {format(ticket.ticketType?.startTime ?? "", "yyyy.MM.dd (EEE) HH:mm", {
-                              locale: zhTW,
-                            }).replace("週", "")}
+                            {ticket.ticketType?.startTime
+                              ? format(
+                                  new Date(ticket.ticketType.startTime),
+                                  "yyyy.MM.dd (EEE) HH:mm",
+                                  {
+                                    locale: zhTW,
+                                  }
+                                ).replace("週", "")
+                              : "--"}
                             -
-                            {format(ticket.ticketType?.endTime ?? "", "MM.dd (EEE) HH:mm", {
-                              locale: zhTW,
-                            }).replace("週", "")}
+                            {ticket.ticketType?.endTime
+                              ? format(new Date(ticket.ticketType.endTime), "MM.dd (EEE) HH:mm", {
+                                  locale: zhTW,
+                                }).replace("週", "")
+                              : "--"}
                             (GMT+8)
                           </div>
                         </td>
@@ -291,13 +395,13 @@ export default function CheckoutPage() {
               <div className="flex items-end">
                 <span className="font-bold text-lg tracking-wide mr-4">付款金額</span>
                 <span className="font-bold text-lg tracking-wide">
-                  NT$ {orderData?.payment?.paidAmount?.toLocaleString()}
+                  NT$ {paidAmount.toLocaleString()}
                 </span>
               </div>
-              {totalPrice > 0 && !!orderData?.paidExpiredAt && (
+              {paidAmount > 0 && paidExpiredAt && (
                 <div className="text-sm text-neutral-700 mt-1">
                   付款期限：
-                  {format(new Date(orderData?.paidExpiredAt as string), "yyyy.MM.dd  HH:mm")}
+                  {format(new Date(paidExpiredAt as string), "yyyy.MM.dd  HH:mm")}
                 </div>
               )}
             </div>
@@ -323,7 +427,7 @@ export default function CheckoutPage() {
                 }}
                 orderId={orderData?.id ?? ""}
               />
-              {totalPrice > 0 ? (
+              {paidAmount > 0 ? (
                 <Button
                   className="w-full md:flex-1 font-semibold bg-neutral-700 text-white hover:bg-neutral-800"
                   onClick={() => {
