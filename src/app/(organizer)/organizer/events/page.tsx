@@ -522,7 +522,7 @@ export default function EventsPage() {
     else if (currentStatus === ActivityStatus.CANCELED) counts.canceled = currentStatusTotal;
 
     return counts;
-  }, [pagination.totalItems]);
+  }, [pagination.totalItems, activeFilters.status]);
 
   // 清除篩選
   const handleClearFilters = () => {
@@ -632,6 +632,7 @@ export default function EventsPage() {
           value={activeFilters.status}
           onValueChange={handleStatusFilterChange}
           counts={eventCounts}
+          loading={loading}
         />
 
         {/* 活動列表 */}

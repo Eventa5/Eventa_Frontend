@@ -35,8 +35,7 @@ export default function BasicInfoPage() {
   const { showError } = useDialogStore();
 
   // 從 organizer store 獲取主辦單位資訊
-  const { getCurrentOrganizerInfo } = useOrganizerStore();
-  const currentOrganizerInfo = getCurrentOrganizerInfo();
+  const currentOrganizerInfo = useOrganizerStore((s) => s.currentOrganizerInfo);
 
   // 本地狀態
   const [isUpdating, setIsUpdating] = useState(false);

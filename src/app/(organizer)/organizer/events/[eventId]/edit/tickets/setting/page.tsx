@@ -808,10 +808,14 @@ export default function TicketSettingPage() {
             isActive: true,
           }));
 
-          await postApiV1ActivitiesByActivityIdTicketTypes({
+          const addTickResponse = await postApiV1ActivitiesByActivityIdTicketTypes({
             path: { activityId: numericEventId },
             body: ticketData,
           });
+
+          if (addTickResponse.error) {
+            throw new Error(addTickResponse.error.message || "新增票券失敗，請稍後再試");
+          }
         }
 
         // 3. 處理更新現有票券
@@ -822,35 +826,38 @@ export default function TicketSettingPage() {
         for (const ticket of existingTickets) {
           const ticketId = Number.parseInt(ticket.id);
           if (!Number.isNaN(ticketId)) {
-            const ticketResponse = await putApiV1ActivitiesByActivityIdTicketTypesByTicketTypeId({
-              path: {
-                activityId: numericEventId,
-                ticketTypeId: ticketId,
-              },
-              body: {
-                name: ticket.name,
-                price: ticket.price,
-                totalQuantity: ticket.quantity,
-                remainingQuantity: ticket.quantity,
-                startTime: combineDateTime(
-                  ticket.saleStartDate,
-                  ticket.saleStartHour,
-                  ticket.saleStartMinute
-                ),
-                endTime: combineDateTime(
-                  ticket.saleEndDate,
-                  ticket.saleEndHour,
-                  ticket.saleEndMinute
-                ),
-                isActive: true,
-              },
-            });
+            const updateTicketResponse =
+              await putApiV1ActivitiesByActivityIdTicketTypesByTicketTypeId({
+                path: {
+                  activityId: numericEventId,
+                  ticketTypeId: ticketId,
+                },
+                body: {
+                  name: ticket.name,
+                  price: ticket.price,
+                  totalQuantity: ticket.quantity,
+                  remainingQuantity: ticket.quantity,
+                  startTime: combineDateTime(
+                    ticket.saleStartDate,
+                    ticket.saleStartHour,
+                    ticket.saleStartMinute
+                  ),
+                  endTime: combineDateTime(
+                    ticket.saleEndDate,
+                    ticket.saleEndHour,
+                    ticket.saleEndMinute
+                  ),
+                  isActive: true,
+                },
+              });
 
-            if (ticketResponse.error) {
-              throw new Error(ticketResponse.error.message || "更新票券失敗，請稍後再試");
+            if (updateTicketResponse.error) {
+              throw new Error(updateTicketResponse.error.message || "更新票券失敗，請稍後再試");
             }
           }
         }
+
+        await loadTickets();
 
         toast.success("活動票券設定已成功更新");
       } catch (error) {

@@ -161,7 +161,7 @@ export default function IntroPage() {
   }
 
   return (
-    <div className="p-6">
+    <div>
       <h1 className="text-2xl font-bold mb-6">
         詳細介紹你的活動內容，讓參加者了解活動且提高參加意願！
       </h1>

@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Camera, Image, Plus, RefreshCw, Upload, X } from "lucide-react";
+import { Camera, Image, RefreshCw, Upload, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -12,16 +12,15 @@ import {
   postApiV1Organizations,
   postApiV1OrganizationsByOrganizationIdImages,
 } from "@/services/api/client/sdk.gen";
-import { useDialogStore } from "@/store/dialog";
 import { useOrganizerStore } from "@/store/organizer";
 import { useErrorHandler } from "@/utils/error-handler";
 import { cn } from "@/utils/transformer";
 
 export default function CreateOrganizerPage() {
   const router = useRouter();
-  const { showError } = useDialogStore();
   const { handleError } = useErrorHandler();
-  const { setCurrentOrganizer } = useOrganizerStore();
+  const setCurrentOrganizerId = useOrganizerStore((state) => state.setCurrentOrganizerId);
+  const fetchCurrentOrganizerInfo = useOrganizerStore((state) => state.fetchCurrentOrganizerInfo);
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null);
@@ -133,7 +132,8 @@ export default function CreateOrganizerPage() {
         }
 
         // 設定為當前主辦單位
-        setCurrentOrganizer(organizationId, data.organizerName);
+        setCurrentOrganizerId(organizationId);
+        await fetchCurrentOrganizerInfo();
 
         // 導航回主辦者中心
         router.push("/organizer");
