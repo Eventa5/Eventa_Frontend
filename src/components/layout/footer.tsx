@@ -41,15 +41,15 @@ const exploreLinks: FooterLink[] = [
   //   href: "/events?categoryId=ai-recommended",
   //   label: "AI 為您推薦",
   // },
-  { id: "faq", href: "/faq", label: "常見問題" },
+  { id: "faq", href: "#", label: "常見問題" },
 ];
 
 // 舉辦活動連結
 const hostLinks: FooterLink[] = [
-  { id: "register", href: "/host/register", label: "成為活動主辦人" },
-  { id: "online", href: "/host/guidelines/online", label: "線上活動規範" },
-  { id: "offline", href: "/host/guidelines/offline", label: "線下活動規範" },
-  { id: "hostfaq", href: "/host/faq", label: "常見問題" },
+  { id: "register", href: "#", label: "成為活動主辦人" },
+  { id: "online", href: "#", label: "線上活動規範" },
+  { id: "offline", href: "#", label: "線下活動規範" },
+  { id: "hostfaq", href: "#", label: "常見問題" },
 ];
 
 // 社交媒體圖示元件

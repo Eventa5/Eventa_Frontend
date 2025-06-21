@@ -12,6 +12,7 @@ import {
 } from "@/services/api/client/sdk.gen";
 import type { ActivitiesResponse, PaginationResponse } from "@/services/api/client/types.gen";
 import { useOrganizerStore } from "@/store/organizer";
+import { ActivityStatus } from "@/types/common";
 import { useErrorHandler } from "@/utils/error-handler";
 import {
   Airplay,
@@ -24,14 +25,6 @@ import {
   Search,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-
-// 活動狀態枚舉
-enum ActivityStatus {
-  DRAFT = "draft",
-  PUBLISHED = "published",
-  ENDED = "ended",
-  CANCELED = "canceled",
-}
 
 // 活動狀態統計介面
 interface EventStatusCounts {

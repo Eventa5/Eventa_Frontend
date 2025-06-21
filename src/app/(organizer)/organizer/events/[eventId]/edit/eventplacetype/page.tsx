@@ -13,6 +13,7 @@ import {
   patchApiV1ActivitiesByActivityIdType,
 } from "@/services/api/client/sdk.gen";
 import { useDialogStore } from "@/store/dialog";
+import { ActivityStatus } from "@/types/common";
 import { useErrorHandler } from "@/utils/error-handler";
 import { Camera, ExternalLink, UserCheck } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -91,6 +92,14 @@ export default function EventPlaceTypePage() {
 
   // 處理表單提交
   const handleSubmit = async () => {
+    if (
+      activityData?.status === ActivityStatus.ENDED ||
+      activityData?.status === ActivityStatus.CANCELED
+    ) {
+      showError("無法編輯已結束或已取消的活動");
+      return;
+    }
+
     const numericEventId = Number.parseInt(eventId);
     if (Number.isNaN(numericEventId)) {
       showError("無效的活動 ID");
@@ -242,7 +251,12 @@ export default function EventPlaceTypePage() {
         <div className="flex justify-center mt-8 border-t border-gray-200 pt-8">
           <Button
             onClick={handleSubmit}
-            disabled={!canProceed || isUpdating}
+            disabled={
+              !canProceed ||
+              isUpdating ||
+              activityData?.status === ActivityStatus.ENDED ||
+              activityData?.status === ActivityStatus.CANCELED
+            }
             className={`${
               canProceed && !isUpdating
                 ? "bg-[#FFD56B] hover:bg-[#FFCA28] cursor-pointer"
