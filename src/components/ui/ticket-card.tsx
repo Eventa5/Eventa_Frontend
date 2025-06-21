@@ -69,30 +69,31 @@ export function TicketCard({
         </div>
         <Collapse className="text-sm mt-6">
           <div className="space-y-4 pt-2">
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <p className="text-sm font-medium">售票時間</p>
               <p className="text-sm text-muted-foreground">
                 {saleStartAt
                   ? format(saleStartAt, "yyyy.MM.dd (EEE) HH:mm", {
                       locale: zhTW,
                     })
-                  : "--"}{" "}
-                -{" "}
+                  : "--"}
+                -
                 {saleEndAt
                   ? format(saleEndAt, "MM.dd (EEE) HH:mm", {
                       locale: zhTW,
                     })
                   : "--"}
               </p>
-            </div>
+            </div> */}
             <div className="space-y-2">
-              <p className="text-sm font-medium">票券可使用時間</p>
+              {/*  目前已 starTime endTime表示 售票時間 (原為 票券可使用時間) */}
+              <p className="text-sm font-medium">售票時間</p>
               <p className="text-sm text-muted-foreground">
                 {startTime
                   ? format(startTime, "yyyy.MM.dd (EEE) HH:mm", {
                       locale: zhTW,
                     })
-                  : "--"}{" "}
+                  : "--"}
                 - {endTime ? format(endTime, "MM.dd (EEE) HH:mm", { locale: zhTW }) : "--"}
               </p>
             </div>
