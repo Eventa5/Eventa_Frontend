@@ -129,9 +129,15 @@ export default function EventPlaceTypePage() {
         }
       }
     } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : eventId === "new"
+            ? "建立活動失敗，請稍後再試"
+            : "更新活動失敗，請稍後再試";
+
       handleError(error, {
-        customErrorMessage:
-          eventId === "new" ? "建立活動失敗，請稍後再試" : "更新活動失敗，請稍後再試",
+        customErrorMessage: errorMessage,
       });
     } finally {
       setIsCreating(false);
