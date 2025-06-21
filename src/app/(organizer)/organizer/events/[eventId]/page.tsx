@@ -22,12 +22,12 @@ import type {
   GetCheckedInResponse,
   GetIncomeResponse,
 } from "@/services/api/client/types.gen";
+import { ActivityStatus } from "@/types/common";
 import { useErrorHandler } from "@/utils/error-handler";
 import { BarChart3, Calendar, Edit3, Eye, TrendingUp, Upload } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ActivityStatus } from "../page";
 
 interface EventStats {
   views: number;

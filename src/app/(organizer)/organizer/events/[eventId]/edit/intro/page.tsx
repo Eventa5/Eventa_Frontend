@@ -8,6 +8,7 @@ import {
   patchApiV1ActivitiesByActivityIdContent,
 } from "@/services/api/client/sdk.gen";
 import { useDialogStore } from "@/store/dialog";
+import { ActivityStatus } from "@/types/common";
 import { useErrorHandler } from "@/utils/error-handler";
 import { zodResolver } from "@hookform/resolvers/zod";
 import dynamic from "next/dynamic";
@@ -15,7 +16,6 @@ import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { ActivityStatus } from "../../../page";
 
 // 動態導入 QuillEditor，確保只在客戶端渲染
 const QuillEditor = dynamic(() => import("@/components/ui/quill-editor"), {

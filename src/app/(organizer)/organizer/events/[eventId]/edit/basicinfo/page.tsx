@@ -12,6 +12,7 @@ import {
 } from "@/services/api/client/sdk.gen";
 import { useDialogStore } from "@/store/dialog";
 import { useOrganizerStore } from "@/store/organizer";
+import { ActivityStatus } from "@/types/common";
 import { combineDateTime, parseDateTime } from "@/utils/date";
 import { useErrorHandler } from "@/utils/error-handler";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,7 +22,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type React from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
-import { ActivityStatus } from "../../../page";
 
 // 固定選項
 const TIMEZONE_OPTIONS = [{ value: "(GMT+08:00) 台北", label: "(GMT+08:00) 台北" }];

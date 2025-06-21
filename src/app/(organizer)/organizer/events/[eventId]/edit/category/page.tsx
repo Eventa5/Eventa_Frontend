@@ -7,12 +7,12 @@ import {
   patchApiV1ActivitiesByActivityIdCategories,
 } from "@/services/api/client/sdk.gen";
 import { useDialogStore } from "@/store/dialog";
+import { ActivityStatus } from "@/types/common";
 import { useErrorHandler } from "@/utils/error-handler";
 import { Info } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ActivityStatus } from "../../../page";
 
 // 主題圖標組件
 const CategoryIcon = ({

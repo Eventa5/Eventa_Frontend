@@ -13,12 +13,12 @@ import {
   patchApiV1ActivitiesByActivityIdType,
 } from "@/services/api/client/sdk.gen";
 import { useDialogStore } from "@/store/dialog";
+import { ActivityStatus } from "@/types/common";
 import { useErrorHandler } from "@/utils/error-handler";
 import { Camera, ExternalLink, UserCheck } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ActivityStatus } from "../../../page";
 
 export default function EventPlaceTypePage() {
   const router = useRouter();

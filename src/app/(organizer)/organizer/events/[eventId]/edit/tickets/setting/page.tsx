@@ -15,6 +15,7 @@ import {
 } from "@/services/api/client/sdk.gen";
 import type { TicketTypeResponse } from "@/services/api/client/types.gen";
 import { useDialogStore } from "@/store/dialog";
+import { ActivityStatus } from "@/types/common";
 import { combineDateTime, parseDateTime } from "@/utils/date";
 import { useErrorHandler } from "@/utils/error-handler";
 import { cn } from "@/utils/transformer";
@@ -40,7 +41,6 @@ import {
   useWatch,
 } from "react-hook-form";
 import { toast } from "sonner";
-import { ActivityStatus } from "../../../../page";
 
 // 票券操作選單組件
 const TicketActionsMenu = memo(
