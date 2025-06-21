@@ -814,7 +814,6 @@ export default function TicketSettingPage() {
               ticket.saleStartMinute
             ),
             endTime: combineDateTime(ticket.saleEndDate, ticket.saleEndHour, ticket.saleEndMinute),
-            isActive: true,
           }));
 
           const addTickResponse = await postApiV1ActivitiesByActivityIdTicketTypes({
@@ -856,7 +855,6 @@ export default function TicketSettingPage() {
                     ticket.saleEndHour,
                     ticket.saleEndMinute
                   ),
-                  isActive: true,
                 },
               });
 
