@@ -15,6 +15,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { ActivityStatus } from "../../../page";
 
 // 動態導入 QuillEditor，確保只在客戶端渲染
 const QuillEditor = dynamic(() => import("@/components/ui/quill-editor"), {
@@ -113,6 +114,14 @@ export default function IntroPage() {
   // 處理表單提交
   const onSubmit = useCallback(
     async (data: IntroFormData) => {
+      if (
+        activityData?.status === ActivityStatus.ENDED ||
+        activityData?.status === ActivityStatus.CANCELED
+      ) {
+        showError("無法編輯已結束或已取消的活動");
+        return;
+      }
+
       const numericEventId = Number.parseInt(eventId);
       if (Number.isNaN(numericEventId)) {
         showError("無效的活動 ID");
@@ -245,7 +254,12 @@ export default function IntroPage() {
         <div className="flex justify-center pt-4">
           <Button
             type="submit"
-            disabled={!isValid || isUpdating}
+            disabled={
+              !isValid ||
+              isUpdating ||
+              activityData?.status === ActivityStatus.ENDED ||
+              activityData?.status === ActivityStatus.CANCELED
+            }
             className={`${
               isValid && !isUpdating
                 ? "bg-[#FFD56B] hover:bg-[#FFCA28] cursor-pointer"

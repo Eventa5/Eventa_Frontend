@@ -40,6 +40,7 @@ import {
   useWatch,
 } from "react-hook-form";
 import { toast } from "sonner";
+import { ActivityStatus } from "../../../../page";
 
 // 票券操作選單組件
 const TicketActionsMenu = memo(
@@ -756,6 +757,14 @@ export default function TicketSettingPage() {
 
   const onSubmit = useCallback(
     async (data: TicketSettingFormData) => {
+      if (
+        activityData?.status === ActivityStatus.ENDED ||
+        activityData?.status === ActivityStatus.CANCELED
+      ) {
+        showError("無法編輯已結束或已取消的活動");
+        return;
+      }
+
       const numericEventId = Number.parseInt(eventId);
       if (Number.isNaN(numericEventId) || !activityData) {
         showError("缺少必要資料，請確認活動信息是否完整");
@@ -1090,7 +1099,12 @@ export default function TicketSettingPage() {
         <div className="flex justify-center border-t border-gray-200 pt-6">
           <Button
             type="submit"
-            disabled={!isValid || isSubmitting}
+            disabled={
+              !isValid ||
+              isSubmitting ||
+              activityData?.status === ActivityStatus.ENDED ||
+              activityData?.status === ActivityStatus.CANCELED
+            }
             className={`${
               isValid && !isSubmitting
                 ? "bg-[#FFD56B] hover:bg-[#FFCA28] cursor-pointer"

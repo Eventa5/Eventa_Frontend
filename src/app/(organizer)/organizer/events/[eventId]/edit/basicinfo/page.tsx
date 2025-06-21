@@ -21,6 +21,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type React from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
+import { ActivityStatus } from "../../../page";
 
 // 固定選項
 const TIMEZONE_OPTIONS = [{ value: "(GMT+08:00) 台北", label: "(GMT+08:00) 台北" }];
@@ -171,6 +172,14 @@ export default function BasicInfoPage() {
   const onSubmit = useCallback(
     async (data: BasicInfoFormData) => {
       const numericEventId = Number.parseInt(eventId);
+      if (
+        activityData?.status === ActivityStatus.ENDED ||
+        activityData?.status === ActivityStatus.CANCELED
+      ) {
+        showError("無法編輯已結束或已取消的活動");
+        return;
+      }
+
       if (Number.isNaN(numericEventId)) {
         showError("無效的活動 ID");
         return;
@@ -488,7 +497,12 @@ export default function BasicInfoPage() {
         <div className="flex justify-center border-t border-gray-200 pt-6">
           <Button
             type="submit"
-            disabled={!isValid || isUpdating}
+            disabled={
+              !isValid ||
+              isUpdating ||
+              activityData?.status === ActivityStatus.ENDED ||
+              activityData?.status === ActivityStatus.CANCELED
+            }
             className={`${
               isValid && !isUpdating
                 ? "bg-[#FFD56B] hover:bg-[#FFCA28] cursor-pointer"

@@ -26,7 +26,7 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 // 活動狀態枚舉
-enum ActivityStatus {
+export enum ActivityStatus {
   DRAFT = "draft",
   PUBLISHED = "published",
   ENDED = "ended",

@@ -27,6 +27,7 @@ import { BarChart3, Calendar, Edit3, Eye, TrendingUp, Upload } from "lucide-reac
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { ActivityStatus } from "../page";
 
 interface EventStats {
   views: number;
@@ -186,6 +187,13 @@ export default function EventDetailPage() {
   // 處理封面圖片上傳
   const handleCoverUpload = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (
+        activityData?.status === ActivityStatus.ENDED ||
+        activityData?.status === ActivityStatus.CANCELED
+      ) {
+        return;
+      }
+
       const file = e.target.files?.[0];
       if (!file) return;
 
@@ -235,8 +243,18 @@ export default function EventDetailPage() {
       }
     },
     [eventId, handleError, loadActivityData]
-  ); // 觸發檔案選擇
+  );
+
+  // 觸發檔案選擇
   const handleCoverClick = () => {
+    if (
+      activityData?.status === ActivityStatus.ENDED ||
+      activityData?.status === ActivityStatus.CANCELED
+    ) {
+      toast.error("無法編輯已結束或已取消的活動");
+      return;
+    }
+
     fileInputRef.current?.click();
   };
 
