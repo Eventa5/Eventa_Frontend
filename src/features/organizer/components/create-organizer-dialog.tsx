@@ -30,7 +30,7 @@ interface CreateOrganizerDialogProps {
 
 export function CreateOrganizerDialog({ onSuccess, children }: CreateOrganizerDialogProps) {
   const { handleError } = useErrorHandler();
-  const { setCurrentOrganizer } = useOrganizerStore();
+  const { setCurrentOrganizerId, fetchCurrentOrganizerInfo } = useOrganizerStore();
 
   const [open, setOpen] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -143,7 +143,8 @@ export function CreateOrganizerDialog({ onSuccess, children }: CreateOrganizerDi
         }
 
         // 設定為當前主辦單位
-        setCurrentOrganizer(organizationId, data.organizerName);
+        setCurrentOrganizerId(organizationId);
+        await fetchCurrentOrganizerInfo();
 
         onSuccess?.();
 

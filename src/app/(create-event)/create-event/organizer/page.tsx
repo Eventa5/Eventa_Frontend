@@ -4,6 +4,7 @@ import CreateOrganizerDialog from "@/features/organizer/components/create-organi
 import { getApiV1Organizations } from "@/services/api/client/sdk.gen";
 import type { OrganizationResponse } from "@/services/api/client/types.gen";
 import { useCreateEventStore } from "@/store/create-event";
+import { useOrganizerStore } from "@/store/organizer";
 import { useErrorHandler } from "@/utils/error-handler";
 import { cn } from "@/utils/transformer";
 import { Building } from "lucide-react";
@@ -20,8 +21,13 @@ export default function CreateEventOrganizerPage() {
   // 錯誤處理
   const { handleError } = useErrorHandler();
 
-  const { organizationInfo, hasUnfinishedEvent, setOrganizationInfo, clearAllData } =
-    useCreateEventStore();
+  const organizationInfo = useCreateEventStore((state) => state.organizationInfo);
+  const hasUnfinishedEvent = useCreateEventStore((state) => state.hasUnfinishedEvent);
+  const setOrganizationInfo = useCreateEventStore((state) => state.setOrganizationInfo);
+  const clearAllData = useCreateEventStore((state) => state.clearAllData);
+
+  const setCurrentOrganizerId = useOrganizerStore((state) => state.setCurrentOrganizerId);
+  const fetchCurrentOrganizerInfo = useOrganizerStore((state) => state.fetchCurrentOrganizerInfo);
 
   // 載入主辦單位列表
   const loadOrganizations = useCallback(async () => {
@@ -64,13 +70,16 @@ export default function CreateEventOrganizerPage() {
   };
 
   // 處理選擇按鈕點擊 - 只儲存主辦單位資訊，不建立活動
-  const handleSelect = () => {
+  const handleSelect = async () => {
     if (selected && selectedOrgName) {
       // 儲存主辦單位資訊到 store
       setOrganizationInfo({
         organizationId: selected,
         organizationName: selectedOrgName,
       });
+
+      setCurrentOrganizerId(selected);
+      await fetchCurrentOrganizerInfo();
 
       // 導航到活動形式選擇頁面
       router.push("/create-event/new/eventplacetype");

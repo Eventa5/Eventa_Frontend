@@ -294,7 +294,7 @@ export default function EventDetailPage() {
   if (isLoading) {
     return (
       <div className="flex flex-col h-full items-center justify-center">
-        <div className="text-lg text-gray-600">載入總攬資料中...</div>
+        <div className="text-lg text-gray-600">載入總覽資料中...</div>
       </div>
     );
   }

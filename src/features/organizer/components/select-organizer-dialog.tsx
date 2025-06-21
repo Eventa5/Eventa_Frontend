@@ -50,7 +50,8 @@ function ConfirmDeleteDialog({
         <div className="py-4">
           <p className="text-gray-600 mb-4">
             確定要刪除主辦單位「
-            <span className="font-medium text-gray-800">{organizationName}</span>」嗎？
+            <span className="font-medium text-gray-800">{organizationName}</span>
+            」嗎？
           </p>
         </div>
 
@@ -80,7 +81,6 @@ function ConfirmDeleteDialog({
 export function SelectOrganizerDialog({ children, onSuccess }: SelectOrganizerDialogProps) {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
-  const [selectedOrgName, setSelectedOrgName] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [organizations, setOrganizations] = useState<OrganizationResponse[]>([]);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -94,7 +94,9 @@ export function SelectOrganizerDialog({ children, onSuccess }: SelectOrganizerDi
   const { handleError } = useErrorHandler();
 
   // organizer store
-  const { setCurrentOrganizer, getCurrentOrganizerId } = useOrganizerStore();
+  const currentId = useOrganizerStore((s) => s.currentId);
+  const setCurrentOrganizerId = useOrganizerStore((s) => s.setCurrentOrganizerId);
+  const fetchCurrentOrganizerInfo = useOrganizerStore((s) => s.fetchCurrentOrganizerInfo);
 
   // 載入主辦單位列表
   const loadOrganizations = useCallback(async () => {
@@ -125,36 +127,29 @@ export function SelectOrganizerDialog({ children, onSuccess }: SelectOrganizerDi
   // 當組織列表載入完成後，設定當前選中的主辦單位
   useEffect(() => {
     if (open && organizations.length > 0) {
-      const currentId = getCurrentOrganizerId();
       if (currentId) {
         setSelected(currentId);
-        // 找到對應的組織名稱
-        const currentOrg = organizations.find((org) => org.id === currentId);
-        if (currentOrg?.name) {
-          setSelectedOrgName(currentOrg.name);
-        }
       }
     }
-  }, [open, organizations, getCurrentOrganizerId]);
+  }, [open, organizations, currentId]);
 
   // 選擇主辦單位
-  const handleSelectOrganizer = (id: number, name: string) => {
+  const handleSelectOrganizer = (id: number) => {
     setSelected(id);
-    setSelectedOrgName(name);
   };
 
   // 處理選擇按鈕點擊
-  const handleSelect = () => {
-    if (selected && selectedOrgName) {
+  const handleSelect = async () => {
+    if (selected) {
       // 儲存主辦單位資訊到 organizer store
-      setCurrentOrganizer(selected, selectedOrgName);
+      setCurrentOrganizerId(selected);
+      await fetchCurrentOrganizerInfo();
 
       // 關閉彈窗
       setOpen(false);
 
       // 重置狀態
       setSelected(null);
-      setSelectedOrgName("");
 
       // 呼叫成功回調
       onSuccess?.();
@@ -196,7 +191,6 @@ export function SelectOrganizerDialog({ children, onSuccess }: SelectOrganizerDi
       // 如果刪除的是當前選中的組織，清除選中狀態
       if (selected === organizationToDelete.id) {
         setSelected(null);
-        setSelectedOrgName("");
       }
 
       // 關閉確認彈窗
@@ -220,11 +214,8 @@ export function SelectOrganizerDialog({ children, onSuccess }: SelectOrganizerDi
     if (!newOpen) {
       // 關閉彈窗時重置狀態
       setSelected(null);
-      setSelectedOrgName("");
     }
   };
-
-  const currentOrganizerId = getCurrentOrganizerId();
 
   return (
     <>
@@ -282,7 +273,7 @@ export function SelectOrganizerDialog({ children, onSuccess }: SelectOrganizerDi
                         type="button"
                         className="flex items-center gap-3 flex-1 text-left"
                         onClick={() => {
-                          org.name && org.id && handleSelectOrganizer(org.id, org.name);
+                          org.id && handleSelectOrganizer(org.id);
                         }}
                       >
                         <span className="bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0">
@@ -311,7 +302,7 @@ export function SelectOrganizerDialog({ children, onSuccess }: SelectOrganizerDi
                       </button>
 
                       {/* 刪除按鈕 - 只有不是當前組織時才顯示 */}
-                      {currentOrganizerId !== org.id && (
+                      {currentId !== org.id && (
                         <button
                           type="button"
                           className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition flex-shrink-0"
