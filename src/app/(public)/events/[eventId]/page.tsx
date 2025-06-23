@@ -249,7 +249,7 @@ export default function EventDetailPage() {
             </div>
             <div className="flex-1 flex flex-col gap-10">
               {/* 關於活動 */}
-              <p className="text-neutral-800 leading-relaxed mt-0 lg:mt-16">
+              <p className="text-neutral-800 leading-relaxed mt-0 lg:mt-16 whitespace-pre-line">
                 {eventData?.summary ?? ""}
               </p>
               <div className="flex flex-wrap gap-2">
