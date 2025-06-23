@@ -653,9 +653,9 @@ export default function EventDetailPage() {
             <div className="flex flex-col items-center gap-2">
               <div className="flex items-center gap-2">
                 <EyeIcon className="w-5 h-5 text-neutral-500" />
-                <span className="text-neutral-500 font-bold">{eventData?.viewCount ?? 0} 人</span>
+                <span className="text-neutral-500 font-bold">{eventData?.viewCount ?? 0} 次</span>
               </div>
-              <span className="text-neutral-500">正在關注活動</span>
+              <span className="text-neutral-500">瀏覽</span>
             </div>
             {/* 垂直分隔線 */}
             <div className="w-0.5 h-14 bg-neutral-400" />
