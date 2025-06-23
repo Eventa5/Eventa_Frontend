@@ -30,8 +30,37 @@
   font-style: italic;
 }
 
+/* 連結樣式 */
 .markdown-content a {
   word-break: break-all;
+  color: #f07348; /* 使用 secondary 色系 */
+  text-decoration: underline;
+  text-decoration-color: #f07348;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+  transition: all 0.2s ease-in-out;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.markdown-content a:hover {
+  color: #c35d3a; /* secondary-600 */
+  text-decoration-color: #c35d3a;
+  background-color: rgba(240, 115, 72, 0.1); /* secondary 色系半透明背景 */
+  border-radius: 4px;
+}
+
+.markdown-content a:focus {
+  outline: 2px solid #f07348;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* 外部連結樣式（可選） */
+.markdown-content a[href^="http"]::after {
+  content: " ↗";
+  font-size: 0.8em;
+  opacity: 0.7;
 }
 
 /* 確保在小尺寸容器中的可讀性 */
@@ -63,5 +92,11 @@
 
   .markdown-content table {
     font-size: 0.75rem;
+  }
+
+  /* 手機版連結樣式調整 */
+  .markdown-content a {
+    text-decoration-thickness: 1px;
+    text-underline-offset: 1px;
   }
 }

@@ -525,10 +525,58 @@ export default function EventDetailPage() {
             </div>
             <div className="flex flex-col gap-2 mt-0 lg:mt-16">
               <div
-                className="text-base text-[#525252]"
+                className="text-base text-[#525252] markdown-content"
                 // biome-ignore lint/security/noDangerouslySetInnerHtml: 已用 DOMPurify 處理
                 dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(eventData?.descriptionMd ?? ""),
+                  __html: (() => {
+                    const rawHtml = eventData?.descriptionMd ?? "";
+                    if (!rawHtml) return "";
+
+                    // 創建臨時 DOM 元素來處理連結
+                    const tempDiv = document.createElement("div");
+                    tempDiv.innerHTML = rawHtml;
+
+                    // 為所有連結添加 target="_blank" 和 rel="noopener noreferrer"
+                    const links = tempDiv.querySelectorAll("a");
+                    for (const link of links) {
+                      link.setAttribute("target", "_blank");
+                      link.setAttribute("rel", "noopener noreferrer");
+                    }
+
+                    // 使用 DOMPurify 清理 HTML，並允許 target 和 rel 屬性
+                    return DOMPurify.sanitize(tempDiv.innerHTML, {
+                      ALLOWED_ATTR: ["href", "target", "rel", "class", "id", "style"],
+                      ALLOWED_TAGS: [
+                        "a",
+                        "p",
+                        "br",
+                        "strong",
+                        "em",
+                        "u",
+                        "h1",
+                        "h2",
+                        "h3",
+                        "h4",
+                        "h5",
+                        "h6",
+                        "ul",
+                        "ol",
+                        "li",
+                        "blockquote",
+                        "code",
+                        "pre",
+                        "table",
+                        "thead",
+                        "tbody",
+                        "tr",
+                        "th",
+                        "td",
+                        "img",
+                        "div",
+                        "span",
+                      ],
+                    });
+                  })(),
                 }}
               />
             </div>
