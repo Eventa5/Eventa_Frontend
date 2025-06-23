@@ -12,6 +12,7 @@ import {
 } from "@/services/api/client/sdk.gen";
 import { useDialogStore } from "@/store/dialog";
 import { useOrganizerStore } from "@/store/organizer";
+import { ActivityStatus } from "@/types/common";
 import { combineDateTime, parseDateTime } from "@/utils/date";
 import { useErrorHandler } from "@/utils/error-handler";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -35,8 +36,7 @@ export default function BasicInfoPage() {
   const { showError } = useDialogStore();
 
   // 從 organizer store 獲取主辦單位資訊
-  const { getCurrentOrganizerInfo } = useOrganizerStore();
-  const currentOrganizerInfo = getCurrentOrganizerInfo();
+  const currentOrganizerInfo = useOrganizerStore((s) => s.currentOrganizerInfo);
 
   // 本地狀態
   const [isUpdating, setIsUpdating] = useState(false);
@@ -172,6 +172,14 @@ export default function BasicInfoPage() {
   const onSubmit = useCallback(
     async (data: BasicInfoFormData) => {
       const numericEventId = Number.parseInt(eventId);
+      if (
+        activityData?.status === ActivityStatus.ENDED ||
+        activityData?.status === ActivityStatus.CANCELED
+      ) {
+        showError("無法編輯已結束或已取消的活動");
+        return;
+      }
+
       if (Number.isNaN(numericEventId)) {
         showError("無效的活動 ID");
         return;
@@ -489,7 +497,12 @@ export default function BasicInfoPage() {
         <div className="flex justify-center border-t border-gray-200 pt-6">
           <Button
             type="submit"
-            disabled={!isValid || isUpdating}
+            disabled={
+              !isValid ||
+              isUpdating ||
+              activityData?.status === ActivityStatus.ENDED ||
+              activityData?.status === ActivityStatus.CANCELED
+            }
             className={`${
               isValid && !isUpdating
                 ? "bg-[#FFD56B] hover:bg-[#FFCA28] cursor-pointer"

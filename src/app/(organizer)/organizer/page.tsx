@@ -53,40 +53,37 @@ export default function OrganizerHomePage() {
     },
   });
 
-  const fetchOrganizerDetail = useCallback(async () => {
-    const currentOrganizer = await fetchCurrentOrganizerInfo();
-    if (!currentOrganizer) {
-      setIsLoading(false);
+  const updateOrganizerInfo = useCallback(async () => {
+    if (!currentOrganizerInfo) {
+      setIsLoading(true);
       return;
     }
 
-    setOrganizerInfo(currentOrganizer);
+    setOrganizerInfo(currentOrganizerInfo);
     reset({
-      organizerName: currentOrganizer.name || "",
-      description: currentOrganizer.introduction || "",
-      phoneNumber: currentOrganizer.phoneNumber || "",
-      email: currentOrganizer.email || "",
+      organizerName: currentOrganizerInfo.name || "",
+      description: currentOrganizerInfo.introduction || "",
+      phoneNumber: currentOrganizerInfo.phoneNumber || "",
+      email: currentOrganizerInfo.email || "",
       language: "繁體中文",
-      currency: currentOrganizer.currency || "TWD",
-      countryCode: `台灣 ${currentOrganizer.countryCode || "+886"}`,
+      currency: currentOrganizerInfo.currency || "TWD",
+      countryCode: `台灣 ${currentOrganizerInfo.countryCode || "+886"}`,
     });
 
-    setAvatarPreview(currentOrganizer?.avatar || null);
-    setCoverImagePreview(currentOrganizer?.cover || null);
+    setAvatarPreview(currentOrganizerInfo?.avatar || null);
+    setCoverImagePreview(currentOrganizerInfo?.cover || null);
     setIsLoading(false);
-  }, [fetchCurrentOrganizerInfo, reset]);
+  }, [currentOrganizerInfo]);
 
   // 監聽 currentOrganizerInfo 的變更
   useEffect(() => {
-    if (currentOrganizerInfo?.id) {
-      fetchOrganizerDetail();
-    }
-  }, [currentOrganizerInfo?.id, fetchOrganizerDetail]);
+    updateOrganizerInfo();
+  }, [currentOrganizerInfo]);
 
   // 初始載入
   useEffect(() => {
-    fetchOrganizerDetail();
-  }, [fetchOrganizerDetail]);
+    updateOrganizerInfo();
+  }, []);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -218,8 +215,8 @@ export default function OrganizerHomePage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500" />
+      <div className="flex flex-col h-full items-center justify-center">
+        <div className="text-lg text-gray-600">載入主辦中心資料中...</div>
       </div>
     );
   }

@@ -52,7 +52,6 @@ import {
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { toast } from "sonner";
 import useSWR from "swr";
 
 const activityFetcher = async (activityId: number) => {
@@ -298,15 +297,9 @@ export default function OrderDetailPage() {
                     {category.name}
                   </span>
                 ))}
-                {/* <span
-                  className="bg-secondary-100 text-secondary-500 px-4 md:px-6 py-1 md:py-2 rounded-lg text-sm md:text-lg font-semibold cursor-pointer hover:bg-secondary-200 transition-colors"
-                  onClick={() => handleCategoryClick(activity?.isOnline ? "線上活動" : "線下活動")}
-                >
-                  {activity?.isOnline ? "線上活動" : "線下活動"}
-                </span> */}
               </div>
               <div className="md:flex mb-4 items-center gap-4">
-                <h2 className="text-3xl md:text-5xl font-extrabold mb-2 font-serif-tc">
+                <h2 className="text-3xl md:text-5xl font-extrabold mb-4 md:mb-2 font-serif-tc">
                   {order?.activity?.title}
                 </h2>
                 {similarActivities && similarActivities.length > 0 && (
@@ -319,7 +312,7 @@ export default function OrderDetailPage() {
                   </Button>
                 )}
               </div>
-              <div className="flex items-center gap-2 mb-6 md:mb-16">
+              <div className="flex items-center gap-2 mb-6 md:mb-16 flex-wrap">
                 {order?.activity?.tags?.split(",").map((tag: string) => (
                   <Badge
                     variant="outline"
@@ -374,30 +367,20 @@ export default function OrderDetailPage() {
                           </span>
                           <div>
                             {order.status === "pending" && (
-                              <>
-                                <Button
-                                  type="button"
-                                  className="py-2 md:py-2.5 rounded mr-2 font-semibold h-auto w-[120px] mb-2 sm:mb-0"
-                                  onClick={() => {
-                                    const activityId = (order.activity as { id?: number })?.id;
-                                    if (activityId) {
-                                      router.push(
-                                        `/events/${activityId}/checkout?orderId=${order.id}`
-                                      );
-                                    }
-                                  }}
-                                >
-                                  前往付款
-                                </Button>
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  className="border-neutral-300 text-neutral-600 py-2 md:py-2.5 rounded hover:bg-neutral-400 hover:text-white w-[120px] h-auto"
-                                  onClick={() => setShowRefundConfirm(true)}
-                                >
-                                  退票
-                                </Button>
-                              </>
+                              <Button
+                                type="button"
+                                className="py-2 md:py-2.5 rounded mr-2 font-semibold h-auto w-[120px] mb-2 sm:mb-0"
+                                onClick={() => {
+                                  const activityId = (order.activity as { id?: number })?.id;
+                                  if (activityId) {
+                                    router.push(
+                                      `/events/${activityId}/checkout?orderId=${order.id}`
+                                    );
+                                  }
+                                }}
+                              >
+                                前往付款
+                              </Button>
                             )}
                             {order.status === "paid" && (
                               <Button
@@ -586,7 +569,7 @@ export default function OrderDetailPage() {
         open={showSimilarActivities}
         onOpenChange={setShowSimilarActivities}
       >
-        <DialogContent className="max-w-3xl border-neutral-300 bg-primary-50">
+        <DialogContent className="md:max-w-3xl border-neutral-300 bg-primary-50">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">
               <DialogDescription>推薦活動</DialogDescription>

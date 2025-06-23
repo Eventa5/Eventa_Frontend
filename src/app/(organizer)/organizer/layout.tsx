@@ -6,8 +6,15 @@ import ErrorDialog from "@/components/ui/error-dialog";
 import { Toaster } from "@/components/ui/sonner";
 import { InitOrganizerState } from "@/features/organizer/components/InitOrganizerState";
 import { getApiV1Organizations } from "@/services/api/client/sdk.gen";
+import type { Viewport } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
 
 export const dynamic = "force-dynamic";
 
@@ -88,10 +95,7 @@ export default async function OrganizerLayout({
         suppressHydrationWarning
       >
         <Suspense fallback={<div>Loading...</div>}>
-          <InitOrganizerState
-            orgId={defaultOrg.id || -1}
-            orgName={defaultOrg.name || ""}
-          >
+          <InitOrganizerState orgId={defaultOrg.id || -1}>
             <OrganizerLayoutContent>{children}</OrganizerLayoutContent>
           </InitOrganizerState>
         </Suspense>

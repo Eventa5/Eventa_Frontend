@@ -823,7 +823,6 @@ export default function TicketSettingPage() {
               ticket.saleStartMinute
             ),
             endTime: combineDateTime(ticket.saleEndDate, ticket.saleEndHour, ticket.saleEndMinute),
-            isActive: true,
           }));
 
           await postApiV1ActivitiesByActivityIdTicketTypes({
@@ -860,7 +859,6 @@ export default function TicketSettingPage() {
                   ticket.saleEndHour,
                   ticket.saleEndMinute
                 ),
-                isActive: true,
               },
             });
 
@@ -868,7 +866,9 @@ export default function TicketSettingPage() {
               throw new Error(ticketResponse.error.message || "更新票券失敗，請稍後再試");
             }
           }
-        } // 4. 發布活動
+        }
+
+        // 4. 發布活動
         const publishResponse = await patchApiV1ActivitiesByActivityIdPublish({
           path: { activityId: numericEventId },
         });

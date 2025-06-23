@@ -115,7 +115,7 @@ export const useCreateEventStore = create<CreateEventState>()(
 
             return eventId;
           }
-          throw new Error("建立活動失敗：無法獲取活動 ID");
+          throw new Error(response.error?.message || "建立活動失敗，請稍後再試");
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : "建立活動失敗";
           set({ error: errorMessage, isLoading: false });

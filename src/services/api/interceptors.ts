@@ -1,4 +1,5 @@
 import { useAuthStore } from "@/store/auth";
+import { useOrganizerStore } from "@/store/organizer";
 import { toast } from "sonner";
 import { client } from "./client/client.gen";
 
@@ -13,6 +14,7 @@ client.interceptors.response.use(async (response) => {
       toast.error("認證已過期，請重新登入");
       // 清除當前的認證狀態
       await useAuthStore.getState().logout();
+      await useOrganizerStore.getState().clearCurrentOrganizer();
       // 重定向到登入頁面
       window.location.href = "/?authRequired=1";
     }

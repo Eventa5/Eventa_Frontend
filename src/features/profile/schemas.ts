@@ -16,6 +16,54 @@ export const birthdaySchema = z
   });
 
 /**
+ * 地址驗證 Schema
+ */
+export const addressSchema = z
+  .string()
+  .min(5, { message: "地址至少需要5個字符" })
+  .max(200, { message: "地址不能超過200個字符" })
+  .refine(
+    (address) => {
+      // 檢查是否包含縣市區
+      const hasCityDistrict = /[縣|市|區]/.test(address);
+      return hasCityDistrict;
+    },
+    {
+      message: "請包含縣市區資訊",
+    }
+  )
+  .refine(
+    (address) => {
+      // 檢查是否包含路街巷弄
+      const hasRoad = /[路|街|巷|弄]/.test(address);
+      return hasRoad;
+    },
+    {
+      message: "請包含路、街、巷、弄等道路資訊",
+    }
+  )
+  .refine(
+    (address) => {
+      // 檢查是否為有效的地址格式（不能只填關鍵字）
+      const onlyKeywords = /^[縣市區路街巷弄號\s]+$/.test(address);
+      return !onlyKeywords;
+    },
+    {
+      message: "請輸入完整的地址內容",
+    }
+  )
+  .refine(
+    (address) => {
+      // 檢查是否為純數字或特殊字符
+      const isOnlyNumbersOrSpecialChars = /^[\d\s\-\_\.]+$/.test(address);
+      return !isOnlyNumbersOrSpecialChars;
+    },
+    {
+      message: "請輸入包含實際地名或建築物的完整地址",
+    }
+  );
+
+/**
  * 個人檔案表單 Schema
  */
 export const profileFormSchema = z.object({
@@ -44,7 +92,7 @@ export const profileFormSchema = z.object({
   ) as z.ZodType<string>,
   address: z.preprocess(
     (val) => (val === null || val === undefined ? "" : val),
-    z.string().min(1, { message: "請輸入詳細地址" })
+    addressSchema
   ) as z.ZodType<string>,
   identity: z.preprocess(
     (val) => (val === null || val === undefined ? "" : val),

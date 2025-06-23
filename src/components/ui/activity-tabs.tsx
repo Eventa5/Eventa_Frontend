@@ -1,5 +1,5 @@
 import { cn } from "@/utils/transformer";
-import { CheckCircle, FileText, Globe, XCircle } from "lucide-react";
+import { CheckCircle, FileText, Globe, Loader, XCircle } from "lucide-react";
 import type React from "react";
 
 export type ActivityTabsValue = "draft" | "published" | "ended" | "canceled";
@@ -13,6 +13,7 @@ export interface ActivityTabsProps {
     ended: number;
     canceled: number;
   };
+  loading?: boolean;
   className?: string;
 }
 
@@ -55,6 +56,7 @@ export const ActivityTabs: React.FC<ActivityTabsProps> = ({
   value,
   onValueChange,
   counts,
+  loading,
   className,
 }) => {
   return (
@@ -79,11 +81,15 @@ export const ActivityTabs: React.FC<ActivityTabsProps> = ({
                 <span className="mr-1 md:mr-2 truncate">{tab.label}</span>
                 <span
                   className={cn(
-                    "inline-flex items-center justify-center px-1 sm:px-1.5 md:px-2 py-0.5 md:py-1 text-xs font-medium rounded-full min-w-[16px] sm:min-w-[18px] md:min-w-[20px] flex-shrink-0",
+                    "inline-flex items-center justify-center h-5 md:h-[26px] text-xs font-medium rounded-full min-w-[16px] sm:min-w-[18px] md:min-w-[22px] flex-shrink-0",
                     isActive ? tab.countClass : "bg-gray-100 hidden"
                   )}
                 >
-                  {counts[tab.value]}
+                  {loading ? (
+                    <Loader className={cn("animate-spin h-3 w-3 text-gray-500", tab.countClass)} />
+                  ) : (
+                    counts[tab.value]
+                  )}
                 </span>
               </button>
             );

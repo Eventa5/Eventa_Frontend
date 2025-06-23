@@ -241,7 +241,7 @@ export default function AttendeesPage() {
                             : "-"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          {participant.status === "unassigned" && (
+                          {participant.status === "assigned" && (
                             <Button
                               size="sm"
                               onClick={() =>
@@ -255,18 +255,6 @@ export default function AttendeesPage() {
                               <CheckCircle className="w-4 h-4 mr-1" />
                               報到
                             </Button>
-                          )}
-                          {participant.status === "used" && (
-                            <span className="text-emerald-600 font-medium">已使用</span>
-                          )}
-                          {participant.status === "assigned" && (
-                            <span className="text-blue-600 font-medium">已分配</span>
-                          )}
-                          {participant.status === "canceled" && (
-                            <span className="text-rose-600 font-medium">已取消</span>
-                          )}
-                          {participant.status === "overdue" && (
-                            <span className="text-gray-600 font-medium">已逾期</span>
                           )}
                         </td>
                       </tr>
@@ -353,7 +341,7 @@ export default function AttendeesPage() {
                           </span>
                         </div>
                       </div>
-                      {participant.status === "unassigned" && (
+                      {participant.status === "assigned" && (
                         <div className="mt-3">
                           <Button
                             size="sm"

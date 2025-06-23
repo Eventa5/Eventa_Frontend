@@ -14,12 +14,13 @@ export const Navbar = () => {
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const logout = useAuthStore((s) => s.logout);
+  const clearCurrentOrganizer = useOrganizerStore((s) => s.clearCurrentOrganizer);
   const currentOrganizerInfo = useOrganizerStore((s) => s.currentOrganizerInfo);
 
   // 處理選擇主辦單位成功
   const handleOrganizerSelected = () => {
     setMenuOpen(false);
-    // 可以在這裡添加其他邏輯，比如刷新頁面或顯示成功訊息
+    router.push("/organizer");
   };
 
   return (
@@ -111,6 +112,7 @@ export const Navbar = () => {
                       className="flex items-center w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-50 cursor-pointer"
                       onClick={() => {
                         logout();
+                        clearCurrentOrganizer();
                         router.push("/");
                       }}
                     >

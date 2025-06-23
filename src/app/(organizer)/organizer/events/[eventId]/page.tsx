@@ -22,6 +22,7 @@ import type {
   GetCheckedInResponse,
   GetIncomeResponse,
 } from "@/services/api/client/types.gen";
+import { ActivityStatus } from "@/types/common";
 import { useErrorHandler } from "@/utils/error-handler";
 import { BarChart3, Calendar, Edit3, Eye, TrendingUp, Upload } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -186,6 +187,13 @@ export default function EventDetailPage() {
   // 處理封面圖片上傳
   const handleCoverUpload = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (
+        activityData?.status === ActivityStatus.ENDED ||
+        activityData?.status === ActivityStatus.CANCELED
+      ) {
+        return;
+      }
+
       const file = e.target.files?.[0];
       if (!file) return;
 
@@ -235,8 +243,18 @@ export default function EventDetailPage() {
       }
     },
     [eventId, handleError, loadActivityData]
-  ); // 觸發檔案選擇
+  );
+
+  // 觸發檔案選擇
   const handleCoverClick = () => {
+    if (
+      activityData?.status === ActivityStatus.ENDED ||
+      activityData?.status === ActivityStatus.CANCELED
+    ) {
+      toast.error("無法編輯已結束或已取消的活動");
+      return;
+    }
+
     fileInputRef.current?.click();
   };
 
@@ -294,7 +312,7 @@ export default function EventDetailPage() {
   if (isLoading) {
     return (
       <div className="flex flex-col h-full items-center justify-center">
-        <div className="text-lg text-gray-600">載入總攬資料中...</div>
+        <div className="text-lg text-gray-600">載入總覽資料中...</div>
       </div>
     );
   }

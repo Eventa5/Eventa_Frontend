@@ -336,6 +336,7 @@ export const SidebarNav = () => {
               className="flex items-center text-left px-4 py-3 text-sm text-neutral-600 border border-neutral-600 rounded-md hover:bg-gray-50 cursor-pointer"
               onClick={() => {
                 logout();
+                clearCurrentOrganizer();
                 router.push("/");
               }}
             >

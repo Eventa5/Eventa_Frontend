@@ -7,6 +7,7 @@ import {
   patchApiV1ActivitiesByActivityIdCategories,
 } from "@/services/api/client/sdk.gen";
 import { useDialogStore } from "@/store/dialog";
+import { ActivityStatus } from "@/types/common";
 import { useErrorHandler } from "@/utils/error-handler";
 import { Info } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -123,6 +124,14 @@ export default function CategoryPage() {
   const handleSubmit = async () => {
     if (selectedCategories.length === 0) return;
 
+    if (
+      activityData?.status === ActivityStatus.ENDED ||
+      activityData?.status === ActivityStatus.CANCELED
+    ) {
+      showError("無法編輯已結束或已取消的活動");
+      return;
+    }
+
     const numericEventId = Number.parseInt(eventId);
     if (Number.isNaN(numericEventId)) {
       showError("無效的活動 ID");
@@ -196,7 +205,12 @@ export default function CategoryPage() {
         <div className="flex justify-center mt-6 border-t border-gray-200 pt-6 w-full">
           <Button
             onClick={handleSubmit}
-            disabled={selectedCategories.length === 0 || isUpdating}
+            disabled={
+              selectedCategories.length === 0 ||
+              isUpdating ||
+              activityData?.status === ActivityStatus.ENDED ||
+              activityData?.status === ActivityStatus.CANCELED
+            }
             className="bg-[#FFD56B] text-[#262626] rounded-lg w-full py-2 text-base font-normal hover:bg-[#FFCA28] transition-colors cursor-pointer h-auto disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isUpdating ? "更新中..." : "儲存"}

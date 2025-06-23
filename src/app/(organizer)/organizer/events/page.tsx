@@ -12,6 +12,7 @@ import {
 } from "@/services/api/client/sdk.gen";
 import type { ActivitiesResponse, PaginationResponse } from "@/services/api/client/types.gen";
 import { useOrganizerStore } from "@/store/organizer";
+import { ActivityStatus } from "@/types/common";
 import { useErrorHandler } from "@/utils/error-handler";
 import {
   Airplay,
@@ -24,14 +25,6 @@ import {
   Search,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-
-// 活動狀態枚舉
-enum ActivityStatus {
-  DRAFT = "draft",
-  PUBLISHED = "published",
-  ENDED = "ended",
-  CANCELED = "canceled",
-}
 
 // 活動狀態統計介面
 interface EventStatusCounts {
@@ -522,7 +515,7 @@ export default function EventsPage() {
     else if (currentStatus === ActivityStatus.CANCELED) counts.canceled = currentStatusTotal;
 
     return counts;
-  }, [pagination.totalItems]);
+  }, [pagination.totalItems, activeFilters.status]);
 
   // 清除篩選
   const handleClearFilters = () => {
@@ -632,6 +625,7 @@ export default function EventsPage() {
           value={activeFilters.status}
           onValueChange={handleStatusFilterChange}
           counts={eventCounts}
+          loading={loading}
         />
 
         {/* 活動列表 */}

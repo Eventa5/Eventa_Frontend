@@ -19,6 +19,7 @@ import SignUpForm from "@/features/auth/components/sign-up-form";
 import { useIsMobile } from "@/hooks/useMediaQuery";
 import { useAuthStore } from "@/store/auth";
 import { useDialogStore } from "@/store/dialog";
+import { useOrganizerStore } from "@/store/organizer";
 import { ChevronLeft, Menu, SquarePen, Ticket, User, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -33,6 +34,7 @@ export default function Header() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const logout = useAuthStore((s) => s.logout);
   const userProfile = useAuthStore((s) => s.userProfile);
+  const clearCurrentOrganizer = useOrganizerStore((s) => s.clearCurrentOrganizer);
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -282,6 +284,7 @@ export default function Header() {
                           className="flex items-center w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-50"
                           onClick={() => {
                             logout();
+                            clearCurrentOrganizer();
                             router.push("/");
                           }}
                         >
@@ -459,6 +462,7 @@ export default function Header() {
                     className="border border-neutral-400 rounded-lg px-4 py-3 text-xs text-neutral-600 cursor-pointer"
                     onClick={() => {
                       logout();
+                      clearCurrentOrganizer();
                       setMobileMenuOpen(false);
                       setMobileUserMenuOpen(false);
                       router.push("/");
