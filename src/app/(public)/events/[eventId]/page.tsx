@@ -113,6 +113,7 @@ export default function EventDetailPage() {
         });
         setLiked(false);
         toast.success("已取消收藏");
+        setEventData((prev) => (prev ? { ...prev, likeCount: (prev.likeCount || 0) - 1 } : prev));
       } else {
         // 新增收藏
         await postApiV1ActivitiesByActivityIdFavorite({
@@ -120,6 +121,7 @@ export default function EventDetailPage() {
         });
         setLiked(true);
         toast.success("已加入收藏");
+        setEventData((prev) => (prev ? { ...prev, likeCount: (prev.likeCount || 0) + 1 } : prev));
       }
     } catch (error) {
       toast.error(liked ? "取消收藏失敗" : "收藏失敗");
