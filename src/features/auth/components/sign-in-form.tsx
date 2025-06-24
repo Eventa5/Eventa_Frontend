@@ -39,8 +39,13 @@ export default function SignInForm({ onSuccess, onSwitchTab, isMobile = false }:
       const height = 600;
       const left = (window.screen.width - width) / 2;
       const top = (window.screen.height - height) / 2;
+      const loginUrl = new URL(
+        "/api/v1/users/google/login",
+        process.env.NEXT_PUBLIC_API_BASE_URL
+      ).toString();
+
       const loginWindow = window.open(
-        "https://eventa-backend-pgun.onrender.com/api/v1/users/google/login",
+        loginUrl,
         "Google 登入",
         `width=${width},height=${height},left=${left},top=${top}`
       );

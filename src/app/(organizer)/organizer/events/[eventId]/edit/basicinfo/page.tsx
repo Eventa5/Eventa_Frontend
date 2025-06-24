@@ -81,10 +81,11 @@ export default function BasicInfoPage() {
     return parseDateTime(activityData?.endTime);
   }, [activityData?.endTime]);
 
-  // 獲取明天的日期
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const tomorrowDate = tomorrow.toISOString().split("T")[0];
+  // 獲取今天的日期
+  const today = new Date();
+  today.setDate(today.getDate() + 1);
+  const todayDate = today.toISOString().split("T")[0];
+
   const {
     control,
     handleSubmit,
@@ -97,8 +98,8 @@ export default function BasicInfoPage() {
       organizerName: currentOrganizerInfo?.name || "",
       eventName: "",
       timezone: "(GMT+08:00) 台北",
-      startDate: tomorrowDate,
-      endDate: tomorrowDate,
+      startDate: todayDate,
+      endDate: todayDate,
       startHour: "",
       startMinute: "",
       endHour: "",
@@ -114,10 +115,10 @@ export default function BasicInfoPage() {
     if (activityData && currentOrganizerInfo) {
       setValue("organizerName", currentOrganizerInfo.name || "");
       setValue("eventName", activityData.title || "");
-      setValue("startDate", startTimeData?.date || tomorrowDate, {
+      setValue("startDate", startTimeData?.date || todayDate, {
         shouldTouch: true,
       });
-      setValue("endDate", endTimeData?.date || tomorrowDate, {
+      setValue("endDate", endTimeData?.date || todayDate, {
         shouldTouch: true,
       });
       setValue("startHour", startTimeData?.hour || "");
@@ -127,7 +128,7 @@ export default function BasicInfoPage() {
       setValue("eventTags", activityData.tags || []);
       setValue("eventLocation", activityData.location || "");
     }
-  }, [activityData, currentOrganizerInfo, startTimeData, endTimeData, tomorrowDate, setValue]);
+  }, [activityData, currentOrganizerInfo, startTimeData, endTimeData, todayDate, setValue]);
 
   // 監看地址變化
   const eventLocation = useWatch({
