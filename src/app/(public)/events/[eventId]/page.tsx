@@ -288,28 +288,19 @@ export default function EventDetailPage() {
                 </a>
               </div>
               <Separator />
-              <div className="flex flex-col lg:flex-row items-start gap-3 pl-0 lg:pl-8">
-                {eventData?.isOnline && !eventLocation ? (
-                  <>
-                    <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg lg:text-base">
-                      <VideoIcon className="w-5 h-5" />
-                      線上活動
-                    </span>
-                    <span className="text-neutral-800">
-                      此活動為線上活動，購票後可於票券頁進入直播連結
-                    </span>
-                  </>
-                ) : (
-                  <>
+              {/* 只有線下活動才顯示活動地點 */}
+              {!eventData?.isOnline && (
+                <>
+                  <div className="flex flex-col lg:flex-row items-start gap-3 pl-0 lg:pl-8">
                     <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg lg:text-base">
                       <MapPin className="w-5 h-5" />
                       活動地點
                     </span>
                     <span className="text-neutral-800">{eventLocation}</span>
-                  </>
-                )}
-              </div>
-              <Separator />
+                  </div>
+                  <Separator />
+                </>
+              )}
               <div className="flex flex-col lg:flex-row items-start gap-3 pl-0 lg:pl-8">
                 <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg lg:text-base">
                   <LinkIcon className="w-5 h-5" />
