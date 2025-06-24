@@ -22,5 +22,5 @@ export const parseDateTime = (isoString: string | undefined) => {
 export const combineDateTime = (date: string, hour: string, minute: string): string => {
   const dateObj = new Date(date);
   dateObj.setHours(Number.parseInt(hour), Number.parseInt(minute), 0, 0);
-  return dateObj.toISOString().slice(0, 16);
+  return dateObj.toISOString();
 };
