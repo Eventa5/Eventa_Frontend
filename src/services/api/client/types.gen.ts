@@ -42,6 +42,13 @@ export type ActivityResponse = {
     isFavorite?: boolean;
     isRegistered?: boolean;
   };
+  organization?: {
+    id?: number;
+    name?: string;
+    avatar?: string;
+    email?: string;
+    officialSiteUrl?: string;
+  };
 };
 
 export type CreateActivityRequest = {
@@ -958,14 +965,6 @@ export type TicketTypeResponse = {
    */
   endTime?: string;
   /**
-   * 開賣時間，格式為 ISO 8601
-   */
-  saleStartAt?: string | null;
-  /**
-   * 開賣結束時間，格式為 ISO 8601
-   */
-  saleEndAt?: string | null;
-  /**
    * 是否為活動中
    */
   isActive?: boolean;
@@ -1492,7 +1491,7 @@ export type PutApiV1ActivitiesByActivityIdTicketTypesByTicketTypeIdData = {
 
 export type PutApiV1ActivitiesByActivityIdTicketTypesByTicketTypeIdErrors = {
   /**
-   * 格式錯誤、票種名稱已存在，請使用其他名稱、票種的銷售開始時間不可晚於活動結束時間、票種的銷售結束時間不可晚於活動結束時間
+   * 格式錯誤、票種名稱已存在，請使用其他名稱、票種的銷售開始時間不可晚於活動結束時間、票種的銷售結束時間不可晚於活動結束時間、該票種已經有票券被使用或分配，無法編輯、該票種已經有票券被使用或分配，無法刪除
    */
   400: ErrorResponse;
   /**
@@ -2192,6 +2191,51 @@ export type GetApiV1CategoriesResponses = {
 export type GetApiV1CategoriesResponse =
   GetApiV1CategoriesResponses[keyof GetApiV1CategoriesResponses];
 
+export type PostApiV1CategoriesByCategoryIdImageData = {
+  body: {
+    /**
+     * 使用者上傳的圖片檔案，僅接受 image*
+     */
+    image?: Blob | File;
+  };
+  path: {
+    /**
+     * 主題 ID
+     */
+    categoryId: number;
+  };
+  query?: never;
+  url: "/api/v1/categories/{categoryId}/image";
+};
+
+export type PostApiV1CategoriesByCategoryIdImageErrors = {
+  /**
+   * 錯誤的請求，例如沒有圖片、圖片上傳失敗等
+   */
+  400: ErrorResponse;
+  /**
+   * 非管理者權限，無法編輯主題圖片
+   */
+  403: ErrorResponse;
+  /**
+   * 主題不存在
+   */
+  404: ErrorResponse;
+};
+
+export type PostApiV1CategoriesByCategoryIdImageError =
+  PostApiV1CategoriesByCategoryIdImageErrors[keyof PostApiV1CategoriesByCategoryIdImageErrors];
+
+export type PostApiV1CategoriesByCategoryIdImageResponses = {
+  /**
+   * 上傳成功
+   */
+  200: UploadCoverResponse;
+};
+
+export type PostApiV1CategoriesByCategoryIdImageResponse =
+  PostApiV1CategoriesByCategoryIdImageResponses[keyof PostApiV1CategoriesByCategoryIdImageResponses];
+
 export type PostApiV1ChatData = {
   body: ChatRequest;
   path?: never;
@@ -2856,7 +2900,7 @@ export type PatchApiV1TicketsByTicketIdUsedData = {
 
 export type PatchApiV1TicketsByTicketIdUsedErrors = {
   /**
-   * 格式錯誤
+   * 格式錯誤、活動尚未開始，無法報到、活動已結束，無法報到
    */
   400: ErrorResponse;
   /**
