@@ -6,14 +6,9 @@ import TicketGuideDialog from "@/features/activities/components/ticket-guide-dia
 import {
   deleteApiV1ActivitiesByActivityIdFavorite,
   getApiV1ActivitiesByActivityId,
-  getApiV1OrganizationsByOrganizationId,
   postApiV1ActivitiesByActivityIdFavorite,
 } from "@/services/api/client/sdk.gen";
-import type {
-  ActivityResponse,
-  FavoriteActivityResponse,
-  OrganizationResponse,
-} from "@/services/api/client/types.gen";
+import type { ActivityResponse } from "@/services/api/client/types.gen";
 import { useAuthStore } from "@/store/auth";
 import { useDialogStore } from "@/store/dialog";
 import { useSearchStore } from "@/store/search";
@@ -48,7 +43,6 @@ export default function EventDetailPage() {
   const setLoginTab = useDialogStore((s) => s.setLoginTab);
   const router = useRouter();
   const [eventData, setEventData] = useState<ActivityResponse | null>(null);
-  const [organization, setOrganization] = useState<OrganizationResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const setSearchValue = useSearchStore((s) => s.setSearchValue);
@@ -67,14 +61,6 @@ export default function EventDetailPage() {
         setEventData(res.data?.data ?? null);
         setLiked(res.data?.data?.userStatus?.isFavorite ?? false);
         if (!res.data?.data) setError("查無此活動");
-        const orgId = res.data?.data?.organizationId;
-        if (orgId) {
-          getApiV1OrganizationsByOrganizationId({
-            path: { organizationId: Number(orgId) },
-          }).then((orgRes) => {
-            setOrganization(orgRes.data?.data ?? null);
-          });
-        }
       })
       .catch(() => setError("載入活動資料失敗"))
       .finally(() => setLoading(false));
@@ -82,6 +68,9 @@ export default function EventDetailPage() {
 
   // 活動地點變數
   const eventLocation = eventData?.location || "";
+
+  // 從活動資料中取得主辦單位資訊
+  const organization = eventData?.organization;
 
   const handleCheckout = () => {
     if (isAuthenticated) {

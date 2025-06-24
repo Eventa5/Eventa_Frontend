@@ -103,6 +103,9 @@ import type {
   PostApiV1ActivitiesData,
   PostApiV1ActivitiesError,
   PostApiV1ActivitiesResponse,
+  PostApiV1CategoriesByCategoryIdImageData,
+  PostApiV1CategoriesByCategoryIdImageError,
+  PostApiV1CategoriesByCategoryIdImageResponse,
   PostApiV1ChatData,
   PostApiV1ChatError,
   PostApiV1ChatResponse,
@@ -715,6 +718,34 @@ export const getApiV1Categories = <ThrowOnError extends boolean = false>(
     ],
     url: "/api/v1/categories",
     ...options,
+  });
+};
+
+/**
+ * 編輯主題圖片
+ * 照片大小限制4MB內
+ */
+export const postApiV1CategoriesByCategoryIdImage = <ThrowOnError extends boolean = false>(
+  options: Options<PostApiV1CategoriesByCategoryIdImageData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).post<
+    PostApiV1CategoriesByCategoryIdImageResponse,
+    PostApiV1CategoriesByCategoryIdImageError,
+    ThrowOnError
+  >({
+    ...formDataBodySerializer,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/v1/categories/{categoryId}/image",
+    ...options,
+    headers: {
+      "Content-Type": null,
+      ...options?.headers,
+    },
   });
 };
 
