@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import TicketGuideDialog from "@/features/activities/components/ticket-guide-dialog";
 import {
+  deleteApiV1ActivitiesByActivityIdFavorite,
   getApiV1ActivitiesByActivityId,
-  getApiV1OrganizationsByOrganizationId,
+  postApiV1ActivitiesByActivityIdFavorite,
 } from "@/services/api/client/sdk.gen";
-import type { ActivityResponse, OrganizationResponse } from "@/services/api/client/types.gen";
+import type { ActivityResponse } from "@/services/api/client/types.gen";
 import { useAuthStore } from "@/store/auth";
 import { useDialogStore } from "@/store/dialog";
 import { useSearchStore } from "@/store/search";
@@ -42,12 +43,12 @@ export default function EventDetailPage() {
   const setLoginTab = useDialogStore((s) => s.setLoginTab);
   const router = useRouter();
   const [eventData, setEventData] = useState<ActivityResponse | null>(null);
-  const [organization, setOrganization] = useState<OrganizationResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const setSearchValue = useSearchStore((s) => s.setSearchValue);
   const [showTicketGuide, setShowTicketGuide] = useState(false);
   const [liked, setLiked] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
 
   useEffect(() => {
     if (!eventId) return;
@@ -60,14 +61,6 @@ export default function EventDetailPage() {
         setEventData(res.data?.data ?? null);
         setLiked(res.data?.data?.userStatus?.isFavorite ?? false);
         if (!res.data?.data) setError("查無此活動");
-        const orgId = res.data?.data?.organizationId;
-        if (orgId) {
-          getApiV1OrganizationsByOrganizationId({
-            path: { organizationId: Number(orgId) },
-          }).then((orgRes) => {
-            setOrganization(orgRes.data?.data ?? null);
-          });
-        }
       })
       .catch(() => setError("載入活動資料失敗"))
       .finally(() => setLoading(false));
@@ -76,6 +69,9 @@ export default function EventDetailPage() {
   // 活動地點變數
   const eventLocation = eventData?.location || "";
 
+  // 從活動資料中取得主辦單位資訊
+  const organization = eventData?.organization;
+
   const handleCheckout = () => {
     if (isAuthenticated) {
       router.push(`/events/${eventId}/checkout`);
@@ -83,6 +79,43 @@ export default function EventDetailPage() {
       setLoginTab("signin");
       setLoginDialogOpen(true);
       toast.error("請先登入才能購票");
+    }
+  };
+
+  // 處理收藏/取消收藏
+  const handleToggleFavorite = async () => {
+    if (!isAuthenticated) {
+      setLoginTab("signin");
+      setLoginDialogOpen(true);
+      toast.error("請先登入才能收藏活動");
+      return;
+    }
+
+    if (!eventId) return;
+
+    setFavoriteLoading(true);
+    try {
+      if (liked) {
+        // 取消收藏
+        await deleteApiV1ActivitiesByActivityIdFavorite({
+          path: { activityId: Number(eventId) },
+        });
+        setLiked(false);
+        toast.success("已取消收藏");
+        setEventData((prev) => (prev ? { ...prev, likeCount: (prev.likeCount || 0) - 1 } : prev));
+      } else {
+        // 新增收藏
+        await postApiV1ActivitiesByActivityIdFavorite({
+          path: { activityId: Number(eventId) },
+        });
+        setLiked(true);
+        toast.success("已加入收藏");
+        setEventData((prev) => (prev ? { ...prev, likeCount: (prev.likeCount || 0) + 1 } : prev));
+      }
+    } catch (error) {
+      toast.error(liked ? "取消收藏失敗" : "收藏失敗");
+    } finally {
+      setFavoriteLoading(false);
     }
   };
 
@@ -207,7 +240,7 @@ export default function EventDetailPage() {
             </div>
             <div className="flex-1 flex flex-col gap-10">
               {/* 關於活動 */}
-              <p className="text-neutral-800 leading-relaxed mt-0 lg:mt-16">
+              <p className="text-neutral-800 leading-relaxed mt-0 lg:mt-16 whitespace-pre-line">
                 {eventData?.summary ?? ""}
               </p>
               <div className="flex flex-wrap gap-2">
@@ -255,14 +288,19 @@ export default function EventDetailPage() {
                 </a>
               </div>
               <Separator />
-              <div className="flex flex-col lg:flex-row items-start gap-3 pl-0 lg:pl-8">
-                <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg lg:text-base">
-                  <MapPin className="w-5 h-5" />
-                  活動地點
-                </span>
-                <span className="text-neutral-800">{eventLocation}</span>
-              </div>
-              <Separator />
+              {/* 只有線下活動才顯示活動地點 */}
+              {!eventData?.isOnline && (
+                <>
+                  <div className="flex flex-col lg:flex-row items-start gap-3 pl-0 lg:pl-8">
+                    <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg lg:text-base">
+                      <MapPin className="w-5 h-5" />
+                      活動地點
+                    </span>
+                    <span className="text-neutral-800">{eventLocation}</span>
+                  </div>
+                  <Separator />
+                </>
+              )}
               <div className="flex flex-col lg:flex-row items-start gap-3 pl-0 lg:pl-8">
                 <span className="inline-flex items-center gap-2 text-neutral-800 font-bold text-lg lg:text-base">
                   <LinkIcon className="w-5 h-5" />
@@ -288,26 +326,25 @@ export default function EventDetailPage() {
                   <div className="flex gap-10 mt-2">
                     <button
                       type="button"
-                      className="text-white cursor-pointer"
-                      onClick={() => setLiked((prev) => !prev)}
+                      className={`text-white cursor-pointer ${favoriteLoading ? "opacity-50 pointer-events-none" : ""}`}
+                      onClick={handleToggleFavorite}
+                      disabled={favoriteLoading}
                     >
-                      <HeartIcon
-                        fill={liked ? "currentColor" : "none"}
-                        className={`${liked ? "text-red-500" : ""}`}
-                      />
+                      {favoriteLoading ? (
+                        <Loader className="w-5 h-5 animate-spin" />
+                      ) : (
+                        <HeartIcon
+                          fill={liked ? "currentColor" : "none"}
+                          className={`${liked ? "text-red-500" : ""}`}
+                        />
+                      )}
                     </button>
-                    <a
-                      href={organization?.officialSiteUrl ? organization.officialSiteUrl : "#"}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`text-white cursor-pointer ${
-                        organization?.officialSiteUrl ? "" : "opacity-50 pointer-events-none"
-                      }`}
+                    <div
+                      className={"text-white cursor-pointer opacity-50 pointer-events-none"}
                       aria-label="主辦單位官方網站"
-                      aria-disabled={!organization?.officialSiteUrl}
                     >
                       <Facebook />
-                    </a>
+                    </div>
                     <a
                       href={organization?.email ? `mailto:${organization.email}` : "#"}
                       className={`text-white cursor-pointer ${
@@ -357,7 +394,7 @@ export default function EventDetailPage() {
                   </span>
                   <span className="text-neutral-500 text-sm">
                     {eventData?.isOnline
-                      ? "本課程使用Zoom進行，報名後會於課前收到課程的Zoom連結，請留意您的Email信箱"
+                      ? "購票後可於票券頁進入直播連結"
                       : "實際入場相關規定以活動主辦方為主"}
                   </span>
                 </div>
@@ -464,10 +501,58 @@ export default function EventDetailPage() {
             </div>
             <div className="flex flex-col gap-2 mt-0 lg:mt-16">
               <div
-                className="text-base text-[#525252]"
+                className="text-base text-[#525252] markdown-content"
                 // biome-ignore lint/security/noDangerouslySetInnerHtml: 已用 DOMPurify 處理
                 dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(eventData?.descriptionMd ?? ""),
+                  __html: (() => {
+                    const rawHtml = eventData?.descriptionMd ?? "";
+                    if (!rawHtml) return "";
+
+                    // 創建臨時 DOM 元素來處理連結
+                    const tempDiv = document.createElement("div");
+                    tempDiv.innerHTML = rawHtml;
+
+                    // 為所有連結添加 target="_blank" 和 rel="noopener noreferrer"
+                    const links = tempDiv.querySelectorAll("a");
+                    for (const link of links) {
+                      link.setAttribute("target", "_blank");
+                      link.setAttribute("rel", "noopener noreferrer");
+                    }
+
+                    // 使用 DOMPurify 清理 HTML，並允許 target 和 rel 屬性
+                    return DOMPurify.sanitize(tempDiv.innerHTML, {
+                      ALLOWED_ATTR: ["href", "target", "rel", "class", "id", "style"],
+                      ALLOWED_TAGS: [
+                        "a",
+                        "p",
+                        "br",
+                        "strong",
+                        "em",
+                        "u",
+                        "h1",
+                        "h2",
+                        "h3",
+                        "h4",
+                        "h5",
+                        "h6",
+                        "ul",
+                        "ol",
+                        "li",
+                        "blockquote",
+                        "code",
+                        "pre",
+                        "table",
+                        "thead",
+                        "tbody",
+                        "tr",
+                        "th",
+                        "td",
+                        "img",
+                        "div",
+                        "span",
+                      ],
+                    });
+                  })(),
                 }}
               />
             </div>
@@ -502,26 +587,25 @@ export default function EventDetailPage() {
             <div className="flex gap-10 mt-2">
               <button
                 type="button"
-                className="text-white cursor-pointer"
-                onClick={() => setLiked((prev) => !prev)}
+                className={`text-white cursor-pointer ${favoriteLoading ? "opacity-50 pointer-events-none" : ""}`}
+                onClick={handleToggleFavorite}
+                disabled={favoriteLoading}
               >
-                <HeartIcon
-                  fill={liked ? "currentColor" : "none"}
-                  className={`${liked ? "text-red-500" : ""}`}
-                />
+                {favoriteLoading ? (
+                  <Loader className="w-5 h-5 animate-spin" />
+                ) : (
+                  <HeartIcon
+                    fill={liked ? "currentColor" : "none"}
+                    className={`${liked ? "text-red-500" : ""}`}
+                  />
+                )}
               </button>
-              <a
-                href={organization?.officialSiteUrl ? organization.officialSiteUrl : "#"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`text-white cursor-pointer ${
-                  organization?.officialSiteUrl ? "" : "opacity-50 pointer-events-none"
-                }`}
+              <div
+                className={"text-white cursor-pointer opacity-50 pointer-events-none"}
                 aria-label="主辦單位官方網站"
-                aria-disabled={!organization?.officialSiteUrl}
               >
                 <Facebook />
-              </a>
+              </div>
               <a
                 href={organization?.email ? `mailto:${organization.email}` : "#"}
                 className={`text-white cursor-pointer ${
@@ -539,16 +623,16 @@ export default function EventDetailPage() {
             <div className="flex flex-col items-center gap-2">
               <div className="flex items-center gap-2">
                 <EyeIcon className="w-5 h-5 text-neutral-500" />
-                <span className="text-neutral-500 font-bold">{eventData?.viewCount ?? 0} 人</span>
+                <span className="text-neutral-500 font-bold">{eventData?.viewCount ?? 0} 次</span>
               </div>
-              <span className="text-neutral-500">正在關注活動</span>
+              <span className="text-neutral-500">瀏覽</span>
             </div>
             {/* 垂直分隔線 */}
             <div className="w-0.5 h-14 bg-neutral-400" />
             <div className="flex flex-col items-center gap-2">
               <div className="flex items-center gap-2">
                 <HeartIcon className="w-5 h-5 text-neutral-500" />
-                <span className="text-neutral-500 font-bold"> {eventData?.likeCount ?? 0} 人</span>
+                <span className="text-neutral-500 font-bold">{eventData?.likeCount ?? 0} 人</span>
               </div>
               <span className="text-neutral-500">喜歡這場活動</span>
             </div>

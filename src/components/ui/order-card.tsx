@@ -84,7 +84,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
                           formatEventDate(order.activity.startTime, order.activity.endTime)
                             .startDateString
                         }
-                        <br className="sm:hidden" />{" "}
+                        <br className="sm:hidden" />
                         {
                           formatEventDate(order.activity.startTime, order.activity.endTime)
                             .timeString
@@ -95,7 +95,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
                         {
                           formatEventDate(order.activity.startTime, order.activity.endTime)
                             .startDateString
-                        }{" "}
+                        }
                         - <br className="sm:hidden" />
                         {
                           formatEventDate(order.activity.startTime, order.activity.endTime)

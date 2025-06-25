@@ -502,7 +502,7 @@ export default function OrderDetailPage() {
                                 order?.paidExpiredAt || "",
                                 order?.paidExpiredAt || ""
                               ).startDateString
-                            }{" "}
+                            }
                             23:59
                           </div>
                           <div className="text-sm mb-1 text-neutral-600">
