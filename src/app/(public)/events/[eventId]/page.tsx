@@ -339,18 +339,12 @@ export default function EventDetailPage() {
                         />
                       )}
                     </button>
-                    <a
-                      href={organization?.officialSiteUrl ? organization.officialSiteUrl : "#"}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`text-white cursor-pointer ${
-                        organization?.officialSiteUrl ? "" : "opacity-50 pointer-events-none"
-                      }`}
+                    <div
+                      className={"text-white cursor-pointer opacity-50 pointer-events-none"}
                       aria-label="主辦單位官方網站"
-                      aria-disabled={!organization?.officialSiteUrl}
                     >
                       <Facebook />
-                    </a>
+                    </div>
                     <a
                       href={organization?.email ? `mailto:${organization.email}` : "#"}
                       className={`text-white cursor-pointer ${
@@ -606,18 +600,12 @@ export default function EventDetailPage() {
                   />
                 )}
               </button>
-              <a
-                href={organization?.officialSiteUrl ? organization.officialSiteUrl : "#"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`text-white cursor-pointer ${
-                  organization?.officialSiteUrl ? "" : "opacity-50 pointer-events-none"
-                }`}
+              <div
+                className={"text-white cursor-pointer opacity-50 pointer-events-none"}
                 aria-label="主辦單位官方網站"
-                aria-disabled={!organization?.officialSiteUrl}
               >
                 <Facebook />
-              </a>
+              </div>
               <a
                 href={organization?.email ? `mailto:${organization.email}` : "#"}
                 className={`text-white cursor-pointer ${
@@ -644,7 +632,7 @@ export default function EventDetailPage() {
             <div className="flex flex-col items-center gap-2">
               <div className="flex items-center gap-2">
                 <HeartIcon className="w-5 h-5 text-neutral-500" />
-                <span className="text-neutral-500 font-bold"> {eventData?.likeCount ?? 0} 人</span>
+                <span className="text-neutral-500 font-bold">{eventData?.likeCount ?? 0} 人</span>
               </div>
               <span className="text-neutral-500">喜歡這場活動</span>
             </div>

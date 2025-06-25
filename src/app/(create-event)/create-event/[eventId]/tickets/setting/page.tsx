@@ -532,13 +532,10 @@ export default function TicketSettingPage() {
     return parseDateTime(activityData?.endTime);
   }, [activityData]);
 
-  // 獲取明天的日期
-  const tomorrow = useMemo(() => {
-    const now = new Date();
-    const nextDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-    return nextDay;
+  // 獲取今天的日期
+  const todayData = useMemo(() => {
+    return parseDateTime(new Date().toISOString());
   }, []);
-  const tomorrowData = useMemo(() => parseDateTime(tomorrow.toISOString()), [tomorrow]);
 
   const {
     control,
@@ -550,10 +547,10 @@ export default function TicketSettingPage() {
   } = useForm<TicketSettingFormData>({
     resolver: zodResolver(ticketSettingSchema),
     defaultValues: {
-      eventStartDate: tomorrowData?.date || "",
+      eventStartDate: todayData?.date || "",
       eventStartHour: "",
       eventStartMinute: "",
-      eventEndDate: tomorrowData?.date || "",
+      eventEndDate: todayData?.date || "",
       eventEndHour: "",
       eventEndMinute: "",
       tickets: [],
@@ -580,18 +577,18 @@ export default function TicketSettingPage() {
         router.push(result.redirectTo);
       }
 
-      setValue("eventStartDate", startTimeData?.date || tomorrowData?.date || "", {
+      setValue("eventStartDate", startTimeData?.date || todayData?.date || "", {
         shouldTouch: true,
       });
       setValue("eventStartHour", startTimeData?.hour || "");
       setValue("eventStartMinute", startTimeData?.minute || "");
-      setValue("eventEndDate", endTimeData?.date || tomorrowData?.date || "", {
+      setValue("eventEndDate", endTimeData?.date || todayData?.date || "", {
         shouldTouch: true,
       });
       setValue("eventEndHour", endTimeData?.hour || "");
       setValue("eventEndMinute", endTimeData?.minute || "");
     }
-  }, [activityData, startTimeData, endTimeData, tomorrowData]);
+  }, [activityData, startTimeData, endTimeData, todayData]);
 
   // 載入票券資料
   const loadTickets = useCallback(async () => {
@@ -605,7 +602,7 @@ export default function TicketSettingPage() {
         path: { activityId: numericEventId },
       });
 
-      if (!response.error?.status === false) {
+      if (response.error) {
         throw new Error(response.error.message || "載入票券資料失敗，請稍後再試");
       }
 
@@ -643,10 +640,10 @@ export default function TicketSettingPage() {
             quantity: ticket.totalQuantity || 0,
             price: ticket.price || 0,
             isFree: (ticket.price || 0) === 0,
-            saleStartDate: startTime?.date || tomorrowData?.date || "",
+            saleStartDate: startTime?.date || todayData?.date || "",
             saleStartHour: startTime?.hour || "09",
             saleStartMinute: startTime?.minute || "00",
-            saleEndDate: endTime?.date || tomorrowData?.date || "",
+            saleEndDate: endTime?.date || todayData?.date || "",
             saleEndHour: endTime?.hour || "23",
             saleEndMinute: endTime?.minute || "59",
           };
@@ -654,7 +651,7 @@ export default function TicketSettingPage() {
       : [];
 
     setValue("tickets", formTickets);
-  }, [tickets, tomorrowData, setValue]);
+  }, [tickets, todayData, setValue]);
 
   const duplicateTicket = useCallback(
     (index: number) => {
@@ -701,7 +698,7 @@ export default function TicketSettingPage() {
             },
           });
 
-          if (response.error?.status === false) {
+          if (response.error) {
             throw new Error(response.error.message || "刪除票券失敗，請稍後再試");
           }
 
@@ -729,10 +726,10 @@ export default function TicketSettingPage() {
         quantity: 10,
         price: 0,
         isFree: true,
-        saleStartDate: tomorrowData?.date || "",
+        saleStartDate: todayData?.date || "",
         saleStartHour: "0",
         saleStartMinute: "0",
-        saleEndDate: tomorrowData?.date || "",
+        saleEndDate: todayData?.date || "",
         saleEndHour: "23",
         saleEndMinute: "59",
       },
@@ -742,7 +739,7 @@ export default function TicketSettingPage() {
     );
 
     setIsAddingTicket(false);
-  }, [append, isAddingTicket, tomorrowData]);
+  }, [append, isAddingTicket, todayData]);
 
   const addPaidTicket = useCallback(() => {
     if (isAddingTicket) return;
@@ -756,10 +753,10 @@ export default function TicketSettingPage() {
         quantity: 10,
         price: 100,
         isFree: false,
-        saleStartDate: tomorrowData?.date || "",
+        saleStartDate: todayData?.date || "",
         saleStartHour: "0",
         saleStartMinute: "0",
-        saleEndDate: tomorrowData?.date || "",
+        saleEndDate: todayData?.date || "",
         saleEndHour: "23",
         saleEndMinute: "59",
       },
@@ -769,7 +766,7 @@ export default function TicketSettingPage() {
     );
 
     setIsAddingTicket(false);
-  }, [append, isAddingTicket, tomorrowData]);
+  }, [append, isAddingTicket, todayData]);
 
   const handleComplete = useCallback(
     async (data: TicketSettingFormData) => {
@@ -802,7 +799,7 @@ export default function TicketSettingPage() {
           },
         });
 
-        if (basicResponse.error?.status === false) {
+        if (basicResponse.error) {
           throw new Error(basicResponse.error.message || "更新基本資料失敗，請稍後再試");
         }
 
@@ -825,10 +822,14 @@ export default function TicketSettingPage() {
             endTime: combineDateTime(ticket.saleEndDate, ticket.saleEndHour, ticket.saleEndMinute),
           }));
 
-          await postApiV1ActivitiesByActivityIdTicketTypes({
+          const addTickResponse = await postApiV1ActivitiesByActivityIdTicketTypes({
             path: { activityId: numericEventId },
             body: ticketData,
           });
+
+          if (addTickResponse.error) {
+            throw new Error(addTickResponse.error.message || "新增票券失敗，請稍後再試");
+          }
         }
 
         // 3. 處理更新現有票券
@@ -862,7 +863,7 @@ export default function TicketSettingPage() {
               },
             });
 
-            if (ticketResponse.error?.status === false) {
+            if (ticketResponse.error) {
               throw new Error(ticketResponse.error.message || "更新票券失敗，請稍後再試");
             }
           }
@@ -873,7 +874,7 @@ export default function TicketSettingPage() {
           path: { activityId: numericEventId },
         });
 
-        if (publishResponse.error?.status === false) {
+        if (publishResponse.error) {
           throw new Error(publishResponse.error.message || "發布活動失敗，請稍後再試");
         }
 

@@ -532,13 +532,10 @@ export default function TicketSettingPage() {
     return parseDateTime(activityData?.endTime);
   }, [activityData?.endTime]);
 
-  // 獲取明天的日期
-  const tomorrow = useMemo(() => {
-    const now = new Date();
-    const nextDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-    return nextDay;
+  // 獲取今天的日期
+  const todayData = useMemo(() => {
+    return parseDateTime(new Date().toISOString());
   }, []);
-  const tomorrowData = useMemo(() => parseDateTime(tomorrow.toISOString()), [tomorrow]);
 
   const {
     control,
@@ -551,10 +548,10 @@ export default function TicketSettingPage() {
   } = useForm<TicketSettingFormData>({
     resolver: zodResolver(ticketSettingSchema),
     defaultValues: {
-      eventStartDate: tomorrowData?.date || "",
+      eventStartDate: todayData?.date || "",
       eventStartHour: "",
       eventStartMinute: "",
-      eventEndDate: tomorrowData?.date || "",
+      eventEndDate: todayData?.date || "",
       eventEndHour: "",
       eventEndMinute: "",
       tickets: [],
@@ -564,18 +561,18 @@ export default function TicketSettingPage() {
 
   useEffect(() => {
     if (activityData) {
-      setValue("eventStartDate", startTimeData?.date || tomorrowData?.date || "", {
+      setValue("eventStartDate", startTimeData?.date || todayData?.date || "", {
         shouldTouch: true,
       });
       setValue("eventStartHour", startTimeData?.hour || "");
       setValue("eventStartMinute", startTimeData?.minute || "");
-      setValue("eventEndDate", endTimeData?.date || tomorrowData?.date || "", {
+      setValue("eventEndDate", endTimeData?.date || todayData?.date || "", {
         shouldTouch: true,
       });
       setValue("eventEndHour", endTimeData?.hour || "");
       setValue("eventEndMinute", endTimeData?.minute || "");
     }
-  }, [activityData, setValue, startTimeData, endTimeData, tomorrowData]);
+  }, [activityData, setValue, startTimeData, endTimeData, todayData]);
 
   // 載入票券資料
   const loadTickets = useCallback(async () => {
@@ -627,10 +624,10 @@ export default function TicketSettingPage() {
             quantity: ticket.totalQuantity || 0,
             price: ticket.price || 0,
             isFree: (ticket.price || 0) === 0,
-            saleStartDate: startTime?.date || tomorrowData?.date || "",
+            saleStartDate: startTime?.date || todayData?.date || "",
             saleStartHour: startTime?.hour || "09",
             saleStartMinute: startTime?.minute || "00",
-            saleEndDate: endTime?.date || tomorrowData?.date || "",
+            saleEndDate: endTime?.date || todayData?.date || "",
             saleEndHour: endTime?.hour || "23",
             saleEndMinute: endTime?.minute || "59",
           };
@@ -638,7 +635,7 @@ export default function TicketSettingPage() {
       : [];
 
     setValue("tickets", formTickets);
-  }, [tickets, tomorrowData, setValue]);
+  }, [tickets, todayData, setValue]);
 
   const duplicateTicket = useCallback(
     (index: number) => {
@@ -713,10 +710,10 @@ export default function TicketSettingPage() {
         quantity: 10,
         price: 0,
         isFree: true,
-        saleStartDate: tomorrowData?.date || "",
+        saleStartDate: todayData?.date || "",
         saleStartHour: "0",
         saleStartMinute: "0",
-        saleEndDate: tomorrowData?.date || "",
+        saleEndDate: todayData?.date || "",
         saleEndHour: "23",
         saleEndMinute: "59",
       },
@@ -726,7 +723,7 @@ export default function TicketSettingPage() {
     );
 
     setIsAddingTicket(false);
-  }, [append, isAddingTicket, tomorrowData]);
+  }, [append, isAddingTicket, todayData]);
 
   const addPaidTicket = useCallback(() => {
     if (isAddingTicket) return;
@@ -740,10 +737,10 @@ export default function TicketSettingPage() {
         quantity: 10,
         price: 100,
         isFree: false,
-        saleStartDate: tomorrowData?.date || "",
+        saleStartDate: todayData?.date || "",
         saleStartHour: "0",
         saleStartMinute: "0",
-        saleEndDate: tomorrowData?.date || "",
+        saleEndDate: todayData?.date || "",
         saleEndHour: "23",
         saleEndMinute: "59",
       },
@@ -753,7 +750,7 @@ export default function TicketSettingPage() {
     );
 
     setIsAddingTicket(false);
-  }, [append, isAddingTicket, tomorrowData]);
+  }, [append, isAddingTicket, todayData]);
 
   const onSubmit = useCallback(
     async (data: TicketSettingFormData) => {

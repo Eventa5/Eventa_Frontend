@@ -100,7 +100,7 @@ export const FormField = ({
       control={control}
       render={({ field, fieldState: { error, isTouched, isDirty } }) => {
         const baseClassName =
-          "w-full border-gray-300 hover:border-[#FFD56B] focus:border-[#FFD56B]";
+          "w-full bg-white border-gray-300 hover:border-[#FFD56B] focus:border-[#FFD56B]";
 
         const showError = error && (isDirty || isTouched);
 
@@ -152,7 +152,7 @@ export const FormField = ({
                     handleFieldChange(dateValue);
                   }}
                   disabledDates={(date) => {
-                    return date < new Date();
+                    return date < new Date(new Date().setHours(0, 0, 0, 0));
                   }}
                   placeholder={placeholder}
                   className={baseClassName}

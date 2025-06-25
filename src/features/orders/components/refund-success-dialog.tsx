@@ -34,7 +34,7 @@ export default function RefundSuccessDialog({
         <div className="flex flex-col items-center py-4">
           <CheckCircle className="w-20 h-20 text-green-500 mb-4" />
           <DialogDescription className="text-center">
-            您好，您於{activityName ? `「${activityName}」` : "[活動名稱]"}的票券，已於{" "}
+            您好，您於{activityName ? `「${activityName}」` : "[活動名稱]"}的票券，已於
             {cancelTime ?? "[取消活動時間]"} 取消。
             <br />
             有任何問題歡迎前往客服詢問。
