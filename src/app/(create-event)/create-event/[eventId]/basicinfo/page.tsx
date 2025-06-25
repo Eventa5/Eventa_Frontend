@@ -70,7 +70,6 @@ export default function BasicInfoPage() {
 
   // 獲取今天的日期
   const today = new Date();
-  today.setDate(today.getDate() + 1);
   const todayDate = today.toISOString().split("T")[0];
 
   const {
