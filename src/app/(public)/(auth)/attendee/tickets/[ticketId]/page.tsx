@@ -301,7 +301,7 @@ export default function TicketDetailPage() {
             <Separator />
 
             {/* QR Code Section */}
-            {ticket.qrCodeToken && (
+            {ticket.activity?.location && (
               <div className="p-6 bg-gray-50">
                 <div className="text-center space-y-4">
                   <div className="flex items-center justify-center gap-2 text-gray-700">
@@ -313,7 +313,7 @@ export default function TicketDetailPage() {
                     <div className="bg-white p-6 rounded-2xl shadow-sm border-2 border-dashed border-gray-200">
                       <div className="w-40 h-40 bg-white rounded-xl flex items-center justify-center">
                         <QRCodeSVG
-                          value={ticket.qrCodeToken}
+                          value={ticket.id ?? ""}
                           size={160}
                           level="H"
                           className="w-full h-full p-2"
