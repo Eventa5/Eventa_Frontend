@@ -90,10 +90,23 @@ export function QRScanner({
     onClose();
   };
 
+  // 當對話框打開時重置狀態
+  const handleDialogOpenChange = (open: boolean) => {
+    if (open) {
+      // 對話框打開時重置狀態
+      setError("");
+      setIsScanning(true);
+      setManualInput("");
+    } else {
+      // 對話框關閉時清理狀態
+      handleClose();
+    }
+  };
+
   return (
     <Dialog
       open={isOpen}
-      onOpenChange={handleClose}
+      onOpenChange={handleDialogOpenChange}
     >
       <DialogContent className="max-w-lg mx-auto w-[95vw] p-0">
         <DialogHeader className="p-3 pb-0">
@@ -117,67 +130,76 @@ export function QRScanner({
                 重試掃描
               </Button>
             </div>
-          ) : (
+          ) : isScanning ? (
             <>
               {/* QR Code 掃描器 */}
-              {isScanning && (
-                <div className="relative bg-gray-900 rounded-xl overflow-hidden">
-                  {/* 掃描器容器 - 響應式高度 */}
-                  <div className="aspect-[4/3] sm:aspect-video relative">
-                    <Scanner
-                      onScan={handleScan}
-                      onError={handleError}
-                      styles={{
-                        container: {
-                          width: "100%",
-                          height: "100%",
-                          borderRadius: "0.75rem",
-                        },
-                      }}
-                      constraints={{
-                        facingMode: "environment",
-                      }}
-                    />
+              <div className="relative bg-gray-900 rounded-xl overflow-hidden">
+                {/* 掃描器容器 - 響應式高度 */}
+                <div className="aspect-[4/3] sm:aspect-video relative">
+                  <Scanner
+                    onScan={handleScan}
+                    onError={handleError}
+                    styles={{
+                      container: {
+                        width: "100%",
+                        height: "100%",
+                        borderRadius: "0.75rem",
+                      },
+                    }}
+                    constraints={{
+                      facingMode: "environment",
+                    }}
+                  />
 
-                    {/* 掃描框覆層 */}
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      {/* 掃描區域指示 */}
-                      <div className="relative">
-                        {/* 外圍虛線框 */}
-                        <div className="w-64 h-64 sm:w-72 sm:h-72 border-2 border-white/30 border-dashed rounded-2xl" />
+                  {/* 掃描框覆層 */}
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    {/* 掃描區域指示 */}
+                    <div className="relative">
+                      {/* 外圍虛線框 */}
+                      <div className="w-64 h-64 sm:w-72 sm:h-72 border-2 border-white/30 border-dashed rounded-2xl" />
 
-                        {/* 內部掃描框 */}
-                        <div className="absolute inset-6 border-2 border-blue-500 rounded-xl">
-                          {/* 四個角落的掃描指示器 */}
-                          <div className="absolute -top-1 -left-1 w-6 h-6 border-t-4 border-l-4 border-blue-500 rounded-tl-lg" />
-                          <div className="absolute -top-1 -right-1 w-6 h-6 border-t-4 border-r-4 border-blue-500 rounded-tr-lg" />
-                          <div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-4 border-l-4 border-blue-500 rounded-bl-lg" />
-                          <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-4 border-r-4 border-blue-500 rounded-br-lg" />
+                      {/* 內部掃描框 */}
+                      <div className="absolute inset-6 border-2 border-blue-500 rounded-xl">
+                        {/* 四個角落的掃描指示器 */}
+                        <div className="absolute -top-1 -left-1 w-6 h-6 border-t-4 border-l-4 border-blue-500 rounded-tl-lg" />
+                        <div className="absolute -top-1 -right-1 w-6 h-6 border-t-4 border-r-4 border-blue-500 rounded-tr-lg" />
+                        <div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-4 border-l-4 border-blue-500 rounded-bl-lg" />
+                        <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-4 border-r-4 border-blue-500 rounded-br-lg" />
 
-                          {/* 掃描線動畫 */}
-                          <div className="absolute inset-0 overflow-hidden rounded-lg">
-                            <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent animate-pulse" />
-                          </div>
+                        {/* 掃描線動畫 */}
+                        <div className="absolute inset-0 overflow-hidden rounded-lg">
+                          <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent animate-pulse" />
                         </div>
                       </div>
                     </div>
+                  </div>
 
-                    {/* 狀態指示 */}
-                    <div className="absolute top-4 left-4 bg-green-500/90 backdrop-blur-sm text-white px-3 py-2 rounded-full text-sm font-medium shadow-lg">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                        掃描中...
-                      </div>
-                    </div>
-
-                    {/* 使用提示 */}
-                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 backdrop-blur-sm text-white px-4 py-2 rounded-full text-xs sm:text-sm text-center max-w-xs">
-                      將 QR Code 對準中央掃描框
+                  {/* 狀態指示 */}
+                  <div className="absolute top-4 left-4 bg-green-500/90 backdrop-blur-sm text-white px-3 py-2 rounded-full text-sm font-medium shadow-lg">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                      掃描中...
                     </div>
                   </div>
+
+                  {/* 使用提示 */}
+                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 backdrop-blur-sm text-white px-4 py-2 rounded-full text-xs sm:text-sm text-center max-w-xs">
+                    將 QR Code 對準中央掃描框
+                  </div>
                 </div>
-              )}
+              </div>
             </>
+          ) : (
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center">
+              <p className="text-gray-600 text-sm font-medium mb-4">掃描器未啟動</p>
+              <Button
+                onClick={restartScanning}
+                variant="outline"
+                className="text-gray-700 border-gray-300 hover:bg-gray-100 transition-colors duration-200"
+              >
+                開始掃描
+              </Button>
+            </div>
           )}
 
           {/* 手動輸入選項 */}
@@ -196,7 +218,7 @@ export function QRScanner({
                 value={manualInput}
                 onChange={(e) => setManualInput(e.target.value)}
                 placeholder="請輸入票券編號"
-                className="text-sm md:text-base shrink-0"
+                className="text-sm md:text-base shrink-0 sm:flex-1"
               />
               <Button
                 onClick={handleManualSubmit}

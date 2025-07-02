@@ -84,7 +84,7 @@ export default function AttendeesPage() {
         setTotalPages(response.data.pagination?.totalPages || 1);
       }
     } catch (error) {
-      console.error("載入參與者資料失敗:", error);
+      toast.error("載入參與者資料失敗，請稍後再試");
     } finally {
       setLoading(false);
     }
@@ -122,7 +122,6 @@ export default function AttendeesPage() {
       // 重新載入參與者資料
       await loadParticipants(currentPage);
     } catch (error) {
-      console.error("報到失敗:", error);
       const errorMessage = error instanceof Error ? error.message : "報到失敗，請稍後再試";
       toast.error(errorMessage);
     }
