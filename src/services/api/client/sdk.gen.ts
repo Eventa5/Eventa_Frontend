@@ -91,6 +91,9 @@ import type {
   PatchApiV1TicketsByTicketIdUsedData,
   PatchApiV1TicketsByTicketIdUsedError,
   PatchApiV1TicketsByTicketIdUsedResponse,
+  PostApiV1ActivitiesByActivityIdContentImageData,
+  PostApiV1ActivitiesByActivityIdContentImageError,
+  PostApiV1ActivitiesByActivityIdContentImageResponse,
   PostApiV1ActivitiesByActivityIdCoverData,
   PostApiV1ActivitiesByActivityIdCoverError,
   PostApiV1ActivitiesByActivityIdCoverResponse,
@@ -647,6 +650,34 @@ export const patchApiV1ActivitiesByActivityIdContent = <ThrowOnError extends boo
     ...options,
     headers: {
       "Content-Type": "application/json",
+      ...options?.headers,
+    },
+  });
+};
+
+/**
+ * 上傳活動內容圖片
+ * 上傳活動內容圖片，照片大小限制4MB內，回傳圖片 url
+ */
+export const postApiV1ActivitiesByActivityIdContentImage = <ThrowOnError extends boolean = false>(
+  options: Options<PostApiV1ActivitiesByActivityIdContentImageData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).post<
+    PostApiV1ActivitiesByActivityIdContentImageResponse,
+    PostApiV1ActivitiesByActivityIdContentImageError,
+    ThrowOnError
+  >({
+    ...formDataBodySerializer,
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/v1/activities/{activityId}/content/image",
+    ...options,
+    headers: {
+      "Content-Type": null,
       ...options?.headers,
     },
   });

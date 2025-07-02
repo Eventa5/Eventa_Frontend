@@ -1,5 +1,5 @@
 export default {
-  input: "https://eventa-backend-testing.onrender.com/api/docs/swagger.json",
+  input: "https://eventa-backend-pgun.onrender.com/api/docs/swagger.json",
   output: "src/services/api/client",
   plugins: [
     {
