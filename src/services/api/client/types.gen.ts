@@ -133,7 +133,7 @@ export type FavoriteActivityResponse = {
 };
 
 export type GetParticipantResponse = {
-  id?: number;
+  id?: string;
   orderId?: string;
   status?: string;
   assignedName?: string;
@@ -1007,14 +1007,6 @@ export type TicketTypeRequestSchema = {
    * 開賣結束時間，格式為 ISO 8601
    */
   endTime: string;
-  /**
-   * 特殊開賣時間，格式為 ISO 8601
-   */
-  saleStartAt?: string | null;
-  /**
-   * 特殊開賣結束時間，格式為 ISO 8601
-   */
-  saleEndAt?: string | null;
   /**
    * 是否為活動中
    */
@@ -2072,6 +2064,61 @@ export type PatchApiV1ActivitiesByActivityIdContentResponses = {
 
 export type PatchApiV1ActivitiesByActivityIdContentResponse =
   PatchApiV1ActivitiesByActivityIdContentResponses[keyof PatchApiV1ActivitiesByActivityIdContentResponses];
+
+export type PostApiV1ActivitiesByActivityIdContentImageData = {
+  body: {
+    /**
+     * 使用者上傳的圖片檔案，僅接受 image*
+     */
+    image?: Blob | File;
+  };
+  path: {
+    /**
+     * 活動 ID
+     */
+    activityId: number;
+  };
+  query?: never;
+  url: "/api/v1/activities/{activityId}/content/image";
+};
+
+export type PostApiV1ActivitiesByActivityIdContentImageErrors = {
+  /**
+   * 錯誤的請求，例如沒有圖片、圖片上傳失敗等
+   */
+  400: ErrorResponse;
+  /**
+   * 未授權
+   */
+  401: ErrorResponse;
+  /**
+   * 無權限，非主辦單位成員
+   */
+  403: ErrorResponse;
+  /**
+   * 活動不存在
+   */
+  404: ErrorResponse;
+};
+
+export type PostApiV1ActivitiesByActivityIdContentImageError =
+  PostApiV1ActivitiesByActivityIdContentImageErrors[keyof PostApiV1ActivitiesByActivityIdContentImageErrors];
+
+export type PostApiV1ActivitiesByActivityIdContentImageResponses = {
+  /**
+   * 上傳成功
+   */
+  200: {
+    message?: string;
+    status?: boolean;
+    data?: {
+      url?: string;
+    };
+  };
+};
+
+export type PostApiV1ActivitiesByActivityIdContentImageResponse =
+  PostApiV1ActivitiesByActivityIdContentImageResponses[keyof PostApiV1ActivitiesByActivityIdContentImageResponses];
 
 export type PatchApiV1ActivitiesByActivityIdPublishData = {
   body?: never;
