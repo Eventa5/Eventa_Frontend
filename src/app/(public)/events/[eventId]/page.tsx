@@ -422,51 +422,53 @@ export default function EventDetailPage() {
           </section>
 
           {/* 活動地圖區塊 */}
-          <section className="flex lg:flex-row flex-col gap-0 lg:gap-8">
-            <div className="hidden lg:flex flex-col items-start">
-              <div className="flex flex-col items-center gap-4">
+          {!eventData?.isOnline && (
+            <section className="flex lg:flex-row flex-col gap-0 lg:gap-8">
+              <div className="hidden lg:flex flex-col items-start">
+                <div className="flex flex-col items-center gap-4">
+                  <Image
+                    src="/images/balloon.png"
+                    alt="Ballon Yellow"
+                    width={24}
+                    height={48}
+                  />
+                  <h2 className="font-bold font-serif-tc [writing-mode:vertical-lr] tracking-[6px] text-[20px] text-neutral-800">
+                    活動地圖
+                  </h2>
+                </div>
+              </div>
+              {/* 手機版活動地圖標題 */}
+              <div className="flex items-end justify-center gap-8 mb-6 lg:hidden">
+                <span className="font-bold font-serif-tc text-3xl lg:text-2xl text-neutral-800">
+                  活動
+                </span>
                 <Image
                   src="/images/balloon.png"
                   alt="Ballon Yellow"
-                  width={24}
-                  height={48}
+                  width={32}
+                  height={32}
+                  className="mx-2"
                 />
-                <h2 className="font-bold font-serif-tc [writing-mode:vertical-lr] tracking-[6px] text-[20px] text-neutral-800">
-                  活動地圖
-                </h2>
+                <span className="font-bold font-serif-tc text-3xl lg:text-2xl text-neutral-800">
+                  地圖
+                </span>
               </div>
-            </div>
-            {/* 手機版活動地圖標題 */}
-            <div className="flex items-end justify-center gap-8 mb-6 lg:hidden">
-              <span className="font-bold font-serif-tc text-3xl lg:text-2xl text-neutral-800">
-                活動
-              </span>
-              <Image
-                src="/images/balloon.png"
-                alt="Ballon Yellow"
-                width={32}
-                height={32}
-                className="mx-2"
-              />
-              <span className="font-bold font-serif-tc text-3xl lg:text-2xl text-neutral-800">
-                地圖
-              </span>
-            </div>
-            <div className="w-full max-w-[845px] rounded-[16px] overflow-hidden mt-0 lg:mt-16">
-              <iframe
-                title="活動地圖"
-                width="100%"
-                height="309"
-                style={{ border: 0 }}
-                loading="lazy"
-                allowFullScreen
-                referrerPolicy="no-referrer-when-downgrade"
-                src={`https://www.google.com/maps?q=${encodeURIComponent(
-                  eventLocation
-                )}&output=embed`}
-              />
-            </div>
-          </section>
+              <div className="w-full max-w-[845px] rounded-[16px] overflow-hidden mt-0 lg:mt-16">
+                <iframe
+                  title="活動地圖"
+                  width="100%"
+                  height="309"
+                  style={{ border: 0 }}
+                  loading="lazy"
+                  allowFullScreen
+                  referrerPolicy="no-referrer-when-downgrade"
+                  src={`https://www.google.com/maps?q=${encodeURIComponent(
+                    eventLocation
+                  )}&output=embed`}
+                />
+              </div>
+            </section>
+          )}
 
           {/* 活動簡介區塊 */}
           <section className="flex flex-col lg:flex-row gap-0 lg:gap-8">
@@ -521,7 +523,18 @@ export default function EventDetailPage() {
 
                     // 使用 DOMPurify 清理 HTML，並允許 target 和 rel 屬性
                     return DOMPurify.sanitize(tempDiv.innerHTML, {
-                      ALLOWED_ATTR: ["href", "target", "rel", "class", "id", "style"],
+                      ALLOWED_ATTR: [
+                        "href",
+                        "target",
+                        "rel",
+                        "class",
+                        "id",
+                        "style",
+                        "src",
+                        "alt",
+                        "width",
+                        "height",
+                      ],
                       ALLOWED_TAGS: [
                         "a",
                         "p",
