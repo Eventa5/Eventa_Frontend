@@ -2,6 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { QRScanner } from "@/components/ui/qr-scanner";
 import {
   Select,
   SelectContent,
@@ -15,7 +16,7 @@ import {
 } from "@/services/api/client/sdk.gen";
 import type { GetParticipantResponse } from "@/services/api/client/types.gen";
 import { cn } from "@/utils/transformer";
-import { CheckCircle, Users } from "lucide-react";
+import { CheckCircle, QrCode, Users } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -66,6 +67,7 @@ export default function AttendeesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [limit, setLimit] = useState(20);
+  const [isQRScannerOpen, setIsQRScannerOpen] = useState(false);
 
   // 載入參與者資料
   const loadParticipants = async (page = 1, pageLimit = limit) => {
@@ -82,9 +84,19 @@ export default function AttendeesPage() {
         setTotalPages(response.data.pagination?.totalPages || 1);
       }
     } catch (error) {
-      console.error("載入參與者資料失敗:", error);
+      toast.error("載入參與者資料失敗，請稍後再試");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // QR Code 掃描處理
+  const handleQRScan = async (ticketId: string) => {
+    try {
+      // 直接呼叫報到 API，讓後端檢核
+      await handleCheckIn(ticketId, "參與者");
+    } catch (error) {
+      toast.error("QR Code 報到失敗，請稍後再試");
     }
   };
 
@@ -93,11 +105,11 @@ export default function AttendeesPage() {
     loadParticipants(currentPage);
   };
   // 處理報到功能
-  const handleCheckIn = async (ticketId: number, participantName: string) => {
+  const handleCheckIn = async (ticketId: string, participantName: string) => {
     try {
       // 調用報到 API
       const response = await patchApiV1TicketsByTicketIdUsed({
-        path: { ticketId: ticketId.toString() },
+        path: { ticketId: ticketId },
       });
 
       if (response.error) {
@@ -110,7 +122,6 @@ export default function AttendeesPage() {
       // 重新載入參與者資料
       await loadParticipants(currentPage);
     } catch (error) {
-      console.error("報到失敗:", error);
       const errorMessage = error instanceof Error ? error.message : "報到失敗，請稍後再試";
       toast.error(errorMessage);
     }
@@ -131,7 +142,15 @@ export default function AttendeesPage() {
         {/* 操作區域 */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
           <div className="flex flex-wrap md:flex-nowrap justify-between items-center gap-3">
-            <h2 className="text-lg font-semibold text-gray-900 w-full md:w-auto">參與者管理</h2>
+            <div className="flex justify-between items-center gap-3 w-full md:w-auto">
+              <h2 className="text-lg font-semibold text-gray-900">參與者管理</h2>
+              <Button
+                onClick={() => setIsQRScannerOpen(true)}
+                className="bg-blue-600 hover:bg-blue-700 text-white duration-200 active:scale-95 cursor-pointer rounded-md flex items-center gap-2 md:hidden"
+              >
+                <QrCode className="w-4 h-4" />
+              </Button>
+            </div>
             <div className="flex w-full md:w-auto justify-end md:justify-center items-center gap-3">
               {/* 每頁筆數選擇 */}
               <div className="flex items-center gap-2">
@@ -155,12 +174,21 @@ export default function AttendeesPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <Button
-                onClick={handleRefresh}
-                className="bg-primary-500 hover:saturate-150 text-neutral-800 duration-200 active:scale-95 cursor-pointer rounded-md flex-grow md:flex-grow-0"
-              >
-                重新搜尋
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => setIsQRScannerOpen(true)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white duration-200 active:scale-95 cursor-pointer rounded-md items-center gap-2 hidden md:flex"
+                >
+                  <QrCode className="w-4 h-4" />
+                  掃描報到
+                </Button>
+                <Button
+                  onClick={handleRefresh}
+                  className="bg-primary-500 hover:saturate-150 text-neutral-800 duration-200 active:scale-95 cursor-pointer rounded-md flex-grow md:flex-grow-0"
+                >
+                  重新搜尋
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -246,7 +274,7 @@ export default function AttendeesPage() {
                               size="sm"
                               onClick={() =>
                                 handleCheckIn(
-                                  participant.id || 0,
+                                  participant.id || "",
                                   participant.assignedName || "參與者"
                                 )
                               }
@@ -347,7 +375,7 @@ export default function AttendeesPage() {
                             size="sm"
                             onClick={() =>
                               handleCheckIn(
-                                participant.id || 0,
+                                participant.id || "",
                                 participant.assignedName || "參與者"
                               )
                             }
@@ -406,6 +434,15 @@ export default function AttendeesPage() {
             </Button>
           </div>
         </div>
+
+        {/* QR Code 掃描器 */}
+        <QRScanner
+          isOpen={isQRScannerOpen}
+          onClose={() => setIsQRScannerOpen(false)}
+          onScan={handleQRScan}
+          title="掃描票券 QR Code"
+          description="將票券上的 QR Code 對準攝影機進行報到"
+        />
       </div>
     </div>
   );

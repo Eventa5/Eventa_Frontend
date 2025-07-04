@@ -138,7 +138,12 @@ export default function IntroPage() {
         // 跳轉到下一步
         router.push(`/create-event/${eventId}/tickets/setting`);
       } catch (error) {
-        handleError(error);
+        // 檢查是否為 TypeError: Failed to fetch（413 Payload Too Large）
+        if (error instanceof TypeError && error.message === "Failed to fetch") {
+          showError("活動內容過大，請減少圖片數量或圖片大小後再試");
+        } else {
+          handleError(error);
+        }
       } finally {
         setIsUpdating(false);
       }
@@ -212,6 +217,7 @@ export default function IntroPage() {
                       height={500}
                       placeholder="請詳細描述您的活動內容、規則和相關資訊..."
                       className="focus-within:border-[#FFD56B]"
+                      activityId={Number.parseInt(eventId)}
                     />
                     {showError && <p className="text-sm text-red-500 mt-1">{error.message}</p>}
                   </div>

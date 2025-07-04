@@ -11,6 +11,8 @@ import {
   useState,
 } from "react";
 import "quill/dist/quill.snow.css";
+import { postApiV1ActivitiesByActivityIdContentImage } from "@/services/api/client/sdk.gen";
+import { useErrorHandler } from "@/utils/error-handler";
 import { cn } from "@/utils/transformer";
 import type { Delta, EmitterSource, QuillOptions, Range } from "quill";
 
@@ -27,6 +29,7 @@ export interface QuillEditorProps {
   disabled?: boolean;
   height?: string | number;
   placeholder?: string;
+  activityId?: number;
 }
 
 // 編輯器實例方法介面
@@ -105,6 +108,7 @@ const QuillEditor = forwardRef<QuillEditorRef, QuillEditorProps>(
       disabled = false,
       height = "300px",
       placeholder = "請輸入內容...",
+      activityId,
     },
     ref
   ) => {
@@ -112,19 +116,128 @@ const QuillEditor = forwardRef<QuillEditorRef, QuillEditorProps>(
     const quillRef = useRef<Quill | null>(null);
     const [isReady, setIsReady] = useState(false);
     const isInitializingRef = useRef(false);
+    const { handleError } = useErrorHandler();
+
+    // 圖片上傳處理函數
+    const imageHandler = useCallback(async () => {
+      if (!activityId || !quillRef.current) {
+        console.warn("無法上傳圖片：缺少活動 ID 或編輯器實例");
+        return;
+      }
+
+      // 創建文件選擇器
+      const input = document.createElement("input");
+      input.setAttribute("type", "file");
+      input.setAttribute("accept", "image/*");
+      input.click();
+
+      input.onchange = async () => {
+        const file = input.files?.[0];
+        if (!file || !quillRef.current) return;
+
+        // 檢查文件大小 (4MB 限制)
+        const maxSize = 4 * 1024 * 1024; // 4MB
+        if (file.size > maxSize) {
+          handleError(new Error("圖片大小不能超過 4MB"), { updateStoreError: false });
+          return;
+        }
+
+        // 檢查文件類型
+        if (!file.type.startsWith("image/")) {
+          handleError(new Error("請選擇圖片"), { updateStoreError: false });
+          return;
+        }
+
+        try {
+          // 獲取當前游標位置
+          const range = quillRef.current.getSelection(true);
+          const index = range ? range.index : quillRef.current.getLength();
+
+          // 插入載入佔位符
+          quillRef.current.insertText(index, "圖片上傳中...", "user");
+
+          // 上傳圖片
+          const response = await postApiV1ActivitiesByActivityIdContentImage({
+            path: { activityId },
+            body: { image: file },
+          });
+
+          // 檢查回傳是否成功
+          if (response.error) {
+            throw new Error(response.error.message || "圖片上傳失敗");
+          }
+
+          const imageUrl = response.data?.data?.url;
+          if (!imageUrl) {
+            throw new Error("圖片上傳成功但未獲得圖片網址");
+          }
+
+          // 移除載入佔位符並插入圖片
+          quillRef.current.deleteText(index, "圖片上傳中...".length);
+          quillRef.current.insertEmbed(index, "image", imageUrl, "user");
+
+          // 將游標移到圖片後面
+          quillRef.current.setSelection(index + 1);
+        } catch (error) {
+          console.error("圖片上傳失敗:", error);
+
+          // 移除載入佔位符
+          const currentText = quillRef.current.getText();
+          const loadingTextIndex = currentText.indexOf("圖片上傳中...");
+          if (loadingTextIndex !== -1) {
+            quillRef.current.deleteText(loadingTextIndex, "圖片上傳中...".length);
+          }
+
+          // 顯示錯誤訊息
+          let errorMessage = "圖片上傳失敗";
+          if (error instanceof Error) {
+            if (error.message.includes("413") || error.message.includes("Payload Too Large")) {
+              errorMessage = "圖片檔案過大，請選擇較小的圖片";
+            } else if (error.message.includes("CORS")) {
+              errorMessage = "網路連線問題，請稍後再試";
+            } else {
+              errorMessage = error.message;
+            }
+          }
+          handleError(new Error(errorMessage), { updateStoreError: false });
+        }
+      };
+    }, [activityId, handleError]);
 
     // 合併配置
     const mergedConfig: QuillOptions = useMemo(() => {
+      const baseModules = {
+        ...defaultConfig.modules,
+        ...config.modules,
+      };
+
+      // 如果有活動ID，設置自定義圖片處理器
+      if (activityId) {
+        const toolbarHandlers = {
+          image: imageHandler,
+        };
+
+        return {
+          ...defaultConfig,
+          ...config,
+          placeholder: config.placeholder || placeholder,
+          modules: {
+            ...baseModules,
+            toolbar: {
+              container: baseModules.toolbar,
+              handlers: toolbarHandlers,
+            },
+          },
+        };
+      }
+
       return {
         ...defaultConfig,
         ...config,
         placeholder: config.placeholder || placeholder,
-        modules: {
-          ...defaultConfig.modules,
-          ...config.modules,
-        },
+        modules: baseModules,
       };
-    }, [config, placeholder]);
+    }, [config, placeholder, activityId, imageHandler]);
 
     // 清理函數
     const cleanupQuill = useCallback(() => {
